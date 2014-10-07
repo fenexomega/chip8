@@ -42,7 +42,7 @@ bool Chip8::InitSystems()
     // Clear memory
     // Load fontset
     for(int i = 0; i < 80; ++i)
-        memory[i] = chip8_fontset[i];
+//        memory[i] = chip8_fontset[i];
 
     return InitGraphics() & InitSound() & InitInput();
 
@@ -61,4 +61,16 @@ void Chip8::drawGraphics()
 void Chip8::setKeys()
 {
 
+}
+
+bool Chip8::loadGame(const char *gamename)
+{
+    dPrint("Loading " << gamename);
+    ifstream Game(gamename,ios::in | ios::binary);
+    //Para CONTINUAR https://stackoverflow.com/questions/18816126/c-read-the-whole-file-in-buffer
+    if(!Game.is_open())
+    {
+        dPrint("Erro at opening game file. Exiting!");
+        return false;
+    }
 }

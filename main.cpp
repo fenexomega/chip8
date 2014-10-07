@@ -7,9 +7,11 @@ using namespace std;
 
 Chip8 myChip8;
 
-int main()
+int main(int argc, char **argv)
 {
     myChip8.InitSystems();
+
+    myChip8.loadGame(argv[1]);
 
     while(true)
     {
