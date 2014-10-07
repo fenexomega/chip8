@@ -13,11 +13,11 @@ int main(int argc, char **argv)
 
     myChip8.loadGame(argv[1]);
 
-    while(true)
+    while(!myChip8.WantToExit())
     {
         // Emulate one cycle
         myChip8.EmulateCycle();
-
+        SDL_Delay(1000/60);
         // If the draw flag is set, update the screen
         if(myChip8.getDrawFlag())
             myChip8.drawGraphics();
@@ -26,6 +26,7 @@ int main(int argc, char **argv)
         myChip8.setKeys();
     }
 
+    myChip8.Dispose();
     return 0;
 }
 

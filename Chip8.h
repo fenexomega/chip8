@@ -2,7 +2,8 @@
 #define CHIP8_H
 #include <iostream>
 #include <fstream>
-
+#include <SDL2/SDL.h>
+#include <vector>
 
 #define dPrint(x) std::cout << x << std::endl
 
@@ -27,6 +28,13 @@ private:
     bool InitGraphics();
     bool InitSound();
     bool InitInput();
+
+    //Coisas do SDL2
+    SDL_Window *window;
+    SDL_Renderer *rend;
+
+    SDL_Event event;
+
 public:
     Chip8();
     bool InitSystems();
@@ -36,6 +44,9 @@ public:
     bool loadGame(const char *gamename);
     bool getDrawFlag() const;
     void setDrawFlag(bool value);
+    void Dispose();
+    bool WantToExit();
+    void Update();
 };
 
 #endif // CHIP8_H
