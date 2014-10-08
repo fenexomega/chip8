@@ -80,6 +80,7 @@ bool Chip8::InitSystems()
 
 void Chip8::EmulateCycle()
 {
+    SDL_Delay(1000/60);
 
 }
 
@@ -111,7 +112,7 @@ bool Chip8::loadGame(const char *gamename)
     vector<char> memoryChucks(4000);
     if(Game.read(memoryChucks.data(),4000))
     {
-//        cout << memoryChucks.data() << endl;
+        cout << memoryChucks.data() << endl;
     }
 
 }
