@@ -93,7 +93,7 @@ void Chip8::emulateCycle()
 
 void Chip8::drawGraphics()
 {
-    Update();
+    update();
     SDL_SetRenderDrawColor(sdl_->rend,0,0,0,1);
     SDL_RenderClear(sdl_->rend);
     // Renderizar Coisas do Emulador
@@ -132,6 +132,6 @@ void Chip8::executeOpcode()
 {
     opcode_ = (memory_[pc] & 0x0000)
 
-
+    
 
 }
