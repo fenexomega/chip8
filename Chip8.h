@@ -15,6 +15,7 @@ public:
     Chip8();
     bool initSystems();
     void emulateCycle();
+    void executeOpcode();
     void drawGraphics();
     void setKeys();
     bool loadGame(const char *gamename);

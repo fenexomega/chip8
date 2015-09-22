@@ -123,3 +123,15 @@ bool Chip8::loadGame(const char *gamename)
     }
 
 }
+
+
+
+
+
+void Chip8::executeOpcode()
+{
+    opcode_ = (memory_[pc] & 0x0000)
+
+
+
+}
