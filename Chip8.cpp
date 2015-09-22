@@ -1,70 +1,77 @@
 #include "Chip8.h"
 
 
+
+Chip8::Chip8()
+{
+
+
+
+
+}
+
 bool Chip8::getDrawFlag() const
 {
-    return drawFlag;
+    return drawFlag_;
 }
 
 void Chip8::setDrawFlag(bool value)
 {
-    drawFlag = value;
+    drawFlag_ = value;
 }
 
-void Chip8::Dispose()
+void Chip8::dispose()
 {
-    SDL_DestroyRenderer(rend);
-    SDL_DestroyWindow(window);
+    SDL_DestroyRenderer(screen_->rend);
+    SDL_DestroyWindow(screen_->window);
     SDL_Quit();
 }
 
-bool Chip8::WantToExit()
+bool Chip8::wantToExit()
 {
-    return event.type == SDL_QUIT;
+    return sdl_->event.type == SDL_QUIT;
 }
 
-void Chip8::Update()
+void Chip8::update()
 {
-    SDL_PollEvent(&event);
+    SDL_PollEvent(&sdl_->event);
 }
 
-bool Chip8::InitGraphics()
+bool Chip8::initGraphics()
 {
-    drawFlag = true;
-    if(SDL_Init(SDL_INIT_EVERYTHING))
+    drawFlag_ = true;
+    if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
     {
         dPrint("Couldn't start the application: " << SDL_GetError());
         return false;
     }
-    window = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,800,600,SDL_WINDOW_RESIZABLE);
-    rend = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
+    sdl_->window_ = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,800,600,SDL_WINDOW_RESIZABLE);
+    sdl_->rend_ = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
+    
     if(window == NULL || rend == NULL)
         return false;
-    SDL_SetRenderDrawBlendMode(rend,SDL_BLENDMODE_BLEND);
+    
+    SDL_SetRenderDrawBlendMode(sdl_->rend,SDL_BLENDMODE_BLEND);
 
     return true;
 }
 
-bool Chip8::InitSound()
+bool Chip8::initSound()
 {
 
 }
 
-bool Chip8::InitInput()
+bool Chip8::initInput()
 {
 
 }
 
-Chip8::Chip8()
+bool Chip8::initSystems()
 {
-}
-
-bool Chip8::InitSystems()
-{
-    pc     = 0x200;  // Program counter starts at 0x200
-    opcode = 0;      // Reset current opcode
-    I      = 0;      // Reset index register
-    sp     = 0;      // Reset stack pointer
+    pc_     = 0x200;  // Program counter starts at 0x200
+    opcode_ = 0;      // Reset current opcode
+    I_      = 0;      // Reset index register
+    sp_     = 0;      // Reset stack pointer
 
     // Clear display
     // Clear stack
@@ -74,11 +81,11 @@ bool Chip8::InitSystems()
     for(int i = 0; i < 80; ++i)
         //        memory[i] = chip8_fontset[i];
 
-        return InitGraphics() & InitSound() & InitInput();
+        return initGraphics() & initSound() & initInput();
 
 }
 
-void Chip8::EmulateCycle()
+void Chip8::emulateCycle()
 {
     SDL_Delay(1000/60);
 
@@ -87,11 +94,11 @@ void Chip8::EmulateCycle()
 void Chip8::drawGraphics()
 {
     Update();
-    SDL_SetRenderDrawColor(rend,0,0,0,1);
-    SDL_RenderClear(rend);
+    SDL_SetRenderDrawColor(sdl_->rend,0,0,0,1);
+    SDL_RenderClear(sdl_->rend);
     // Renderizar Coisas do Emulador
 
-    SDL_RenderPresent(rend);
+    SDL_RenderPresent(sdl_->rend);
 }
 
 void Chip8::setKeys()

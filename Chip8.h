@@ -23,7 +23,7 @@ public:
     void dispose();
     bool wantToExit();
     void update();
-
+    ~Chip8();
 private:
     bool drawFlag_;
     unsigned short opcode_;
@@ -32,8 +32,8 @@ private:
     unsigned short I_;
     unsigned short p_c;
     unsigned char gfx_[64 * 32];
-    unsigned char delayTimer;
-    unsigned char soundTimer;
+    unsigned char delayTimer_;
+    unsigned char soundTimer_;
     unsigned short stack_[16];
     unsigned short sp_;
     unsigned char key_[16];
@@ -44,12 +44,12 @@ private:
 
     //Coisas do SDL2
 	struct 
-	{
-    	SDL_Window *window;
-    	SDL_Renderer *rend;
-		SDL_Event event;
+    {
+        SDL_Window *window;
+        SDL_Renderer *rend;
+        SDL_Event event;
 	
-	} screen_;
+    }sdl_;
 
 
 };
