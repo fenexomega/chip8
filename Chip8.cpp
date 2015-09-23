@@ -130,8 +130,75 @@ bool Chip8::loadGame(const char *gamename)
 
 void Chip8::executeOpcode()
 {
-    opcode_ = (memory_[pc] & 0x0000)
+	opcode_ = ( memory_[ pc ] << 8 | memory_[ pc + 1 ] );
+	
+    pc_ += 2;
 
+	// NNN: address
+	// NN: 8 bit constant
+	// N: 4 bit constant
+	// X and Y: (4-bit value) register identifier
+
+
+
+	switch( opcode_ & 0xf000 )
+	{
+		
+		case 0x0000:
+			switch( opcode_ )
+			{
+				case 0x0000: // 0NNN " calls RCA 1802 program at address NNN. not necessary for most ROMs. "
+					break;
+
+
+
+				case 0x00E0: // clear screen
+					break;
+
+
+
+				case 0x00EE: // return from a subrotine ( unwind stack )
+					break;
+
+			}
+		
+		
+
+		case 0x1000: // 1NNN:  jumps to address NNN
+			break;
+	
+
+		case 0x2000: // 2NNN: Calls subrotine at address NNN
+			break;
+
+
+		case 0x3000: // 3XNN: Skips the next instruction if VX equals NN
+			if ( V_[ opcode_ & 0x0f00 ] == (opcode_ & 0x00ff ) )
+                pc += 2;
+
+            break;
+
+
+
+        case 0x4000: // 4XNN: Skips the next instruction if VX doesn't equal NN
+            if ( V_ [ opcode_ & 0x0f00 ] != ( opcode_ & 0x00ff ) )
+                pc += 2;
+
+            break;
+
+
+        case 0x5000: // 5XY0: Skips the next instruction if VX equals VY
+            if ( V_ [ opcode_ & 0x0f00 ] == V_ [ opcode_ & 0x00f0] )
+                pc += 2;
+
+            break;
+
+
+
+
+
+
+	}	
     
 
 }
