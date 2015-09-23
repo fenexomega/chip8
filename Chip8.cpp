@@ -22,8 +22,8 @@ void Chip8::setDrawFlag(bool value)
 
 void Chip8::dispose()
 {
-    SDL_DestroyRenderer(screen_->rend);
-    SDL_DestroyWindow(screen_->window);
+    SDL_DestroyRenderer(sdl_->rend);
+    SDL_DestroyWindow(sdl_->window);
     SDL_Quit();
 }
 
