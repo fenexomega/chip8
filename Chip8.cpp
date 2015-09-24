@@ -193,10 +193,40 @@ void Chip8::executeOpcode()
 
             break;
 
+		
+		case 0x6000: // 6XNN: store number NN in register VX
+			V_ [ opcode &  0x0f00   ] = ( opcode & 0x00ff );
+			break;
+
+
+		case 0x7000: // 7XNN: add the value NN to register VX
+			V_ [ opcode & 0x0f00 ] = ( opcode & 0x00ff );
+			break;
+
+
+		case 0x8000:
+			switch( opcode & 0x000f )
+			{
+				case 0x0: // 8XY0: store the value of register VY in register VX
+					V_ [ opcode & 0x0f00 ] = V_ [ opcode & 0x00f0 ];
+					break;
+
+
+				case 0x1: // 8XY1: set VX to VX | VY
+					V_ [ opcode & 0x0f00 ] = ( V_ [ opcode & 0x0f00 ] | V_ [ opcode & 0x00f0 ] ) ;
+					break;
+			
 
 
 
 
+
+
+
+
+
+
+			}
 
 	}	
     
