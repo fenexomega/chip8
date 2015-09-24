@@ -130,7 +130,7 @@ bool Chip8::loadGame(const char *gamename)
 
 void Chip8::executeOpcode()
 {
-	opcode_ = ( memory_[ pc ] << 8 | memory_[ pc + 1 ] );
+	opcode_ = ( memory_[ pc_ ] << 8 | memory_[ pc_ + 1 ] );
 	
     pc_ += 2;
 

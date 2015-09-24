@@ -31,7 +31,7 @@ private:
     unsigned char memory_[4096];
     unsigned char V_[16];
     unsigned short I_;
-    unsigned short p_c;
+    unsigned short pc_;
     unsigned char gfx_[64 * 32];
     unsigned char delayTimer_;
     unsigned char soundTimer_;
