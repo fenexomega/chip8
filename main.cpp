@@ -1,9 +1,8 @@
 #include <iostream>
-#include <SDL2/SDL_image.h>
 #include <SDL2/SDL.h>
-#include "Chip8.h"
+#include <SDL/SDL_image.h>
 
-using namespace std;
+#include "Chip8.h"
 
 Chip8 myChip8;
 

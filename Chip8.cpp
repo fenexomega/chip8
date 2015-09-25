@@ -1,12 +1,11 @@
+#include <algorithm>
 #include "Chip8.h"
 
 
 
 Chip8::Chip8()
 {
-
-
-
+    sdl_ = new screen_t;
 
 }
 
@@ -45,10 +44,10 @@ bool Chip8::initGraphics()
         dPrint("Couldn't start the application: " << SDL_GetError());
         return false;
     }
-    sdl_->window_ = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,800,600,SDL_WINDOW_RESIZABLE);
-    sdl_->rend_ = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
+    sdl_->window = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,800,600,SDL_WINDOW_RESIZABLE);
+    sdl_->rend = SDL_CreateRenderer(sdl_->window,-1,SDL_RENDERER_ACCELERATED);
     
-    if(window == NULL || rend == NULL)
+    if(sdl_->window == NULL || sdl_->rend == NULL)
         return false;
     
     SDL_SetRenderDrawBlendMode(sdl_->rend,SDL_BLENDMODE_BLEND);
@@ -59,11 +58,13 @@ bool Chip8::initGraphics()
 bool Chip8::initSound()
 {
 
+    return true;
 }
 
 bool Chip8::initInput()
 {
 
+    return true;
 }
 
 bool Chip8::initSystems()
@@ -75,13 +76,16 @@ bool Chip8::initSystems()
 
     // Clear display
     // Clear stack
-    // Clear registers V0-VF
-    // Clear memory
+    std::fill(V_,V_+0xf,0); // Clear registers V0-VF
+    std::for_each(V_, V_+0xf, []( unsigned short v ) { std::cout << (unsigned) v << std::endl; });
+	// Clear memory
     // Load fontset
     for(int i = 0; i < 80; ++i)
+    {
         //        memory[i] = chip8_fontset[i];
-
-        return initGraphics() & initSound() & initInput();
+    }
+    
+    return initGraphics() & initSound() & initInput();
 
 }
 
@@ -122,9 +126,14 @@ bool Chip8::loadGame(const char *gamename)
         cout << memoryChucks.data() << endl;
     }
 
+    return true;
 }
 
-
+Chip8::~Chip8()
+{
+    this->dispose();
+    delete sdl_;
+}
 
 
 
@@ -174,7 +183,7 @@ void Chip8::executeOpcode()
 
 		case 0x3000: // 3XNN: Skips the next instruction if VX equals NN
 			if ( V_[ opcode_ & 0x0f00 ] == (opcode_ & 0x00ff ) )
-                pc += 2;
+                pc_ += 2;
 
             break;
 
@@ -182,49 +191,40 @@ void Chip8::executeOpcode()
 
         case 0x4000: // 4XNN: Skips the next instruction if VX doesn't equal NN
             if ( V_ [ opcode_ & 0x0f00 ] != ( opcode_ & 0x00ff ) )
-                pc += 2;
+                pc_ += 2;
 
             break;
 
 
         case 0x5000: // 5XY0: Skips the next instruction if VX equals VY
             if ( V_ [ opcode_ & 0x0f00 ] == V_ [ opcode_ & 0x00f0] )
-                pc += 2;
+                pc_ += 2;
 
             break;
 
 		
 		case 0x6000: // 6XNN: store number NN in register VX
-			V_ [ opcode &  0x0f00   ] = ( opcode & 0x00ff );
+			V_ [ opcode_ &  0x0f00   ] = ( opcode_ & 0x00ff );
 			break;
 
 
 		case 0x7000: // 7XNN: add the value NN to register VX
-			V_ [ opcode & 0x0f00 ] = ( opcode & 0x00ff );
+			V_ [ opcode_ & 0x0f00 ] = ( opcode_ & 0x00ff );
 			break;
 
 
 		case 0x8000:
-			switch( opcode & 0x000f )
+			switch( opcode_ & 0x000f )
 			{
 				case 0x0: // 8XY0: store the value of register VY in register VX
-					V_ [ opcode & 0x0f00 ] = V_ [ opcode & 0x00f0 ];
+					V_ [ opcode_ & 0x0f00 ] = V_ [ opcode_ & 0x00f0 ];
 					break;
 
 
 				case 0x1: // 8XY1: set VX to VX | VY
-					V_ [ opcode & 0x0f00 ] = ( V_ [ opcode & 0x0f00 ] | V_ [ opcode & 0x00f0 ] ) ;
+					V_ [ opcode_ & 0x0f00 ] = ( V_ [ opcode_ & 0x0f00 ] | V_ [ opcode_ & 0x00f0 ] ) ;
 					break;
 			
-
-
-
-
-
-
-
-
-
 
 			}
 

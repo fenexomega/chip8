@@ -44,13 +44,13 @@ private:
     bool initInput();
 
     //Coisas do SDL2
-	struct 
+	struct screen_t
     {
         SDL_Window *window;
         SDL_Renderer *rend;
         SDL_Event event;
 	
-    }sdl_;
+    } *sdl_;
 
 
 };
