@@ -9,6 +9,13 @@
 
 using namespace std;
 
+
+
+#define MEMORY_MAX 4096
+
+
+
+
 class Chip8
 {
 public:
