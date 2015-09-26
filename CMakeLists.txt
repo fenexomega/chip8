@@ -1,10 +1,20 @@
 project(Chip8)
-find_package(SDL2 REQUIRED)
+cmake_minimum_required(VERSION 2.8)
 
+# ADICIONAR MODULES EXTERNOS
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeInclude)
+
+find_package(SDL2 REQUIRED)
 INCLUDE_DIRECTORIES( ${SDL2_INCLUDE_DIR} )
 
-cmake_minimum_required(VERSION 2.8)
-aux_source_directory(. SRC_LIST)
-add_executable(${PROJECT_NAME} ${SRC_LIST})
+# ACHAR OS .CPP E .H
+file(GLOB_RECURSE SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.cpp)
+file(GLOB_RECURSE HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}  src/*.h)
+
+
+# Linkar .cpp para este binário (que tem o nome do projeto)
+add_executable(${PROJECT_NAME} ${SRCS})
+
+# Linkar bibliotecas dinâmicas
 TARGET_LINK_LIBRARIES( ${PROJECT_NAME} ${SDL2_LIBRARY} )
 

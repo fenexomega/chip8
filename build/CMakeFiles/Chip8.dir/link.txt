@@ -1,0 +1,1 @@
+/usr/bin/c++      CMakeFiles/Chip8.dir/src/main.cpp.o CMakeFiles/Chip8.dir/src/Chip8.cpp.o CMakeFiles/Chip8.dir/src/tests.cpp.o  -o Chip8 -rdynamic -lSDL2 -lpthread 
