@@ -77,8 +77,7 @@ bool Chip8::initSystems()
     // Clear display
     // Clear stack
     std::fill(V_,V_+0xf,0); // Clear registers V0-VF
-    std::for_each(V_, V_+0xf, []( unsigned short v ) { std::cout << (unsigned) v << std::endl; });
-	// Clear memory
+	std::fill(memory_,memory_+MEMORY_MAX,0) // Clear memory
     // Load fontset
     for(int i = 0; i < 80; ++i)
     {
