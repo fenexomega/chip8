@@ -2,6 +2,9 @@
 *.txt.user.*
 build/
 
+# Vim files
+*.swp
+
 # Compiled Object files
 *.slo
 *.lo
