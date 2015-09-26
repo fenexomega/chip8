@@ -1,5 +1,6 @@
 # CMake files
 *.txt.user.*
+build/
 
 # Compiled Object files
 *.slo
