@@ -23,18 +23,26 @@
 class iRenderer
 {
 
-	virtual int Initialize()
+	virtual bool initialize()
 	{
 		LOG("Inicializando Renderizador");
 	}
 
-	virtual void Render(unsigned char *gfx)
+	
+	virtual void render(unsigned char *gfx)
 	{
 		LOG("Renderizando tela");
 	}
 
-	virtual void Dispose()
+	
+	virtual void dispose()
 	{
 		LOG("Destruindo Renderizador");			
 	}
-}
+
+
+
+
+
+
+};

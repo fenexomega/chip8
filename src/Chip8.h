@@ -1,14 +1,9 @@
 #ifndef CHIP8_H
 #define CHIP8_H
-#include <iostream>
-#include <fstream>
+
 #include <SDL2/SDL.h>
-#include <vector>
 
 #define dPrint(x) std::cout << x << std::endl
-
-using namespace std;
-
 
 
 #define MEMORY_MAX 4096
@@ -25,7 +20,7 @@ public:
     void executeOpcode();
     void drawGraphics();
     void setKeys();
-    bool loadGame(const char *gamename);
+    bool loadGame(const char *gameName);
     bool getDrawFlag() const;
     void setDrawFlag(bool value);
     void dispose();
@@ -35,7 +30,7 @@ public:
 private:
     bool drawFlag_;
     unsigned short opcode_;
-    unsigned char memory_[4096];
+    unsigned char memory_[MEMORY_MAX];
     unsigned char V_[16];
     unsigned short I_;
     unsigned short pc_;
