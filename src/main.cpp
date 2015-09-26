@@ -6,15 +6,25 @@
 
 Chip8 myChip8;
 
+
+
 int main(int argc, char **argv)
 {
+		
+	if(argc < 2 )
+	{
+		std::cout << "No game to load, exiting." << std::endl; 
+		return 0;
+	}
 
-   if(!myChip8.loadGame(argv[1]))
+	if(!myChip8.loadGame(argv[1]))
        return 1;
 
     myChip8.initSystems();
 
-    while(!myChip8.wantToExit())
+  
+	
+	while(!myChip8.wantToExit())
     {
         // Emulate one cycle
         myChip8.emulateCycle();
@@ -27,6 +37,7 @@ int main(int argc, char **argv)
     }
 
     myChip8.dispose();
-    return 0;
+    
+	return 0;
 }
 
