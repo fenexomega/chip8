@@ -13,12 +13,6 @@ Chip8::Chip8() :
 
 }
 
-
-void Chip8::dispose()
-{
-   
-}
-
 bool Chip8::wantToExit()
 {
    // return sdl_->event.type == SDL_QUIT;
@@ -59,11 +53,13 @@ bool Chip8::initSystems()
     I_      = 0;      // Reset index register
     sp_     = 0;      // Reset stack pointer
 
-    std::fill(gfx_,gfx_ + ( gfxResolution ), 0); 		// Clear display
+    std::fill(gfx_,gfx_ + ( gfxResolution ), 0);// Clear display
     std::fill(stack_,stack_ + STACK_MAX, 0); 	// Clear stack
-    std::fill(V_,V_+16,0);  					// Clear registers V0-VF
+	std::fill(V_,V_+16,0); 						// Clear registers V0-VF
 	std::fill(memory_,memory_+MEMORY_MAX,0);  	// Clear memory
-    // Load fontset
+	
+	// Load fontset
+	
 	unsigned char chip8_fontset[80] 
 	{
 		0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -147,6 +143,14 @@ bool Chip8::loadRom(const char *romFileName)
 		   
     return true;
 }
+
+
+
+void Chip8::dispose()
+{
+   
+}
+
 Chip8::~Chip8()
 {
     dPrint("Destroying Chip8...");
