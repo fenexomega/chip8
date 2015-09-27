@@ -13,15 +13,6 @@ Chip8::Chip8() :
 
 }
 
-bool Chip8::getDrawFlag() const
-{
-    return drawFlag_;
-}
-
-void Chip8::setDrawFlag(bool value)
-{
-    drawFlag_ = value;
-}
 
 void Chip8::dispose()
 {
@@ -68,7 +59,7 @@ bool Chip8::initSystems()
     I_      = 0;      // Reset index register
     sp_     = 0;      // Reset stack pointer
 
-    std::fill(gfx_,gfx_ + ( gfxRes ), 0); 		// Clear display
+    std::fill(gfx_,gfx_ + ( gfxResolution ), 0); 		// Clear display
     std::fill(stack_,stack_ + STACK_MAX, 0); 	// Clear stack
     std::fill(V_,V_+16,0);  					// Clear registers V0-VF
 	std::fill(memory_,memory_+MEMORY_MAX,0);  	// Clear memory
@@ -112,37 +103,47 @@ void Chip8::drawGraphics()
     update();
 }
 
+bool Chip8::getDrawFlag() const
+{
+    return drawFlag_;
+}
+
+void Chip8::setDrawFlag(const bool value)
+{
+    drawFlag_ = value;
+}
+
 void Chip8::setKeys()
 {
 
 }
 
 
-bool Chip8::loadGame(const char *gameName)
+bool Chip8::loadRom(const char *romFileName)
 {
-    dPrint("Loading " << gameName);
-    std::ifstream game(gameName, std::ios::in | std::ios::binary | std::ios::ate);
+    dPrint("Loading " << romFileName);
+    std::ifstream romFile(romFileName, std::ios::in | std::ios::binary | std::ios::ate);
    
 
-    if(!game.is_open())
+    if(!romFile.is_open())
     {
-        dPrint("Error at opening game file. Exiting!");
+        dPrint("Error at opening ROM file. Exiting!");
         return false;
     }
 
-	size_t gameSize = game.tellg();
+	size_t romFileSize = romFile.tellg();
 
-	if(gameSize > romMax)
+	if(romFileSize > romMaxSize)
 	{
 		dPrint("Error, ROM size not compatible. Exiting!");
 		return false;
 	}
 	
-	game.seekg(0,game.beg);
+	romFile.seekg(0,romFile.beg);
 
-	std::copy(std::istream_iterator<unsigned char>(game), std::istream_iterator<unsigned char>(), memory_ + 0x200);
+	std::copy(std::istream_iterator<unsigned char>(romFile), std::istream_iterator<unsigned char>(), memory_ + 0x200);
  	
-	game.close();
+	romFile.close();
 		   
     return true;
 }
@@ -252,7 +253,7 @@ void Chip8::executeOpcode()
 
 
 				case 0x3: // 8XY3: sets VX to VX xor VY
-					V_ [ opcode_ & 0x0f00 ] = ( V_ [ opocde_ & 0x0f00 ] ^ V_ [ opcode_ & 0x00f0 ] ); 
+					V_ [ opcode_ & 0x0f00 ] = ( V_ [ opcode_ & 0x0f00 ] ^ V_ [ opcode_ & 0x00f0 ] ); 
 					break;
 				
 				
@@ -273,6 +274,7 @@ void Chip8::executeOpcode()
 					VX = result;
 					*/
 					// otimizado :
+					
 					unsigned int result = V_ [ opcode_ & 0x0f00 ] + V_ [ opcode_ & 0x00f0 ];
 					( result & 0xffff0000 ) ? V_ [ 0xF ] = 1 : V_ [ 0xF ] = 0;
 
