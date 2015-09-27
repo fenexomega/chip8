@@ -12,11 +12,12 @@ void DissassembleChip8Op(uint8_t *codebuffer, int pc)
 {
 	uint8_t *code = &codebuffer[pc];
 	uint8_t firstNbr = (code[0] >> 4);
+	uint16_t address = (code[0] & 0x0111) + code[1];
 
 	printf("%04x %02x %02x ", pc, code[0],code[1]);
 	switch (firstNbr) {
 		case 0x00: printf(" not handled yet"); break;
-		case 0x01: printf(" not handled yet"); break;
+		case 0x01: printf("jmp $%04x",address); break;
 		case 0x02: printf(" not handled yet"); break;
 		case 0x03: printf(" not handled yet"); break;
 		case 0x04: printf(" not handled yet"); break;
@@ -45,15 +46,14 @@ int main(int argc, char** argv)
 	}
 	unsigned int pc = 0x200;
 	unsigned int size = inFile.tellg(); 
-	std::vector<unsigned char> v;
-
-	v.reserve(size + 0x200);
-	v.insert(v.begin(),
+	std::vector<unsigned char> v(size + 0x200);
+	inFile.seekg(0,ios::beg);
+	cout << v.size() << endl;
+	v.insert(v.begin() + 0x200,
 			istream_iterator<unsigned char>(inFile),
 			istream_iterator<unsigned char>());
 
 
-	inFile.seekg(0,ios::beg);
 	inFile.close();
 	
 
