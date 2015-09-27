@@ -1,18 +1,16 @@
 #ifndef CHIP8_H
 #define CHIP8_H
 #include <iostream>
-#include <fstream>
 #include <SDL2/SDL.h>
-#include <vector>
-
+#include "interfaces/iRenderer.h"
 #define dPrint(x) std::cout << x << std::endl
-
-using namespace std;
-
 
 
 #define MEMORY_MAX 4096
+#define STACK_MAX 16
 
+constexpr size_t gfxRes { 64 * 32 };
+constexpr size_t romMax { MEMORY_MAX - 0x200 };
 
 
 
@@ -25,40 +23,33 @@ public:
     void executeOpcode();
     void drawGraphics();
     void setKeys();
-    bool loadGame(const char *gamename);
+    bool loadGame(const char *gameName);
     bool getDrawFlag() const;
-    void setDrawFlag(bool value);
+    void setDrawFlag(const bool value);
     void dispose();
     bool wantToExit();
     void update();
     ~Chip8();
 private:
+	iRenderer *renderer_;
     bool drawFlag_;
     unsigned short opcode_;
-    unsigned char memory_[4096];
+    unsigned char memory_[MEMORY_MAX];
     unsigned char V_[16];
     unsigned short I_;
     unsigned short pc_;
-    unsigned char gfx_[64 * 32];
+    unsigned char gfx_[gfxRes];
     unsigned char delayTimer_;
     unsigned char soundTimer_;
-    unsigned short stack_[16];
+    unsigned short stack_[STACK_MAX];
     unsigned short sp_;
     unsigned char key_[16];
 
     bool initGraphics();
     bool initSound();
     bool initInput();
-
-    //Coisas do SDL2
-	struct screen_t
-    {
-        SDL_Window *window;
-        SDL_Renderer *rend;
-        SDL_Event event;
 	
-    } *sdl_;
-
+    
 
 };
 
