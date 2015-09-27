@@ -7,6 +7,9 @@
 
 
 #define MEMORY_MAX 4096
+#define STACK_MAX 16
+
+constexpr size_t gfxRes { 64 * 32 };
 constexpr size_t romMax { MEMORY_MAX - 0x200 };
 
 
@@ -35,10 +38,10 @@ private:
     unsigned char V_[16];
     unsigned short I_;
     unsigned short pc_;
-    unsigned char gfx_[64 * 32];
+    unsigned char gfx_[gfxRes];
     unsigned char delayTimer_;
     unsigned char soundTimer_;
-    unsigned short stack_[16];
+    unsigned short stack_[STACK_MAX];
     unsigned short sp_;
     unsigned char key_[16];
 

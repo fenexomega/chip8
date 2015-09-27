@@ -71,15 +71,34 @@ bool Chip8::initSystems()
     I_      = 0;      // Reset index register
     sp_     = 0;      // Reset stack pointer
 
-    // Clear display
-    // Clear stack
-    std::fill(V_,V_+0xf,0); // Clear registers V0-VF
-	std::fill(memory_,memory_+MEMORY_MAX,0); // Clear memory
+    std::fill(gfx_,gfx_ + ( gfxRes ), 0); 		// Clear display
+    std::fill(stack_,stack_ + STACK_MAX, 0); 	// Clear stack
+    std::fill(V_,V_+16,0);  					// Clear registers V0-VF
+	std::fill(memory_,memory_+MEMORY_MAX,0);  	// Clear memory
     // Load fontset
-    for(int i = 0; i < 80; ++i)
-    {
-        //        memory[i] = chip8_fontset[i];
-    }
+	unsigned char chip8_fontset[80] 
+	{
+		0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+		0x20, 0x60, 0x20, 0x20, 0x70, // 1
+		0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+		0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+		0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+		0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+		0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+		0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+		0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+		0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+		0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+		0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+		0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+		0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+		0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+		0xF0, 0x80, 0xF0, 0x80, 0x80  // F
+	};
+
+	std::copy(chip8_fontset,chip8_fontset+80, memory_); // copy fontset to memory.
+
+
     
     return initGraphics() & initSound() & initInput();
 
@@ -132,7 +151,8 @@ bool Chip8::loadGame(const char *gameName)
 }
 Chip8::~Chip8()
 {
-    this->dispose();
+    dPrint("Destroying Chip8...");
+	this->dispose();
     delete renderer_;
 }
 
