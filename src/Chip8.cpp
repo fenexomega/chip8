@@ -1,11 +1,18 @@
 #include <algorithm>
+#include <exception>
+#include <fstream>
+#include <iterator>
+#include "SdlRenderer.h"
 #include "Chip8.h"
 
 
 
-Chip8::Chip8()
+
+Chip8::Chip8() : 
+	renderer_ ( new SdlRenderer() )
 {
-    sdl_ = new screen_t;
+	if(renderer_ == nullptr)
+		throw std::bad_alloc();
 
 }
 
@@ -21,37 +28,27 @@ void Chip8::setDrawFlag(bool value)
 
 void Chip8::dispose()
 {
-    SDL_DestroyRenderer(sdl_->rend);
-    SDL_DestroyWindow(sdl_->window);
-    SDL_Quit();
+   
 }
 
 bool Chip8::wantToExit()
 {
-    return sdl_->event.type == SDL_QUIT;
+   // return sdl_->event.type == SDL_QUIT;
 }
 
 void Chip8::update()
 {
-    SDL_PollEvent(&sdl_->event);
+    //SDL_PollEvent(&sdl_->event);
 }
 
 bool Chip8::initGraphics()
 {
-    drawFlag_ = true;
-    if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
-    {
-        dPrint("Couldn't start the application: " << SDL_GetError());
-        return false;
-    }
-    sdl_->window = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,800,600,SDL_WINDOW_RESIZABLE);
-    sdl_->rend = SDL_CreateRenderer(sdl_->window,-1,SDL_RENDERER_ACCELERATED);
-    
-    if(sdl_->window == NULL || sdl_->rend == NULL)
-        return false;
-    
-    SDL_SetRenderDrawBlendMode(sdl_->rend,SDL_BLENDMODE_BLEND);
+    if(!renderer_->initialize())
+		return false;
 
+	
+	drawFlag_ = true;
+   
     return true;
 }
 
@@ -77,7 +74,7 @@ bool Chip8::initSystems()
     // Clear display
     // Clear stack
     std::fill(V_,V_+0xf,0); // Clear registers V0-VF
-	std::fill(memory_,memory_+MEMORY_MAX,0) // Clear memory
+	std::fill(memory_,memory_+MEMORY_MAX,0); // Clear memory
     // Load fontset
     for(int i = 0; i < 80; ++i)
     {
@@ -97,11 +94,6 @@ void Chip8::emulateCycle()
 void Chip8::drawGraphics()
 {
     update();
-    SDL_SetRenderDrawColor(sdl_->rend,0,0,0,1);
-    SDL_RenderClear(sdl_->rend);
-    // Renderizar Coisas do Emulador
-
-    SDL_RenderPresent(sdl_->rend);
 }
 
 void Chip8::setKeys()
@@ -109,29 +101,39 @@ void Chip8::setKeys()
 
 }
 
-bool Chip8::loadGame(const char *gamename)
+
+bool Chip8::loadGame(const char *gameName)
 {
-    dPrint("Loading " << gamename);
-    ifstream Game(gamename,ios::in | ios::binary);
-    //Para CONTINUAR https://stackoverflow.com/questions/18816126/c-read-the-whole-file-in-buffer
-    if(!Game.is_open())
+    dPrint("Loading " << gameName);
+    std::ifstream game(gameName, std::ios::in | std::ios::binary | std::ios::ate);
+   
+
+    if(!game.is_open())
     {
-        dPrint("Erro at opening game file. Exiting!");
+        dPrint("Error at opening game file. Exiting!");
         return false;
     }
-    vector<char> memoryChucks(4000);
-    if(Game.read(memoryChucks.data(),4000))
-    {
-        cout << memoryChucks.data() << endl;
-    }
 
+	size_t gameSize = game.tellg();
+
+	if(gameSize > romMax)
+	{
+		dPrint("Error, ROM size not compatible. Exiting!");
+		return false;
+	}
+	
+	game.seekg(0,game.beg);
+
+	std::copy(std::istream_iterator<unsigned char>(game), std::istream_iterator<unsigned char>(), memory_ + 0x200);
+ 	
+	game.close();
+		   
     return true;
 }
-
 Chip8::~Chip8()
 {
     this->dispose();
-    delete sdl_;
+    delete renderer_;
 }
 
 

@@ -1,13 +1,13 @@
 #ifndef CHIP8_H
 #define CHIP8_H
-
+#include <iostream>
 #include <SDL2/SDL.h>
-
+#include "interfaces/iRenderer.h"
 #define dPrint(x) std::cout << x << std::endl
 
 
 #define MEMORY_MAX 4096
-
+constexpr size_t romMax { MEMORY_MAX - 0x200 };
 
 
 
@@ -22,12 +22,13 @@ public:
     void setKeys();
     bool loadGame(const char *gameName);
     bool getDrawFlag() const;
-    void setDrawFlag(bool value);
+    void setDrawFlag(const bool value);
     void dispose();
     bool wantToExit();
     void update();
     ~Chip8();
 private:
+	iRenderer *renderer_;
     bool drawFlag_;
     unsigned short opcode_;
     unsigned char memory_[MEMORY_MAX];
@@ -44,16 +45,8 @@ private:
     bool initGraphics();
     bool initSound();
     bool initInput();
-
-    //Coisas do SDL2
-	struct screen_t
-    {
-        SDL_Window *window;
-        SDL_Renderer *rend;
-        SDL_Event event;
 	
-    } *sdl_;
-
+    
 
 };
 

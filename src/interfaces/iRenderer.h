@@ -1,3 +1,6 @@
+#ifndef IRENDERER_H
+#define IRENDERER_H
+
 /*
  * =====================================================================================
  *
@@ -22,14 +25,14 @@
 
 class iRenderer
 {
-
+public:
 	virtual bool initialize()
 	{
 		LOG("Inicializando Renderizador");
 	}
 
 	
-	virtual void render(unsigned char *gfx)
+	virtual void render(const unsigned char *gfx)
 	{
 		LOG("Renderizando tela");
 	}
@@ -46,3 +49,7 @@ class iRenderer
 
 
 };
+
+
+
+#endif
