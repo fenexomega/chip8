@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <exception>
 #include <fstream>
 #include <iterator>
 #include "SdlRenderer.h"
@@ -11,8 +10,6 @@
 Chip8::Chip8() : 
 	renderer_ ( new SdlRenderer() )
 {
-	if(renderer_ == nullptr)
-		throw std::bad_alloc();
 
 }
 
