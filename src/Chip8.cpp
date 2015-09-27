@@ -165,9 +165,12 @@ void Chip8::executeOpcode()
 	// NN: 8 bit constant
 	// N: 4 bit constant
 	// X and Y: (4-bit value) register identifier
-
-
-
+	
+	// para maioria dos casos VX e VY:
+	#define VX V_ [ opcode_ & 0x0f00 ]
+	#define VY V_ [ opcode_ & 0x00f0 ]
+	
+	
 	switch( opcode_ & 0xf000 )
 	{
 		
@@ -255,6 +258,8 @@ void Chip8::executeOpcode()
 				
 				case 0x4: // 8XY4: Adds VY to VX . VF is set to 1 when theres a carry, and to 0 when there isn't
 				{
+					/* demonstracao : 
+					
 					auto &VX = V_ [ opcode_ & 0x0f00 ];
 					auto &VY = V_ [ opcode_ & 0x00f0 ];
 
@@ -264,6 +269,14 @@ void Chip8::executeOpcode()
 						V_ [ 0xF ] = true;
 
 					VX = result;
+					*/
+					// otimizado :
+					unsigned int result = V_ [ opcode_ & 0x0f00 ] + V_ [ opcode_ & 0x00f0 ];
+					if( result & 0xffff0000 )
+						V_ [ 0xF ] = 1;
+
+					V_ [ opcode_ & 0x0f00 ] = ( result & 0xffff );
+
 					
 
 				}	
@@ -273,5 +286,6 @@ void Chip8::executeOpcode()
 
 	}	
     
-
+	#undef VX
+	#undef VY
 }
