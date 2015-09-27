@@ -165,13 +165,16 @@ void Chip8::executeOpcode()
 	// NN: 8 bit constant
 	// N: 4 bit constant
 	// X and Y: (4-bit value) register identifier
-
-
-
+	
+	// para maioria dos casos VX e VY:
+	#define VX V_ [ opcode_ & 0x0f00 ]
+	#define VY V_ [ opcode_ & 0x00f0 ]
+	
+	
 	switch( opcode_ & 0xf000 )
 	{
 		
-		case 0x0000:
+		case 0x0000: // BEGIN OF 0xxx
 			switch( opcode_ )
 			{
 				case 0x0000: // 0NNN " calls RCA 1802 program at address NNN. not necessary for most ROMs. "
@@ -188,7 +191,7 @@ void Chip8::executeOpcode()
 					break;
 
 			}
-		
+			break;// END OF 0xxx
 		
 
 		case 0x1000: // 1NNN:  jumps to address NNN
@@ -231,7 +234,7 @@ void Chip8::executeOpcode()
 			break;
 
 
-		case 0x8000:
+		case 0x8000: // BEGIN OF 8xxx
 			switch( opcode_ & 0x000f )
 			{
 				case 0x0: // 8XY0: store the value of register VY in register VX
@@ -242,11 +245,48 @@ void Chip8::executeOpcode()
 				case 0x1: // 8XY1: set VX to VX | VY
 					V_ [ opcode_ & 0x0f00 ] = ( V_ [ opcode_ & 0x0f00 ] | V_ [ opcode_ & 0x00f0 ] ) ;
 					break;
-			
 
+				case 0x2: // 8XY2: sets VX to VX and VY
+					V_ [ opcode_ & 0x0f00 ] = ( V_ [ opcode_ & 0x0f00] & V_ [ opcode_ & 0x00f0] ) ;
+					break;
+
+
+				case 0x3: // 8XY3: sets VX to VX xor VY
+					V_ [ opcode_ & 0x0f00 ] = ( V_ [ opocde_ & 0x0f00 ] ^ V_ [ opcode_ & 0x00f0 ] ); 
+					break;
+				
+				
+				case 0x4: // 8XY4: Adds VY to VX . VF is set to 1 when theres a carry, and to 0 when there isn't
+				{
+					/* demonstracao : 
+					
+					auto &VX = V_ [ opcode_ & 0x0f00 ];
+					auto &VY = V_ [ opcode_ & 0x00f0 ];
+
+					unsigned int result = VX + VY;
+			
+					if( ( result & 0xffff0000 ) != 0 )
+						V_ [ 0xF ] = true;
+
+					VX = result;
+					*/
+					// otimizado :
+					unsigned int result = V_ [ opcode_ & 0x0f00 ] + V_ [ opcode_ & 0x00f0 ];
+					if( result & 0xffff0000 )
+						V_ [ 0xF ] = 1;
+
+					V_ [ opcode_ & 0x0f00 ] = ( result & 0xffff );
+
+					
+					break;
+				}	
+					
 			}
+			break; // END OF 8xxx
+			
 
 	}	
     
-
+	#undef VX
+	#undef VY
 }
