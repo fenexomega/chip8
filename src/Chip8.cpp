@@ -267,13 +267,14 @@ void Chip8::executeOpcode()
 			
 					if( ( result & 0xffff0000 ) != 0 )
 						V_ [ 0xF ] = true;
+					else
+						V_ [ 0xF ] = false;
 
 					VX = result;
 					*/
 					// otimizado :
 					unsigned int result = V_ [ opcode_ & 0x0f00 ] + V_ [ opcode_ & 0x00f0 ];
-					if( result & 0xffff0000 )
-						V_ [ 0xF ] = 1;
+					( result & 0xffff0000 ) ? V_ [ 0xF ] = 1 : V_ [ 0xF ] = 0;
 
 					V_ [ opcode_ & 0x0f00 ] = ( result & 0xffff );
 
