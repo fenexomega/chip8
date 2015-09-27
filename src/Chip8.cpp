@@ -174,7 +174,7 @@ void Chip8::executeOpcode()
 	switch( opcode_ & 0xf000 )
 	{
 		
-		case 0x0000:
+		case 0x0000: // BEGIN OF 0xxx
 			switch( opcode_ )
 			{
 				case 0x0000: // 0NNN " calls RCA 1802 program at address NNN. not necessary for most ROMs. "
@@ -191,7 +191,7 @@ void Chip8::executeOpcode()
 					break;
 
 			}
-		
+			break;// END OF 0xxx
 		
 
 		case 0x1000: // 1NNN:  jumps to address NNN
@@ -234,7 +234,7 @@ void Chip8::executeOpcode()
 			break;
 
 
-		case 0x8000:
+		case 0x8000: // BEGIN OF 8xxx
 			switch( opcode_ & 0x000f )
 			{
 				case 0x0: // 8XY0: store the value of register VY in register VX
@@ -278,11 +278,12 @@ void Chip8::executeOpcode()
 					V_ [ opcode_ & 0x0f00 ] = ( result & 0xffff );
 
 					
-
+					break;
 				}	
-					break;		
-
+					
 			}
+			break; // END OF 8xxx
+			
 
 	}	
     
