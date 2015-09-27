@@ -242,7 +242,32 @@ void Chip8::executeOpcode()
 				case 0x1: // 8XY1: set VX to VX | VY
 					V_ [ opcode_ & 0x0f00 ] = ( V_ [ opcode_ & 0x0f00 ] | V_ [ opcode_ & 0x00f0 ] ) ;
 					break;
+
+				case 0x2: // 8XY2: sets VX to VX and VY
+					V_ [ opcode_ & 0x0f00 ] = ( V_ [ opcode_ & 0x0f00] & V_ [ opcode_ & 0x00f0] ) ;
+					break;
+
+
+				case 0x3: // 8XY3: sets VX to VX xor VY
+					V_ [ opcode_ & 0x0f00 ] = ( V_ [ opocde_ & 0x0f00 ] ^ V_ [ opcode_ & 0x00f0 ] ); 
+					break;
+				
+				
+				case 0x4: // 8XY4: Adds VY to VX . VF is set to 1 when theres a carry, and to 0 when there isn't
+				{
+					auto &VX = V_ [ opcode_ & 0x0f00 ];
+					auto &VY = V_ [ opcode_ & 0x00f0 ];
+
+					unsigned int result = VX + VY;
 			
+					if( ( result & 0xffff0000 ) != 0 )
+						V_ [ 0xF ] = true;
+
+					VX = result;
+					
+
+				}	
+					break;		
 
 			}
 
