@@ -19,8 +19,8 @@ bool SdlRenderer::initialize()
 
 	if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
-    	LOG("Couldn't start the application: " << SDL_GetError());
-    	return false;
+		LOG("Couldn't start the application: " << SDL_GetError());
+		return false;
 	}
 	
 
@@ -31,7 +31,7 @@ bool SdlRenderer::initialize()
 	{
 
 		LOG("Couldn't allocate SDL_Window or SDL_Renderer.");
-    	return false;
+		return false;
 	}
 	
 
