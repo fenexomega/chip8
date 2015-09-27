@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 	}
 	std::unique_ptr<Chip8> myChip8(new Chip8()); // save stack memory using smart pointers.
 
-	if(!myChip8->loadGame(argv[1]))
+	if(!myChip8->loadRom(argv[1]))
     	return 1;
 
     if(!myChip8->initSystems())
