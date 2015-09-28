@@ -14,7 +14,7 @@ public:
 	SdlRenderer();
 
 	bool Initialize();
-	void Render();
+    void Render(const unsigned char *fgx);
 	void Dispose();
 	bool IsWindowClosed();
 

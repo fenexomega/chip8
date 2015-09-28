@@ -46,7 +46,7 @@ bool SdlRenderer::Initialize()
 }
 
 
-void SdlRenderer::Render()
+void SdlRenderer::Render(const unsigned char *fgx)
 {
 
 
@@ -56,7 +56,7 @@ void SdlRenderer::Render()
 
     SDL_RenderPresent(rend_);
 
-	UpdateWindowState();
+    UpdateWindowState();
 
 }
 
