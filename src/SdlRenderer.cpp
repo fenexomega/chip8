@@ -7,17 +7,18 @@
 
 SdlRenderer::SdlRenderer()
 {
-	window_ = nullptr;
-	rend_ = nullptr;
+	m_window = nullptr;
+	m_rend = nullptr;
 	m_userWannaClose = false;
 }
 
-bool SdlRenderer::IsWindowClosed()
-{
-	return m_userWannaClose;
-}
 
-bool SdlRenderer::Initialize()
+
+
+
+
+
+bool SdlRenderer::Initialize() noexcept
 {
 
 
@@ -28,10 +29,10 @@ bool SdlRenderer::Initialize()
 	}
 	
 
-	window_ = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,800,600,SDL_WINDOW_RESIZABLE);
-	rend_ = SDL_CreateRenderer(window_,-1,SDL_RENDERER_ACCELERATED);
+	m_window = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,800,600,SDL_WINDOW_RESIZABLE);
+	m_rend = SDL_CreateRenderer(m_window,-1,SDL_RENDERER_ACCELERATED);
 
-	if(window_ == nullptr || rend_ == nullptr)
+	if(m_window == nullptr || m_rend == nullptr)
 	{
 
 		LOG("Couldn't allocate SDL_Window or SDL_Renderer.");
@@ -39,29 +40,40 @@ bool SdlRenderer::Initialize()
 	}
 	
 
-	SDL_SetRenderDrawBlendMode(rend_,SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawBlendMode(m_rend,SDL_BLENDMODE_BLEND);
 
 
 	return true;
 }
 
 
-void SdlRenderer::Render(const unsigned char *fgx)
+
+
+
+
+
+void SdlRenderer::Render(const unsigned char *fgx) noexcept
 {
 
 
-    SDL_SetRenderDrawColor(rend_,0,0,0,1);
-    SDL_RenderClear(rend_);
+    SDL_SetRenderDrawColor(m_rend,0,0,0,1);
+    SDL_RenderClear(m_rend);
     // Renderizar Coisas do Emulador
 
-    SDL_RenderPresent(rend_);
+    SDL_RenderPresent(m_rend);
 
     UpdateWindowState();
 
 }
 
 
-void SdlRenderer::UpdateWindowState()
+
+
+
+
+
+
+void SdlRenderer::UpdateWindowState() noexcept
 {
 	static SDL_Event event;
 	SDL_PollEvent(&event);
@@ -71,19 +83,39 @@ void SdlRenderer::UpdateWindowState()
 	}
 }
 
-void SdlRenderer::Dispose()
+
+
+
+
+
+bool SdlRenderer::IsWindowClosed() noexcept
 {
-	SDL_DestroyRenderer(rend_);
-	SDL_DestroyWindow(window_);
-	rend_ = nullptr;
-	window_ = nullptr;
+	return m_userWannaClose;
 }
+
+
+
+
+
+
+
+void SdlRenderer::Dispose() noexcept
+{
+	SDL_DestroyRenderer(m_rend);
+	SDL_DestroyWindow(m_window);
+	m_rend = nullptr;
+	m_window = nullptr;
+}
+
+
+
+
 
 
 
 SdlRenderer::~SdlRenderer()
 {
-	if( rend_ != nullptr || window_  != nullptr )
+	if( m_rend != nullptr || m_window  != nullptr )
 		this->Dispose();
 
 	SDL_Quit();

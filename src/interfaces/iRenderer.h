@@ -37,13 +37,14 @@ public:
 		LOG("Renderizando tela");
 	}
 
-	
+	virtual bool IsWindowClosed() = 0;
+
 	virtual void Dispose()
 	{
 		LOG("Destruindo Renderizador");			
 	}
 
-	virtual bool IsWindowClosed() = 0;
+	
 
 
 

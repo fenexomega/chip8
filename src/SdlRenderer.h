@@ -13,20 +13,18 @@ class SdlRenderer : public iRenderer
 public:
 	SdlRenderer();
 
-	bool Initialize();
-    void Render(const unsigned char *fgx);
-	void Dispose();
-	bool IsWindowClosed();
+	bool Initialize() noexcept ;
+    void Render(const unsigned char *fgx) noexcept;
+	void Dispose() noexcept ;
+	bool IsWindowClosed() noexcept ;
 
 	~SdlRenderer();
-
-
 private:
-	SDL_Window *window_;
-	SDL_Renderer *rend_;
-	bool m_userWannaClose;
+	void UpdateWindowState() noexcept;
 
-	void UpdateWindowState();
+	SDL_Window *m_window;
+	SDL_Renderer *m_rend;
+	bool m_userWannaClose;
 
 	
 
