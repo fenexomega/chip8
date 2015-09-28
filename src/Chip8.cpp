@@ -31,16 +31,18 @@ void Chip8::dispose()
 bool Chip8::wantToExit()
 {
    // return sdl_->event.type == SDL_QUIT;
+   return renderer_->IsWindowClosed();
 }
 
 void Chip8::update()
 {
     //SDL_PollEvent(&sdl_->event);
+	
 }
 
 bool Chip8::initGraphics()
 {
-    if(!renderer_->initialize())
+    if(!renderer_->Initialize())
 		return false;
 
 	
@@ -109,7 +111,7 @@ void Chip8::emulateCycle()
 
 void Chip8::drawGraphics()
 {
-    update();
+	renderer_->Render(NULL);
 }
 
 void Chip8::setKeys()
@@ -252,7 +254,7 @@ void Chip8::executeOpcode()
 
 
 				case 0x3: // 8XY3: sets VX to VX xor VY
-					V_ [ opcode_ & 0x0f00 ] = ( V_ [ opocde_ & 0x0f00 ] ^ V_ [ opcode_ & 0x00f0 ] ); 
+					V_ [ opcode_ & 0x0f00 ] = ( V_ [ opcode_ & 0x0f00 ] ^ V_ [ opcode_ & 0x00f0 ] ); 
 					break;
 				
 				

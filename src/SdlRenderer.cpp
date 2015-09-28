@@ -9,11 +9,15 @@ SdlRenderer::SdlRenderer()
 {
 	window_ = nullptr;
 	rend_ = nullptr;
+	m_userWannaClose = false;
 }
 
+bool SdlRenderer::IsWindowClosed()
+{
+	return m_userWannaClose;
+}
 
-
-bool SdlRenderer::initialize()
+bool SdlRenderer::Initialize()
 {
 
 
@@ -42,7 +46,7 @@ bool SdlRenderer::initialize()
 }
 
 
-void SdlRenderer::render()
+void SdlRenderer::Render()
 {
 
 
@@ -52,12 +56,22 @@ void SdlRenderer::render()
 
     SDL_RenderPresent(rend_);
 
-
-
+	UpdateWindowState();
 
 }
 
-void SdlRenderer::dispose()
+
+void SdlRenderer::UpdateWindowState()
+{
+	static SDL_Event event;
+	SDL_PollEvent(&event);
+	if(event.type == SDL_QUIT)
+	{
+		m_userWannaClose = true;
+	}
+}
+
+void SdlRenderer::Dispose()
 {
 	SDL_DestroyRenderer(rend_);
 	SDL_DestroyWindow(window_);
@@ -66,10 +80,11 @@ void SdlRenderer::dispose()
 }
 
 
+
 SdlRenderer::~SdlRenderer()
 {
 	if( rend_ != nullptr || window_  != nullptr )
-		this->dispose();
+		this->Dispose();
 
 	SDL_Quit();
 }

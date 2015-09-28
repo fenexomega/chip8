@@ -13,9 +13,10 @@ class SdlRenderer : public iRenderer
 public:
 	SdlRenderer();
 
-	bool initialize();
-	void render();
-	void dispose();
+	bool Initialize();
+	void Render();
+	void Dispose();
+	bool IsWindowClosed();
 
 	~SdlRenderer();
 
@@ -23,6 +24,10 @@ public:
 private:
 	SDL_Window *window_;
 	SDL_Renderer *rend_;
+	bool m_userWannaClose;
+
+	void UpdateWindowState();
+
 	
 
 };
