@@ -16,16 +16,18 @@ Chip8::Chip8() :
 bool Chip8::wantToExit()
 {
    // return sdl_->event.type == SDL_QUIT;
+   return renderer_->IsWindowClosed();
 }
 
 void Chip8::update()
 {
     //SDL_PollEvent(&sdl_->event);
+	
 }
 
 bool Chip8::initGraphics()
 {
-    if(!renderer_->initialize())
+    if(!renderer_->Initialize())
 		return false;
 
 	
@@ -96,7 +98,7 @@ void Chip8::emulateCycle()
 
 void Chip8::drawGraphics()
 {
-    update();
+	renderer_->Render(NULL);
 }
 
 bool Chip8::getDrawFlag() const
