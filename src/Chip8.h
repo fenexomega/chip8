@@ -25,13 +25,12 @@ public:
     void drawGraphics();
     bool getDrawFlag() const;
     void setDrawFlag(const bool value);
-    void setKeys();
-    
-    
-    void dispose();
-    bool wantToExit();
-    void update();
-    
+	void setKeys();
+	
+	void update();
+	bool wantToExit();
+	void dispose();
+	
 	~Chip8();
 private:
     bool initGraphics();

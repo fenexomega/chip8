@@ -12,6 +12,11 @@ Chip8::Chip8() :
 	dPrint("Creating Chip8 object...");
 }
 
+
+
+
+
+
 bool Chip8::wantToExit()
 {
 	return renderer_->IsWindowClosed();
@@ -66,9 +71,9 @@ bool Chip8::initSystems()
     sp_     = 0;      // Reset stack pointer
 
     std::fill(gfx_,gfx_ + ( gfxResolution ), 0);// Clear display
-    std::fill(stack_,stack_ + STACK_MAX, 0);	// Clear stack
+    std::fill(stack_,(stack_ + STACK_MAX), 0);	// Clear stack
 	std::fill(V_,V_+16,0);						// Clear registers V0-VF
-	std::fill(memory_,memory_+MEMORY_MAX,0);	// Clear memory
+	std::fill(memory_,(memory_ + MEMORY_MAX),0);	// Clear memory
 	
 	// Load fontset
 	
@@ -92,11 +97,9 @@ bool Chip8::initSystems()
 		0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 	};
 
-	std::copy(chip8_fontset,chip8_fontset+80, memory_); // copy fontset to memory.
+	std::copy(chip8_fontset, ( chip8_fontset + 80 ), memory_); // copy fontset to memory.
 
-
-    
-    return initGraphics() & initSound() & initInput();
+	return initGraphics() & initSound() & initInput();
 
 }
 
@@ -146,6 +149,7 @@ void Chip8::setKeys()
 
 
 
+
 bool Chip8::loadRom(const char *romFileName)
 {
     dPrint("Loading " << romFileName);
@@ -168,11 +172,13 @@ bool Chip8::loadRom(const char *romFileName)
 	
 	romFile.seekg(0,romFile.beg);
 
-	std::copy(std::istream_iterator<unsigned char>(romFile), std::istream_iterator<unsigned char>(), memory_ + 0x200);
+	std::copy(std::istream_iterator<unsigned char>(romFile),
+				std::istream_iterator<unsigned char>(), 
+				memory_ + 0x200);
 	
 	romFile.close();
-		   
-    return true;
+
+	return true;
 }
 
 
@@ -312,7 +318,7 @@ void Chip8::executeOpcode()
 
 					unsigned int result = VX + VY;
 			
-					if( ( result & 0xffff0000 ) != 0 )
+					if( ( result & 0xffffff00 ) != 0 )
 						V_ [ 0xF ] = true;
 					else
 						V_ [ 0xF ] = false;
@@ -322,9 +328,9 @@ void Chip8::executeOpcode()
 					// otimizado :
 					
 					unsigned int result = V_ [ opcode_ & 0x0f00 ] + V_ [ opcode_ & 0x00f0 ];
-					( result & 0xffff0000 ) ? V_ [ 0xF ] = 1 : V_ [ 0xF ] = 0;
+					( result & 0xffffff00 ) ? V_ [ 0xF ] = 1 : V_ [ 0xF ] = 0;
 
-					V_ [ opcode_ & 0x0f00 ] = ( result & 0xffff );
+					V_ [ opcode_ & 0x0f00 ] = ( result & 0xff );
 
 					
 					break;
@@ -332,21 +338,44 @@ void Chip8::executeOpcode()
 					
 			
 
+				case 0x5: // 8XY5: VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
+					
+					V_ [ 0xF ] = ( V_ [ opcode_  &  0x0f00 ]  >  V_  [ opcode_ & 0x00f0 ] ); // checking if theres is a borrow
+					
+					V_ [ opcode_ & 0x0f00 ] -= V_ [ opcode_ & 0x00f0 ]; // VX -= VY
+			 
+					break;
+				
+
+
+
+
+				case 0x6: // 8XY6: Shifts VX right by one. VF is set to the value of the least significant bit of VX before the shift.
+					V_ [ 0xF ] = (V_ [ opcode_ & 0x0f00 ] & 0x1); // check the least significant bit
+					V_ [ 0x0f00 ] >>=  1;
+
+					break;
 
 
 
 
 
+				case 0x7: // 8XY7: Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
+
+					V_ [ 0xF ] =  ( V_ [ opcode_ & 0x00f0 ] > V_ [ opcode_ & 0x0f00 ] ); // check borrow ( VY > VX )
+
+					V_ [ 0x0f00 ] =  ( V_ [ 0x00f0 ] - V_ [ 0x0f00 ] );
+
+					break;
 
 
 
 
+				case 0xE: // Shifts VX left by one. VF is set to the value of the most significant bit of VX before the shift.
+					V_ [ 0xF ] = ( V_ [ opcode_ & 0x0f00 ] & 0x80 );  // check the most signifcant bit
+					V_ [ 0x0f00 ] <<= 1;
 
-
-
-
-
-
+					break;
 
 
 			}

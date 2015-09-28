@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 
 	if(!myChip8->loadRom(argv[1]))
 		return 1;
-
+	
 	if(!myChip8->initSystems())
 		return 1;
 
@@ -36,9 +36,9 @@ int main(int argc, char **argv)
 	    // Store key press state (Press and Release)
 	   	myChip8->setKeys();
 	}
-
+	
 	myChip8->dispose();
-
+	
 	return 0;
 }
 
