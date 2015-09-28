@@ -37,16 +37,17 @@ public:
 		LOG("Renderizando tela");
 	}
 
+
 	virtual bool IsWindowClosed() = 0;
+
 
 	virtual void Dispose()
 	{
 		LOG("Destruindo Renderizador");			
 	}
 
-	
 
-
+	virtual ~iRenderer(){}; // needed for destroying an object from a iRenderer pointer.
 
 
 

@@ -5,18 +5,19 @@
 #include "interfaces/iRenderer.h"
 
 
-
-
 class SdlRenderer : public iRenderer
 {
 
 public:
 	SdlRenderer();
 
-	bool Initialize() noexcept ;
+	bool Initialize() noexcept;
+
     void Render(const unsigned char *fgx) noexcept;
-	void Dispose() noexcept ;
-	bool IsWindowClosed() noexcept ;
+    
+	void Dispose() noexcept;
+
+	bool IsWindowClosed() noexcept;
 
 	~SdlRenderer();
 private:
