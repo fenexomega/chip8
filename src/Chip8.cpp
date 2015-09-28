@@ -6,24 +6,26 @@
 
 
 
-
 Chip8::Chip8() : 
 	renderer_ ( new SdlRenderer() )
 {
-
+	dPrint("Creating Chip8 object...");
 }
 
 bool Chip8::wantToExit()
 {
-   // return sdl_->event.type == SDL_QUIT;
-   return renderer_->IsWindowClosed();
+	return renderer_->IsWindowClosed();
 }
+
+
 
 void Chip8::update()
 {
-    //SDL_PollEvent(&sdl_->event);
+  
 	
 }
+
+
 
 bool Chip8::initGraphics()
 {
@@ -36,17 +38,25 @@ bool Chip8::initGraphics()
     return true;
 }
 
+
+
 bool Chip8::initSound()
 {
 
     return true;
 }
 
+
+
 bool Chip8::initInput()
 {
 
     return true;
 }
+
+
+
+
 
 bool Chip8::initSystems()
 {
@@ -90,31 +100,50 @@ bool Chip8::initSystems()
 
 }
 
+
+
+
+
+
 void Chip8::emulateCycle()
 {
     SDL_Delay(1000/60);
 
 }
 
+
+
+
 void Chip8::drawGraphics()
 {
 	renderer_->Render(NULL);
 }
+
+
+
 
 bool Chip8::getDrawFlag() const
 {
     return drawFlag_;
 }
 
+
+
+
 void Chip8::setDrawFlag(const bool value)
 {
     drawFlag_ = value;
 }
 
+
+
+
 void Chip8::setKeys()
 {
 
 }
+
+
 
 
 bool Chip8::loadRom(const char *romFileName)
@@ -148,17 +177,28 @@ bool Chip8::loadRom(const char *romFileName)
 
 
 
+
+
 void Chip8::dispose()
 {
-   
+	if(renderer_ != nullptr)
+		delete renderer_;
+	
+	renderer_ = nullptr;
 }
+
+
+
 
 Chip8::~Chip8()
 {
-    dPrint("Destroying Chip8...");
-	this->dispose();
-    delete renderer_;
+	dPrint("Destroying Chip8 object...");
+	
+	if(renderer_ != nullptr)
+		this->dispose();
 }
+
+
 
 
 
@@ -166,7 +206,7 @@ void Chip8::executeOpcode()
 {
 	opcode_ = ( memory_[ pc_ ] << 8 | memory_[ pc_ + 1 ] );
 	
-    pc_ += 2;
+	pc_ += 2;
 
 	// NNN: address
 	// NN: 8 bit constant
@@ -290,6 +330,25 @@ void Chip8::executeOpcode()
 					break;
 				}	
 					
+			
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 			}
 			break; // END OF 8xxx
 			

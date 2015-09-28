@@ -5,13 +5,11 @@
 
 
 
-SdlRenderer::SdlRenderer()
+SdlRenderer::SdlRenderer() :
+	m_window (nullptr), m_rend (nullptr), m_userWannaClose (false)
 {
-	m_window = nullptr;
-	m_rend = nullptr;
-	m_userWannaClose = false;
+	LOG("Creating SdlRenderer object");
 }
-
 
 
 
@@ -95,14 +93,13 @@ bool SdlRenderer::IsWindowClosed() noexcept
 
 
 
-
-
-
-
 void SdlRenderer::Dispose() noexcept
 {
-	SDL_DestroyRenderer(m_rend);
-	SDL_DestroyWindow(m_window);
+	if(m_rend != nullptr)
+		SDL_DestroyRenderer(m_rend);
+	if(m_window != nullptr)
+		SDL_DestroyWindow(m_window);
+
 	m_rend = nullptr;
 	m_window = nullptr;
 }
@@ -112,9 +109,10 @@ void SdlRenderer::Dispose() noexcept
 
 
 
-
 SdlRenderer::~SdlRenderer()
 {
+
+	LOG("Destroying SdlRenderer object...");
 	if( m_rend != nullptr || m_window  != nullptr )
 		this->Dispose();
 
