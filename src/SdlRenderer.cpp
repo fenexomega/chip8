@@ -43,7 +43,7 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 	//SDL_SetRenderDrawBlendMode(m_rend, SDL_BLENDMODE_BLEND);
 	//SDL_SetTextureBlendMode(m_texture, SDL_BLENDMODE_BLEND);
 
-	//SDL_SetRenderDrawColor(m_rend, 0, 0, 0, 255);
+	SDL_SetRenderDrawColor(m_rend, 0, 0, 0, 255);
 
 	SDL_RenderClear(m_rend);
 
@@ -60,16 +60,19 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 
 void SdlRenderer::Render(const uint32_t *gfx) noexcept
 {
+	
+	
 
 	SDL_UpdateTexture(m_texture, nullptr, gfx, 4 * 64 );
 	
-	
+	SDL_RenderClear(m_rend);
+
 	SDL_RenderCopy(m_rend, m_texture, nullptr, nullptr);
 
 	
 	SDL_RenderPresent(m_rend);
 
-	SDL_Delay(1000/120);
+	SDL_Delay(1000/60);
 }
 
 

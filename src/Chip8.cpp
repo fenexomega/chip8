@@ -227,7 +227,7 @@ void Chip8::executeOpcode()
 
 
 				case 0x00E0: // clear screen
-					//renderer_->Render(NULL);
+					std::fill_n(gfx_, gfxResolution, 0);
 					break;
 
 
@@ -462,7 +462,7 @@ void Chip8::executeOpcode()
 
 					V_ [0xF] |= ( gfx_ [pixelPos] & pixel );
 
-					gfx_ [pixelPos] ^= ( pixel != 0) ? 0xffffffff : 0;
+					gfx_ [pixelPos] ^= ( pixel != 0 ) ? 0xffffffff : 0;
 					
 				
 					
