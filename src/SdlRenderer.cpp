@@ -6,7 +6,7 @@
 
 
 SdlRenderer::SdlRenderer() :
-	m_window (nullptr), m_rend (nullptr), m_userWannaClose (false)
+	m_window (nullptr), m_rend (nullptr), m_texture (nullptr),  m_userWannaClose (false)
 {
 	LOG("Creating SdlRenderer object");
 }
@@ -16,7 +16,7 @@ SdlRenderer::SdlRenderer() :
 
 
 
-bool SdlRenderer::Initialize() noexcept
+bool SdlRenderer::Initialize(const int width,const int height) noexcept
 {
 
 
@@ -27,13 +27,14 @@ bool SdlRenderer::Initialize() noexcept
 	}
 	
 
-	m_window = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,800,600,SDL_WINDOW_RESIZABLE);
+	m_window = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,width*4,height*6,SDL_WINDOW_RESIZABLE);
 	m_rend = SDL_CreateRenderer(m_window,-1,SDL_RENDERER_ACCELERATED);
+	m_texture = SDL_CreateTexture(m_rend, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width,height);
 
-	if(m_window == nullptr || m_rend == nullptr)
+	if(m_window == nullptr || m_rend == nullptr || m_texture == nullptr)
 	{
 
-		LOG("Couldn't allocate SDL_Window or SDL_Renderer.");
+		LOG("Couldn't allocate SDL_Window, SDL_Renderer or SDL_Texture.");
 		return false;
 	}
 	
@@ -50,18 +51,18 @@ bool SdlRenderer::Initialize() noexcept
 
 
 
-void SdlRenderer::Render(const unsigned char *fgx) noexcept
+void SdlRenderer::Render(const unsigned int *gfx) noexcept
 {
 
 
-    SDL_SetRenderDrawColor(m_rend,0,0,0,1);
-    SDL_RenderClear(m_rend);
-    // Renderizar Coisas do Emulador
 
-    SDL_RenderPresent(m_rend);
 
-    UpdateWindowState();
+	SDL_UpdateTexture(m_texture, nullptr, gfx, 4*64);
+	SDL_RenderCopy(m_rend, m_texture, nullptr, nullptr);
+	SDL_RenderPresent(m_rend);
 
+	
+	
 }
 
 
@@ -76,9 +77,8 @@ void SdlRenderer::UpdateWindowState() noexcept
 	static SDL_Event event;
 	SDL_PollEvent(&event);
 	if(event.type == SDL_QUIT)
-	{
 		m_userWannaClose = true;
-	}
+	
 }
 
 
@@ -88,6 +88,7 @@ void SdlRenderer::UpdateWindowState() noexcept
 
 bool SdlRenderer::IsWindowClosed() noexcept
 {
+	UpdateWindowState();
 	return m_userWannaClose;
 }
 
@@ -95,11 +96,14 @@ bool SdlRenderer::IsWindowClosed() noexcept
 
 void SdlRenderer::Dispose() noexcept
 {
+	if(m_texture != nullptr)
+		SDL_DestroyTexture(m_texture);
 	if(m_rend != nullptr)
 		SDL_DestroyRenderer(m_rend);
 	if(m_window != nullptr)
 		SDL_DestroyWindow(m_window);
 
+	m_texture = nullptr;
 	m_rend = nullptr;
 	m_window = nullptr;
 }
@@ -113,7 +117,7 @@ SdlRenderer::~SdlRenderer()
 {
 
 	LOG("Destroying SdlRenderer object...");
-	if( m_rend != nullptr || m_window  != nullptr )
+	if( m_rend != nullptr || m_window  != nullptr  || m_texture != nullptr)
 		this->Dispose();
 
 	SDL_Quit();

@@ -11,9 +11,9 @@ class SdlRenderer : public iRenderer
 public:
 	SdlRenderer();
 
-	bool Initialize() noexcept;
+	bool Initialize(const int width,const int height) noexcept;
 
-    void Render(const unsigned char *fgx) noexcept;
+    void Render(const unsigned int *gfx) noexcept;
     
 	void Dispose() noexcept;
 
@@ -25,6 +25,8 @@ private:
 
 	SDL_Window *m_window;
 	SDL_Renderer *m_rend;
+	SDL_Texture *m_texture;
+	
 	bool m_userWannaClose;
 
 	

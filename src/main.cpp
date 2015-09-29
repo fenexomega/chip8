@@ -1,7 +1,6 @@
 #include <iostream>
 #include <memory>
 #include <SDL2/SDL.h>
-#include <SDL/SDL_image.h>
 
 #include "Chip8.h"
 
@@ -28,13 +27,8 @@ int main(int argc, char **argv)
 	while(!myChip8->wantToExit())
 	{
 	    // Emulate one cycle
-	    myChip8->emulateCycle();
-	    // If the draw flag is set, update the screen
-	    if(myChip8->getDrawFlag())
-	    	myChip8->drawGraphics();
+	    myChip8->executeOpcode(); // test phase.
 
-	    // Store key press state (Press and Release)
-	   	myChip8->setKeys();
 	}
 	
 	myChip8->dispose();

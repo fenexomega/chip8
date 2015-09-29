@@ -25,26 +25,17 @@
 
 class iRenderer
 {
+// pure abstract class, better for VCPP build, and performance.
 public:
-	virtual bool Initialize()
-	{
-		LOG("Inicializando Renderizador");
-	}
-
-	
-	virtual void Render(const unsigned char *gfx)
-	{
-		LOG("Renderizando tela");
-	}
+	virtual bool Initialize(const int,const int) = 0; 
+		
+	virtual void Render(const unsigned int *gfx) = 0;
 
 
 	virtual bool IsWindowClosed() = 0;
 
 
-	virtual void Dispose()
-	{
-		LOG("Destruindo Renderizador");			
-	}
+	virtual void Dispose() = 0;
 
 
 	virtual ~iRenderer(){}; // needed for destroying an object from a iRenderer pointer.
