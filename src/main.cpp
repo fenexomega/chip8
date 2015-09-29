@@ -1,7 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <SDL2/SDL.h>
-#include <SDL/SDL_image.h>
+#include <SDL2/SDL_image.h>
 
 #include "Chip8.h"
 
@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 {
 		
 
-	if(argc < 2 )
+	if(argc < 1 )
 	{
 		std::cout << "No game to load, exiting." << std::endl; 
 		return 0;
@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 
 	std::unique_ptr<Chip8> myChip8(new Chip8()); // save stack memory using smart pointers.
 
-	if(!myChip8->loadRom(argv[1]))
+	if(!myChip8->loadRom("brix_test_game"))
 		return 1;
 	
 	if(!myChip8->initSystems())

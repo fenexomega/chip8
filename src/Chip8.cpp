@@ -27,7 +27,6 @@ bool Chip8::wantToExit()
 void Chip8::update()
 {
   
-	
 }
 
 
@@ -327,10 +326,10 @@ void Chip8::executeOpcode()
 					*/
 					// otimizado :
 					
-					unsigned int result = V_ [ opcode_ & 0x0f00 ] + V_ [ opcode_ & 0x00f0 ];
-					( result & 0xffffff00 ) ? V_ [ 0xF ] = 1 : V_ [ 0xF ] = 0;
+					unsigned int result = V_ [ opcode_ & 0x0f00 ] + V_ [ opcode_ & 0x00f0 ]; // compute sum
+					( result & 0xffffff00 ) ? V_ [ 0xF ] = 1 : V_ [ 0xF ] = 0; // check carry
 
-					V_ [ opcode_ & 0x0f00 ] = ( result & 0xff );
+					V_ [ opcode_ & 0x0f00 ] = ( result & 0xff ); 
 
 					
 					break;
