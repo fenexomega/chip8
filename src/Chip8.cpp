@@ -66,17 +66,17 @@ bool Chip8::initInput()
 
 bool Chip8::initSystems()
 {
-    pc_     = 0x200;  // Program counter starts at 0x200
-    opcode_ = 0;      // Reset current opcode
-    I_      = 0;      // Reset index register
-    sp_     = 0;      // Reset stack pointer
-	
-	std::srand(std::time(NULL));  					// seed rand
-    std::fill(gfx_,gfx_ + ( gfxResolution ), 0); 	// Clear display
-    std::fill(stack_,(stack_ + STACK_MAX), 0);		// Clear stack
-	std::fill(V_,V_+16,0);							// Clear registers V0-VF
+	pc_     = 0x200;  // Program counter starts at 0x200
+	opcode_ = 0;      // Reset current opcode
+	I_      = 0;      // Reset index register
+	sp_     = 0;      // Reset stack pointer
+
+	std::srand(std::time(NULL)); 			// seed rand
+	std::fill(gfx_,gfx_ + ( gfxResolution ), 0); 	// Clear display
+	std::fill(stack_,(stack_ + STACK_MAX), 0);	// Clear stack
+	std::fill(V_,V_+16,0);				// Clear registers V0-VF
 	std::fill(memory_,(memory_ + MEMORY_MAX),0); 	// Clear memory
-	
+
 	// Load fontset
 	
 	unsigned char chip8_fontset[80] 
@@ -112,7 +112,7 @@ bool Chip8::initSystems()
 
 void Chip8::emulateCycle()
 {
-    SDL_Delay(1000/60);
+	SDL_Delay(1000/60);
 
 }
 
@@ -129,7 +129,7 @@ void Chip8::drawGraphics()
 
 bool Chip8::getDrawFlag() const
 {
-    return drawFlag_;
+	return drawFlag_;
 }
 
 
@@ -137,7 +137,7 @@ bool Chip8::getDrawFlag() const
 
 void Chip8::setDrawFlag(const bool value)
 {
-    drawFlag_ = value;
+	drawFlag_ = value;
 }
 
 
@@ -154,18 +154,18 @@ void Chip8::setKeys()
 
 bool Chip8::loadRom(const char *romFileName)
 {
-    dPrint("Loading " << romFileName);
-    std::ifstream romFile(romFileName, std::ios::in | std::ios::binary | std::ios::ate);
+	dPrint("Loading " << romFileName);
+	std::ifstream romFile(romFileName, std::ios::in | std::ios::binary | std::ios::ate);
    
 
-    if(!romFile.is_open())
-    {
-        dPrint("Error at opening ROM file. Exiting!");
-        return false;
-    }
-
+	if(!romFile.is_open())
+	{
+		dPrint("Error at opening ROM file. Exiting!");
+		return false;
+	}
+	
 	size_t romFileSize = romFile.tellg();
-
+	
 	if(romFileSize > romMaxSize)
 	{
 		dPrint("Error, ROM size not compatible. Exiting!");
@@ -173,13 +173,13 @@ bool Chip8::loadRom(const char *romFileName)
 	}
 	
 	romFile.seekg(0,romFile.beg);
-
+	
 	std::copy(std::istream_iterator<unsigned char>(romFile),
-				std::istream_iterator<unsigned char>(), 
-				memory_ + 0x200);
+			std::istream_iterator<unsigned char>(), 
+			memory_ + 0x200);
 	
 	romFile.close();
-
+	
 	return true;
 }
 
@@ -450,6 +450,7 @@ void Chip8::executeOpcode()
 					if(sprite[currentBit])
 						gfx_[(Vx + Vy) * Vy] = ~gfx_[(Vx + Vy) * Vy];
 				}
+				_8bitRow++;
 			}
 
 			renderer_->Render(gfx_);
