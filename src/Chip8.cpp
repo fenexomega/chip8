@@ -28,7 +28,7 @@ bool Chip8::wantToExit()
 
 void Chip8::update()
 {
-  
+
 }
 
 
@@ -121,7 +121,7 @@ void Chip8::emulateCycle()
 
 void Chip8::drawGraphics()
 {
-	renderer_->Render(NULL);
+	//renderer_->Render(NULL);
 }
 
 
@@ -439,28 +439,33 @@ void Chip8::executeOpcode()
 			*/
 
 
-			auto Vx = V_ [ opcode_ & 0x0f00 ], Vy = V_ [ opcode_ & 0x00f0 ];
-			auto *_8bitRow = &memory_ [ I_ ];
-			unsigned int height = ( opcode_ & 0x000f );
-			for(unsigned int i = 0; i < height; ++i, ++Vy)
+			V_ [0xF] = 1;
+			auto Vx = V_ [ opcode_ & 0x0f00], Vy = V_ [ opcode_ & 0x00f0 ];
+			int height = ( opcode_ & 0x000f);
+			
+			for (int j = 0; j < height; j++) 
 			{
-				std::bitset<8> sprite(*_8bitRow);
-				for(int currentBit = 7 ; currentBit >=0; --currentBit, ++Vx)
+				unsigned char sprite = memory_[ I_ + j];
+				for (int i = 0; i < 8; i++) 
 				{
-					if(sprite[currentBit])
-						gfx_[(Vx + Vy) * Vy] = ~gfx_[(Vx + Vy) * Vy];
+					int px = (Vx + i) & 63;
+					int py = (Vy + j) & 31;
+					int pos = 64 * py + px;
+					int pixel = (sprite & (1 << (7-i))) != 0;
+
+					V_ [0xF] |= (gfx_ [pos] & pixel);
+					gfx_ [pos] ^= pixel;
 				}
-				_8bitRow++;
 			}
 
 			renderer_->Render(gfx_);
 
 
-
 			break;
 		}
 
-	
+		default:
+			break;
 
 	}	
     

@@ -57,12 +57,11 @@ void SdlRenderer::Render(const unsigned int *gfx) noexcept
 
 
 	SDL_UpdateTexture(m_texture, nullptr, gfx, 4*64);
-
 	SDL_RenderCopy(m_rend, m_texture, nullptr, nullptr);
 	SDL_RenderPresent(m_rend);
 
+	
 	UpdateWindowState();
-
 }
 
 
@@ -77,9 +76,8 @@ void SdlRenderer::UpdateWindowState() noexcept
 	static SDL_Event event;
 	SDL_PollEvent(&event);
 	if(event.type == SDL_QUIT)
-	{
 		m_userWannaClose = true;
-	}
+	
 }
 
 
