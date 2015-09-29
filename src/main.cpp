@@ -1,7 +1,7 @@
 #include <iostream>
 #include <memory>
 #include <SDL2/SDL.h>
-
+#include <SDL/SDL_image.h>
 #include "Chip8.h"
 
 int main(int argc, char **argv)

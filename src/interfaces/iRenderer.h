@@ -29,7 +29,7 @@ class iRenderer
 public:
 	virtual bool Initialize(const int,const int) = 0; 
 		
-	virtual void Render(const unsigned int *gfx) = 0;
+	virtual void Render(const uint32_t *gfx) = 0;
 
 
 	virtual bool IsWindowClosed() = 0;

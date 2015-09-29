@@ -13,7 +13,7 @@ public:
 
 	bool Initialize(const int width,const int height) noexcept;
 
-    void Render(const unsigned int *gfx) noexcept;
+    void Render(const uint32_t *gfx) noexcept;
     
 	void Dispose() noexcept;
 
