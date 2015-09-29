@@ -64,6 +64,9 @@ bool Chip8::initInput()
 
 bool Chip8::initSystems()
 {
+
+	dPrint("Initializing Chip8 Systems...");
+
 	pc_     = 0x200;  // Program counter starts at 0x200
 	opcode_ = 0;      // Reset current opcode
 	I_      = 0;      // Reset index register
@@ -110,7 +113,6 @@ bool Chip8::initSystems()
 
 void Chip8::emulateCycle()
 {
-	this->executeOpcode();
 
 	SDL_Delay(1000/60);
 
@@ -180,6 +182,9 @@ bool Chip8::loadRom(const char *romFileName)
 	
 	romFile.close();
 	
+	dPrint("Load Done!");
+
+
 	return true;
 }
 
@@ -230,6 +235,7 @@ void Chip8::executeOpcode()
 	{
 		
 		case 0x0000: // BEGIN OF 0xxx
+		{
 			switch( opcode_ )
 			{
 				case 0x0000: // 0NNN " calls RCA 1802 program at address NNN. not necessary for most ROMs. "
@@ -250,8 +256,9 @@ void Chip8::executeOpcode()
 					break;
 
 			}
+
 			break;// END OF 0xxx
-		
+		}
 
 		case 0x1000: // 1NNN:  jumps to address NNN
 			pc_ = (opcode_ & 0x0fff);
@@ -409,13 +416,13 @@ void Chip8::executeOpcode()
 
 
 		case 0xA000: // ANNN: sets I to the address NNN
-			I_ = opcode_ & 0x0fff;
+			I_ = (opcode_ & 0x0fff);
 			break;
 
 
 
 		case 0xB000: // BNNN: jumps to the address NNN plus V0
-			pc_ = (( opcode_ & 0x0fff ) + V_ [ 0 ]) & 0xFFF ;
+			pc_ = (( opcode_ & 0x0fff ) + V_ [ 0 ]) & 0xFFF;
 			break;
 
 	
@@ -453,12 +460,15 @@ void Chip8::executeOpcode()
 
 
 			V_ [0xF] = 0;
+
 			auto Vx = V_ [ opcode_ & 0x0f00], Vy = V_ [ opcode_ & 0x00f0 ];
+			
 			int height = ( opcode_ & 0x000f);
 			
 			for (int j = 0; j < height; j++) 
 			{
 				auto sprite = memory_ [ I_ + j ];
+				
 				for (int i = 0; i < 8; i++) 
 				{
 					int px = (Vx + i) & 63;
@@ -467,7 +477,8 @@ void Chip8::executeOpcode()
 					int pixel = (sprite & (1 << (7-i))) != 0;
 
 					V_ [ 0xF ] |= (gfx_ [ pos ] & pixel);
-					gfx_ [ pos ] ^= pixel;
+
+					gfx_ [ pos ] = ~pixel;
 				}
 			}
 			
@@ -507,8 +518,6 @@ void Chip8::executeOpcode()
 					break;
 
 				
-
-
 
 				case 0x8: // FX18	Sets the sound timer to VX.
 					soundTimer_ = V_[opcode_ & 0x0f00];
@@ -584,6 +593,7 @@ void Chip8::executeOpcode()
 
 	if (soundTimer_ > 0)
 		--soundTimer_;
+
 	if (delayTimer_ > 0)
 		--delayTimer_;
 

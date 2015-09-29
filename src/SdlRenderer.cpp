@@ -6,7 +6,7 @@
 
 
 SdlRenderer::SdlRenderer() :
-	m_window (nullptr), m_rend (nullptr), m_userWannaClose (false)
+	m_window (nullptr), m_rend (nullptr), m_texture (nullptr),  m_userWannaClose (false)
 {
 	LOG("Creating SdlRenderer object");
 }
@@ -16,7 +16,7 @@ SdlRenderer::SdlRenderer() :
 
 
 
-bool SdlRenderer::Initialize(int width, int height) noexcept
+bool SdlRenderer::Initialize(const int width,const int height) noexcept
 {
 
 
@@ -53,6 +53,7 @@ bool SdlRenderer::Initialize(int width, int height) noexcept
 
 void SdlRenderer::Render(const unsigned int *gfx) noexcept
 {
+
 
 
 
@@ -95,11 +96,14 @@ bool SdlRenderer::IsWindowClosed() noexcept
 
 void SdlRenderer::Dispose() noexcept
 {
+	if(m_texture != nullptr)
+		SDL_DestroyTexture(m_texture);
 	if(m_rend != nullptr)
 		SDL_DestroyRenderer(m_rend);
 	if(m_window != nullptr)
 		SDL_DestroyWindow(m_window);
 
+	m_texture = nullptr;
 	m_rend = nullptr;
 	m_window = nullptr;
 }
@@ -113,7 +117,7 @@ SdlRenderer::~SdlRenderer()
 {
 
 	LOG("Destroying SdlRenderer object...");
-	if( m_rend != nullptr || m_window  != nullptr )
+	if( m_rend != nullptr || m_window  != nullptr  || m_texture != nullptr)
 		this->Dispose();
 
 	SDL_Quit();
