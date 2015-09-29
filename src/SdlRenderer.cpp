@@ -61,7 +61,7 @@ void SdlRenderer::Render(const unsigned int *gfx) noexcept
 	SDL_RenderPresent(m_rend);
 
 	
-	UpdateWindowState();
+	
 }
 
 
@@ -87,6 +87,7 @@ void SdlRenderer::UpdateWindowState() noexcept
 
 bool SdlRenderer::IsWindowClosed() noexcept
 {
+	UpdateWindowState();
 	return m_userWannaClose;
 }
 

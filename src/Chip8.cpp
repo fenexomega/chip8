@@ -38,8 +38,6 @@ bool Chip8::initGraphics()
     if(!renderer_->Initialize(64,32))
 		return false;
 
-	
-	drawFlag_ = true;
    
     return true;
 }
@@ -70,12 +68,12 @@ bool Chip8::initSystems()
 	opcode_ = 0;      // Reset current opcode
 	I_      = 0;      // Reset index register
 	sp_     = 0;      // Reset stack pointer
-
-	std::srand(std::time(NULL)); 			// seed rand
-	std::fill(gfx_,gfx_ + ( gfxResolution ), 0); 	// Clear display
-	std::fill(stack_,(stack_ + STACK_MAX), 0);	// Clear stack
-	std::fill(V_,V_+16,0);				// Clear registers V0-VF
-	std::fill(memory_,(memory_ + MEMORY_MAX),0); 	// Clear memory
+	drawFlag_ = false;
+	std::srand(std::time(NULL)); 		// seed rand
+	std::fill_n(gfx_,gfxResolution, 0); // Clear display
+	std::fill_n(stack_,STACK_MAX, 0);	// Clear stack
+	std::fill_n(V_,16,0);				// Clear registers V0-VF
+	std::fill_n(memory_,MEMORY_MAX,0); 	// Clear memory
 
 	// Load fontset
 	
@@ -112,6 +110,8 @@ bool Chip8::initSystems()
 
 void Chip8::emulateCycle()
 {
+	this->executeOpcode();
+
 	SDL_Delay(1000/60);
 
 }
@@ -290,36 +290,37 @@ void Chip8::executeOpcode()
 
 
 		case 0x8000: // BEGIN OF 8xxx
-			switch( opcode_ & 0x000f )
+		{
+			switch (opcode_ & 0x000f)
 			{
 				case 0x0: // 8XY0: store the value of register VY in register VX
-					V_ [ opcode_ & 0x0f00 ] = V_ [ opcode_ & 0x00f0 ];
+					V_[opcode_ & 0x0f00] = V_[opcode_ & 0x00f0];
 					break;
 
 
 				case 0x1: // 8XY1: set VX to VX | VY
-					V_ [ opcode_ & 0x0f00 ] = ( V_ [ opcode_ & 0x0f00 ] | V_ [ opcode_ & 0x00f0 ] ) ;
+					V_[opcode_ & 0x0f00] = (V_[opcode_ & 0x0f00] | V_[opcode_ & 0x00f0]);
 					break;
 
 				case 0x2: // 8XY2: sets VX to VX and VY
-					V_ [ opcode_ & 0x0f00 ] = ( V_ [ opcode_ & 0x0f00] & V_ [ opcode_ & 0x00f0] ) ;
+					V_[opcode_ & 0x0f00] = (V_[opcode_ & 0x0f00] & V_[opcode_ & 0x00f0]);
 					break;
 
 
 				case 0x3: // 8XY3: sets VX to VX xor VY
-					V_ [ opcode_ & 0x0f00 ] = ( V_ [ opcode_ & 0x0f00 ] ^ V_ [ opcode_ & 0x00f0 ] ); 
+					V_[opcode_ & 0x0f00] = (V_[opcode_ & 0x0f00] ^ V_[opcode_ & 0x00f0]);
 					break;
-				
-				
+
+
 				case 0x4: // 8XY4: Adds VY to VX . VF is set to 1 when theres a carry, and to 0 when there isn't
 				{
-					/* demonstracao : 
-					
+					/* demonstracao :
+
 					auto &VX = V_ [ opcode_ & 0x0f00 ];
 					auto &VY = V_ [ opcode_ & 0x00f0 ];
 
 					unsigned int result = VX + VY;
-			
+
 					if( ( result & 0xffffff00 ) != 0 )
 						V_ [ 0xF ] = true;
 					else
@@ -328,33 +329,33 @@ void Chip8::executeOpcode()
 					VX = result;
 					*/
 					// otimizado :
-					
-					unsigned int result = V_ [ opcode_ & 0x0f00 ] + V_ [ opcode_ & 0x00f0 ]; // compute sum
-					( result & 0xffffff00 ) ? V_ [ 0xF ] = 1 : V_ [ 0xF ] = 0; // check carry
 
-					V_ [ opcode_ & 0x0f00 ] = ( result & 0xff ); 
+					unsigned int result = V_[opcode_ & 0x0f00] + V_[opcode_ & 0x00f0]; // compute sum
+					(result & 0xffffff00) ? V_[0xF] = 1 : V_[0xF] = 0; // check carry
 
-					
+					V_[opcode_ & 0x0f00] = (result & 0xff);
+
+
 					break;
-				}	
-					
-			
+			}
+
+
 
 				case 0x5: // 8XY5: VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
-					
-					V_ [ 0xF ] = ( V_ [ opcode_  &  0x0f00 ]  >  V_  [ opcode_ & 0x00f0 ] ); // checking if theres is a borrow
-					
-					V_ [ opcode_ & 0x0f00 ] -= V_ [ opcode_ & 0x00f0 ]; // VX -= VY
-			 
+
+					V_[0xF] = (V_[opcode_ & 0x0f00] > V_[opcode_ & 0x00f0]); // checking if theres is a borrow
+
+					V_[opcode_ & 0x0f00] -= V_[opcode_ & 0x00f0]; // VX -= VY
+
 					break;
-				
+
 
 
 
 
 				case 0x6: // 8XY6: Shifts VX right by one. VF is set to the value of the least significant bit of VX before the shift.
-					V_ [ 0xF ] = (V_ [ opcode_ & 0x0f00 ] & 0x1); // check the least significant bit
-					V_ [ 0x0f00 ] >>=  1;
+					V_[0xF] = (V_[opcode_ & 0x0f00] & 0x1); // check the least significant bit
+					V_[0x0f00] >>= 1;
 
 					break;
 
@@ -364,9 +365,9 @@ void Chip8::executeOpcode()
 
 				case 0x7: // 8XY7: Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
 
-					V_ [ 0xF ] =  ( V_ [ opcode_ & 0x00f0 ] > V_ [ opcode_ & 0x0f00 ] ); // check borrow ( VY > VX )
+					V_[0xF] = (V_[opcode_ & 0x00f0] > V_[opcode_ & 0x0f00]); // check borrow ( VY > VX )
 
-					V_ [ 0x0f00 ] =  ( V_ [ 0x00f0 ] - V_ [ 0x0f00 ] );
+					V_[0x0f00] = (V_[0x00f0] - V_[0x0f00]);
 
 					break;
 
@@ -374,16 +375,19 @@ void Chip8::executeOpcode()
 
 
 				case 0xE: // Shifts VX left by one. VF is set to the value of the most significant bit of VX before the shift.
-					V_ [ 0xF ] = ( V_ [ opcode_ & 0x0f00 ] & 0x80 );  // check the most signifcant bit
-					V_ [ 0x0f00 ] <<= 1;
+					V_[0xF] = (V_[opcode_ & 0x0f00] & 0x80);  // check the most signifcant bit
+					V_[0x0f00] <<= 1;
 
 					break;
 
 
 			}
+			
+			
+			
 			break; // END OF 8xxx
-		
 
+		}
 
 
 
@@ -439,13 +443,13 @@ void Chip8::executeOpcode()
 			*/
 
 
-			V_ [0xF] = 1;
+			V_ [0xF] = 0;
 			auto Vx = V_ [ opcode_ & 0x0f00], Vy = V_ [ opcode_ & 0x00f0 ];
 			int height = ( opcode_ & 0x000f);
 			
 			for (int j = 0; j < height; j++) 
 			{
-				unsigned char sprite = memory_[ I_ + j];
+				auto sprite = memory_ [ I_ + j ];
 				for (int i = 0; i < 8; i++) 
 				{
 					int px = (Vx + i) & 63;
@@ -453,22 +457,127 @@ void Chip8::executeOpcode()
 					int pos = 64 * py + px;
 					int pixel = (sprite & (1 << (7-i))) != 0;
 
-					V_ [0xF] |= (gfx_ [pos] & pixel);
-					gfx_ [pos] ^= pixel;
+					V_ [ 0xF ] |= (gfx_ [ pos ] & pixel);
+					gfx_ [ pos ] ^= pixel;
 				}
 			}
 
 			renderer_->Render(gfx_);
-
+			
 
 			break;
 		}
 
-		default:
-			break;
 
+		case 0xE000:// BEGIN Exxx
+		{
+			switch (opcode_ & 0x000f)
+			{
+				case 0xE: // EX9E: Skips the next instruction if the key stored in VX is pressed.
+					break;
+
+
+				case 0x1: //0xEXA1	Skips the next instruction if the key stored in VX isn't pressed.
+					break;
+			}			
+			
+			break; // END OF Exxx
+		}
+
+
+		case 0xF000: // BEGIN OF Fxxx
+		{
+			switch (opcode_ & 0x000f)
+			{
+				case 0x7: // FX07	Sets VX to the value of the delay timer.
+					V_[opcode_ & 0x0f00] = delayTimer_;
+					break;
+
+
+				case 0xA: //FX0A	A key press is awaited, and then stored in VX.
+					break;
+
+				
+
+
+
+				case 0x8: // FX18	Sets the sound timer to VX.
+					soundTimer_ = V_[opcode_ & 0x0f00];
+					break;
+
+
+
+				case 0xE://	FX1E	Adds VX to I.
+					I_ += V_[opcode_ & 0x0f00];
+					break;
+
+				case 0x9: // FX29   Sets I to the location of the sprite for the character in VX. 
+						  // Characters 0-F (in hexadecimal) are represented by a 4x5 font.
+					I_ = (V_[opcode_ & 0x0f00] & 0xf);
+
+					break;
+
+
+				case 0x3: //FX33	Stores the Binary - coded decimal representation of VX, 
+				{		 //with the most significant of three digits at the address in I, 
+						 //the middle digit at I plus 1, and the least significant digit at I plus 2. 
+						 //(In other words, take the decimal representation of VX, place the hundreds digit in memory at location in I, 
+						 //the tens digit at location I + 1, and the ones digit at location I + 2.)
+					auto Vx = V_[opcode_ & 0x0f00];
+
+					memory_[I_ + 2] = Vx % 10;
+					memory_[I_ + 1] = (Vx / 10) % 10;
+					memory_[I_] = (Vx / 100);
+
+					break;
+				}
+
+
+
+
+				case 0x5: // BEGIN OF FX*5
+				{
+					switch (opcode_ & 0x00ff)
+					{
+						case 0x15: // FX15	Sets the delay timer to VX.
+							delayTimer_ = V_[opcode_ & 0x0f00];
+							break;
+
+						case 0x55: //FX55	Stores V0 to VX in memory starting at address I
+							std::copy_n(V_, (opcode_ & 0x0f00) + 1, memory_ + I_);
+							break;
+
+						case 0x65: //FX65	Fills V0 to VX with values from memory starting at address I.
+							std::copy_n(memory_ + I_, (opcode_ & 0x0f00) + 1, V_);
+							break;
+
+					}
+
+
+					break; // END OF FX*5
+				}
+
+
+
+				
+				
+			}
+
+
+			break; // END OF Fxxx
+		}
+		
+		
+		#undef VX
+		#undef VY
+		
 	}	
+
+	if (soundTimer_ > 0)
+		--soundTimer_;
+	if (delayTimer_ > 0)
+		--delayTimer_;
+
     
-	#undef VX
-	#undef VY
+
 }
