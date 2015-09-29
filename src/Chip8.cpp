@@ -69,10 +69,10 @@ bool Chip8::initSystems()
     I_      = 0;      // Reset index register
     sp_     = 0;      // Reset stack pointer
 
-    std::fill(gfx_,gfx_ + ( gfxResolution ), 0);// Clear display
-    std::fill(stack_,(stack_ + STACK_MAX), 0);	// Clear stack
-	std::fill(V_,V_+16,0);						// Clear registers V0-VF
-	std::fill(memory_,(memory_ + MEMORY_MAX),0);	// Clear memory
+    std::fill(gfx_,gfx_ + ( gfxResolution ), 0); 	// Clear display
+    std::fill(stack_,(stack_ + STACK_MAX), 0);		// Clear stack
+	std::fill(V_,V_+16,0);							// Clear registers V0-VF
+	std::fill(memory_,(memory_ + MEMORY_MAX),0); 	// Clear memory
 	
 	// Load fontset
 	

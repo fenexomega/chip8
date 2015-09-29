@@ -12,7 +12,9 @@
 constexpr size_t gfxResolution { 64 * 32 };
 constexpr size_t romMaxSize { MEMORY_MAX - 0x200 };
 
-
+// Telmac operated 3.58MHz / 2
+// Chip8 timers count down at 60Hz .
+// ( 3580000 / 2 ) / 60
 
 class Chip8
 {
