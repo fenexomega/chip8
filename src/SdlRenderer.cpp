@@ -16,7 +16,7 @@ SdlRenderer::SdlRenderer() :
 
 
 
-bool SdlRenderer::Initialize() noexcept
+bool SdlRenderer::Initialize(int width, int height) noexcept
 {
 
 
@@ -27,13 +27,14 @@ bool SdlRenderer::Initialize() noexcept
 	}
 	
 
-	m_window = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,800,600,SDL_WINDOW_RESIZABLE);
+	m_window = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,width*4,height*6,SDL_WINDOW_RESIZABLE);
 	m_rend = SDL_CreateRenderer(m_window,-1,SDL_RENDERER_ACCELERATED);
+	m_texture = SDL_CreateTexture(m_rend, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width,height);
 
-	if(m_window == nullptr || m_rend == nullptr)
+	if(m_window == nullptr || m_rend == nullptr || m_texture == nullptr)
 	{
 
-		LOG("Couldn't allocate SDL_Window or SDL_Renderer.");
+		LOG("Couldn't allocate SDL_Window, SDL_Renderer or SDL_Texture.");
 		return false;
 	}
 	
@@ -50,17 +51,17 @@ bool SdlRenderer::Initialize() noexcept
 
 
 
-void SdlRenderer::Render(const unsigned char *fgx) noexcept
+void SdlRenderer::Render(const unsigned int *gfx) noexcept
 {
 
 
-    SDL_SetRenderDrawColor(m_rend,0,0,0,1);
-    SDL_RenderClear(m_rend);
-    // Renderizar Coisas do Emulador
 
-    SDL_RenderPresent(m_rend);
+	SDL_UpdateTexture(m_texture, nullptr, gfx, 4*64);
 
-    UpdateWindowState();
+	SDL_RenderCopy(m_rend, m_texture, nullptr, nullptr);
+	SDL_RenderPresent(m_rend);
+
+	UpdateWindowState();
 
 }
 

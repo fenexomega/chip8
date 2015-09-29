@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 {
 		
 
-	if(argc < 1 )
+	if(argc < 2 )
 	{
 		std::cout << "No game to load, exiting." << std::endl; 
 		return 0;
@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 
 	std::unique_ptr<Chip8> myChip8(new Chip8()); // save stack memory using smart pointers.
 
-	if(!myChip8->loadRom("brix_test_game"))
+	if(!myChip8->loadRom(argv[1]))
 		return 1;
 	
 	if(!myChip8->initSystems())
@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 	while(!myChip8->wantToExit())
 	{
 	    // Emulate one cycle
-	    myChip8->emulateCycle();
+	    myChip8->executeOpcode();
 	    // If the draw flag is set, update the screen
 	    if(myChip8->getDrawFlag())
 	    	myChip8->drawGraphics();

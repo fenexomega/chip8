@@ -6,7 +6,7 @@
 #define dPrint(x) std::cout << x << std::endl
 
 
-#define MEMORY_MAX 4096
+#define MEMORY_MAX 0xFFF
 #define STACK_MAX 16
 
 constexpr size_t gfxResolution { 64 * 32 };
@@ -47,7 +47,7 @@ private:
     unsigned char V_[16];
     unsigned short I_;
     unsigned short pc_;
-    unsigned char gfx_[gfxResolution];
+    unsigned int gfx_[gfxResolution];
     unsigned char delayTimer_;
     unsigned char soundTimer_;
     unsigned short stack_[STACK_MAX];

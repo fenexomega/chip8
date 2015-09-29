@@ -1,6 +1,8 @@
+#include <ctime>
 #include <algorithm>
 #include <fstream>
 #include <iterator>
+#include <bitset>
 #include "SdlRenderer.h"
 #include "Chip8.h"
 
@@ -33,7 +35,7 @@ void Chip8::update()
 
 bool Chip8::initGraphics()
 {
-    if(!renderer_->Initialize())
+    if(!renderer_->Initialize(64,32))
 		return false;
 
 	
@@ -68,7 +70,8 @@ bool Chip8::initSystems()
     opcode_ = 0;      // Reset current opcode
     I_      = 0;      // Reset index register
     sp_     = 0;      // Reset stack pointer
-
+	
+	std::srand(std::time(NULL));  					// seed rand
     std::fill(gfx_,gfx_ + ( gfxResolution ), 0); 	// Clear display
     std::fill(stack_,(stack_ + STACK_MAX), 0);		// Clear stack
 	std::fill(V_,V_+16,0);							// Clear registers V0-VF
@@ -379,7 +382,84 @@ void Chip8::executeOpcode()
 
 			}
 			break; // END OF 8xxx
+		
+
+
+
+
+		case 0x9000: // 9XY0: skips the next instruction if VX doesn't equal VY
+			if( V_ [ opcode_ & 0x0f00 ] != V_ [ opcode_ & 0x00f0 ] )
+				pc_ += 2;
 			
+			break;
+
+
+
+		case 0xA000: // ANNN: sets I to the address NNN
+			I_ = opcode_ & 0x0fff;
+			break;
+
+
+
+		case 0xB000: // BNNN: jumps to the address NNN plus V0
+			pc_ = (( opcode_ & 0x0fff ) + V_ [ 0 ]) & 0xFFF ;
+			break;
+
+	
+		case 0xC000: // CXNN: Sets VX to a bitwise operation AND ( & ) between NN and a random number
+			V_ [ opcode_ & 0x0f00 ] =  ( opcode_ & 0x00ff ) & ( std::rand()%0xff );
+			break;
+
+		case 0xD000: // DXYN: DRAW INSTRUCTION
+		{
+			// from : http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
+
+			/*	Drawing pixels: 
+				The opcode responsible for drawing to our display is 0xDXYN. The Wikipedia description tells us the following:
+
+				Draws a sprite at coordinate (VX, VY) 
+				that has a width of 8 pixels and a height of N pixels.
+				Each row of 8 pixels is read as bit-coded starting from memory location I; 
+				I value doesn’t change after the execution of this instruction. 
+				As described above, 
+				VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, 
+				and to 0 if that doesn’t happen.
+
+
+
+				As the description of the opcode is telling us, 
+				the Chip 8 actually draws on the screen by drawing sprites. 
+				It will give us the location of where the sprite needs to be drawn 
+				(the opcode tells us which V register we need to check to fetch the X and Y coordinates) and the number of rows (N).
+				 The width of each sprite is fixed (8 bits / 1 byte). 
+				 The state of each pixel is set by using a bitwise XOR operation. 
+				 This means that it will compare the current pixel state with the current value in the memory. 
+				 If the current value is different from the value in the memory, the bit value will be 1. 
+				 If both values match, the bit value will be 0.
+			*/
+
+
+			auto Vx = V_ [ opcode_ & 0x0f00 ], Vy = V_ [ opcode_ & 0x00f0 ];
+			auto *_8bitRow = &memory_ [ I_ ];
+			unsigned int height = ( opcode_ & 0x000f );
+			for(unsigned int i = 0; i < height; ++i, ++Vy)
+			{
+				std::bitset<8> sprite(*_8bitRow);
+				for(int currentBit = 7 ; currentBit >=0; --currentBit, ++Vx)
+				{
+					if(sprite[currentBit])
+						gfx_[(Vx + Vy) * Vy] = ~gfx_[(Vx + Vy) * Vy];
+				}
+			}
+
+			renderer_->Render(gfx_);
+
+
+
+			break;
+		}
+
+	
 
 	}	
     
