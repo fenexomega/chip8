@@ -2,7 +2,6 @@
 #include <memory>
 #include <SDL2/SDL.h>
 
-
 #include "Chip8.h"
 
 int main(int argc, char **argv)

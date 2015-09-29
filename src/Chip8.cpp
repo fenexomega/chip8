@@ -238,11 +238,15 @@ void Chip8::executeOpcode()
 
 
 				case 0x00E0: // clear screen
+					std::fill_n(gfx_, gfxResolution, 0);
 					break;
 
 
 
 				case 0x00EE: // return from a subrotine ( unwind stack )
+					if (sp_ > 0)
+						pc_ = stack_[--sp_];
+					
 					break;
 
 			}
@@ -250,10 +254,15 @@ void Chip8::executeOpcode()
 		
 
 		case 0x1000: // 1NNN:  jumps to address NNN
+			pc_ = (opcode_ & 0x0fff);
 			break;
 	
 
 		case 0x2000: // 2NNN: Calls subrotine at address NNN
+			if (sp_	 < 16)
+				stack_[sp_++] = pc_;
+			
+			pc_ = ( opcode_ & 0x0fff );
 			break;
 
 
@@ -285,7 +294,7 @@ void Chip8::executeOpcode()
 
 
 		case 0x7000: // 7XNN: add the value NN to register VX
-			V_ [ opcode_ & 0x0f00 ] = ( opcode_ & 0x00ff );
+			V_ [ opcode_ & 0x0f00 ] += ( opcode_ & 0x00ff );
 			break;
 
 
@@ -461,7 +470,7 @@ void Chip8::executeOpcode()
 					gfx_ [ pos ] ^= pixel;
 				}
 			}
-
+			
 			renderer_->Render(gfx_);
 			
 
