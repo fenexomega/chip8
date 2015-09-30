@@ -13,7 +13,8 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	Chip8 *myChip8 = new Chip8();
+
+	Chip8 *myChip8 = new Chip8(); // smart points are awesome, but in this case I choose Raw pointer.
 
 	if (!myChip8->initSystems())
 		return 1;
@@ -28,10 +29,15 @@ int main(int argc, char **argv)
 	while(!myChip8->wantToExit())
 	{
 	    // Emulate one cycle
-		myChip8->executeOpcode(); // test phase.
-		//myChip8->drawGraphics();
+		myChip8->executeOpcode();
+
 	}
 
+
+
+
+
+	// CLEAN
 	myChip8->dispose();
 	delete myChip8;
 	

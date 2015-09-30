@@ -69,7 +69,7 @@ void SdlRenderer::Render(const uint32_t *gfx) noexcept
 	
 	SDL_RenderPresent(m_rend);
 
-	SDL_Delay(1000/60);
+	SDL_Delay(1000/120);
 }
 
 
