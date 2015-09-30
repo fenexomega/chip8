@@ -182,7 +182,7 @@ void Chip8::setDrawFlag(const bool value)
 
 void Chip8::setKeys()
 {
-
+	while(!renderer_->IsWindowClosed());
 }
 
 
@@ -465,18 +465,29 @@ void Chip8::executeOpcode()
 			//dPrint("DRAWING");
 			
 			V_ [0xF] = 0;
-			
-			static uint8_t Vx = VX, Vy = VY;
-			static int height = N;
 
-			for (int i = 0; i < height; ++i, ++Vy)
+			unsigned char Vx = VX, Vy = VY;
+			int height = N;
+
+			for (int i = 0; i < height; ++i)
 			{
-				static auto _8bitRow  = memory_[ I_ + i ];
-				Vx = VX;
-				for (int j = 0; j < 8; ++j, ++Vx)
+				unsigned char _8bitRow  = memory_[ I_ + i ];
+
+				for (int j = 0; j < 8; ++j)
 				{
-					if( (_8bitRow & (1 << ( 7 - j ))) != 0 )
-						gfx_ [(64 * ( Vy & 31 )) + ( Vx & 63 )] ^= 0xffffffff;
+					int px = ((Vx + j) & 63);
+					int py = ((Vy + i) & 31);
+
+					int pixelPos = (64 * py) + px;
+
+					int pixel = (_8bitRow & (1 << (7-j))) != 0;
+
+					V_ [0xF] |= ( gfx_ [pixelPos] & pixel );
+
+					gfx_ [pixelPos] ^= ( pixel != 0) ? 0xffffffff : 0;
+				
+					
+
 				}
 			}
 			
@@ -486,6 +497,7 @@ void Chip8::executeOpcode()
 
 			break;
 		}
+
 
 
 		case 0xE000:// BEGIN Exxx
@@ -514,6 +526,7 @@ void Chip8::executeOpcode()
 
 
 				case 0xA: //FX0A	A key press is awaited, and then stored in VX.
+					this->setKeys();
 					break;
 
 				
