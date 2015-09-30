@@ -47,7 +47,7 @@ private:
     unsigned char V_[16];
     unsigned short I_;
     unsigned short pc_;
-    unsigned int gfx_[gfxResolution];
+    uint32_t gfx_[gfxResolution];
     unsigned char delayTimer_;
     unsigned char soundTimer_;
     unsigned short stack_[STACK_MAX];

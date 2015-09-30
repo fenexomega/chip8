@@ -1,7 +1,6 @@
 #include <iostream>
 #include <memory>
 #include <SDL2/SDL.h>
-
 #include "Chip8.h"
 
 int main(int argc, char **argv)
@@ -14,24 +13,27 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	std::unique_ptr<Chip8> myChip8(new Chip8()); // save stack memory using smart pointers.
+	Chip8 *myChip8 = new Chip8();
+
+	if (!myChip8->initSystems())
+		return 1;
 
 	if(!myChip8->loadRom(argv[1]))
 		return 1;
 	
-	if(!myChip8->initSystems())
-		return 1;
+
 
 
 
 	while(!myChip8->wantToExit())
 	{
 	    // Emulate one cycle
-	    myChip8->executeOpcode(); // test phase.
-
+		myChip8->executeOpcode(); // test phase.
+		//myChip8->drawGraphics();
 	}
-	
+
 	myChip8->dispose();
+	delete myChip8;
 	
 	return 0;
 }

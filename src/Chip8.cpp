@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <fstream>
 #include <iterator>
-#include <bitset>
 #include "SdlRenderer.h"
 #include "Chip8.h"
 
@@ -71,7 +70,10 @@ bool Chip8::initSystems()
 	opcode_ = 0;      // Reset current opcode
 	I_      = 0;      // Reset index register
 	sp_     = 0;      // Reset stack pointer
+	soundTimer_ = 0;
+	delayTimer_ = 0;
 	drawFlag_ = false;
+
 	std::srand(std::time(NULL)); 		// seed rand
 	std::fill_n(gfx_,gfxResolution, 0); // Clear display
 	std::fill_n(stack_,STACK_MAX, 0);	// Clear stack
@@ -100,13 +102,46 @@ bool Chip8::initSystems()
 		0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 	};
 
-	std::copy(chip8_fontset, ( chip8_fontset + 80 ), memory_); // copy fontset to memory.
+	std::copy_n(chip8_fontset, 80, memory_); // copy fontset to memory.
 
 	return initGraphics() & initSound() & initInput();
 
 }
 
 
+
+
+bool Chip8::loadRom(const char *romFileName)
+{
+	dPrint("Loading " << romFileName);
+	std::ifstream romFile(romFileName, std::ios::ate | std::ios::binary);
+
+
+	if (!romFile.is_open())
+	{
+		dPrint("Error at opening ROM file. Exiting!");
+		return false;
+	}
+
+	size_t romFileSize = romFile.tellg();
+	romFile.seekg(0, romFile.beg);
+
+	if (romFileSize > romMaxSize)
+	{
+		dPrint("Error, ROM size not compatible. Exiting!");
+		return false;
+	}
+
+	std::copy(std::istreambuf_iterator<char>(romFile),
+				std::istreambuf_iterator<char>(), memory_ + 0x200);
+
+	romFile.close();
+
+	dPrint("Load Done!");
+
+
+	return true;
+}
 
 
 
@@ -123,7 +158,7 @@ void Chip8::emulateCycle()
 
 void Chip8::drawGraphics()
 {
-	//renderer_->Render(NULL);
+	renderer_->Render(NULL);
 }
 
 
@@ -154,49 +189,16 @@ void Chip8::setKeys()
 
 
 
-bool Chip8::loadRom(const char *romFileName)
-{
-	dPrint("Loading " << romFileName);
-	std::ifstream romFile(romFileName, std::ios::in | std::ios::binary | std::ios::ate);
-   
-
-	if(!romFile.is_open())
-	{
-		dPrint("Error at opening ROM file. Exiting!");
-		return false;
-	}
-	
-	size_t romFileSize = romFile.tellg();
-	
-	if(romFileSize > romMaxSize)
-	{
-		dPrint("Error, ROM size not compatible. Exiting!");
-		return false;
-	}
-	
-	romFile.seekg(0,romFile.beg);
-	
-	std::copy(std::istream_iterator<unsigned char>(romFile),
-			std::istream_iterator<unsigned char>(), 
-			memory_ + 0x200);
-	
-	romFile.close();
-	
-	dPrint("Load Done!");
-
-
-	return true;
-}
-
-
 
 
 
 void Chip8::dispose()
 {
-	if(renderer_ != nullptr)
+	if (renderer_ != nullptr)
+	{
+		renderer_->Dispose();
 		delete renderer_;
-	
+	}
 	renderer_ = nullptr;
 }
 
@@ -217,7 +219,8 @@ Chip8::~Chip8()
 
 void Chip8::executeOpcode()
 {
-	opcode_ = ( memory_[ pc_ ] << 8 | memory_[ pc_ + 1 ] );
+	
+	opcode_ = ( ( memory_[ pc_ ] << 8 ) | memory_ [ pc_ + 1 ] );
 	
 	pc_ += 2;
 
@@ -227,9 +230,11 @@ void Chip8::executeOpcode()
 	// X and Y: (4-bit value) register identifier
 	
 	// para maioria dos casos VX e VY:
-	#define VX V_ [ opcode_ & 0x0f00 ]
-	#define VY V_ [ opcode_ & 0x00f0 ]
-	
+	#define VX V_ [ ( (opcode_ & 0x0f00 ) >> 8)  ]
+	#define VY V_ [ ( (opcode_ & 0x00f0 ) >> 4)  ]
+	#define NNN (opcode_ & 0x0fff)
+	#define NN (opcode_ & 0x00ff)
+	#define N (opcode_ & 0x000f)
 	
 	switch( opcode_ & 0xf000 )
 	{
@@ -244,7 +249,7 @@ void Chip8::executeOpcode()
 
 
 				case 0x00E0: // clear screen
-					std::fill_n(gfx_, gfxResolution, 0);
+					//renderer_->Render(NULL);
 					break;
 
 
@@ -261,20 +266,20 @@ void Chip8::executeOpcode()
 		}
 
 		case 0x1000: // 1NNN:  jumps to address NNN
-			pc_ = (opcode_ & 0x0fff);
+			pc_ = NNN;
 			break;
 	
 
 		case 0x2000: // 2NNN: Calls subrotine at address NNN
 			if (sp_	 < 16)
-				stack_[sp_++] = pc_;
+				stack_ [ sp_++ ] = pc_;
 			
-			pc_ = ( opcode_ & 0x0fff );
+			pc_ = NNN;
 			break;
 
 
 		case 0x3000: // 3XNN: Skips the next instruction if VX equals NN
-			if ( V_[ opcode_ & 0x0f00 ] == (opcode_ & 0x00ff ) )
+			if ( VX == NN )
                 pc_ += 2;
 
             break;
@@ -282,49 +287,49 @@ void Chip8::executeOpcode()
 
 
         case 0x4000: // 4XNN: Skips the next instruction if VX doesn't equal NN
-            if ( V_ [ opcode_ & 0x0f00 ] != ( opcode_ & 0x00ff ) )
+            if ( VX != NN )
                 pc_ += 2;
 
             break;
 
 
         case 0x5000: // 5XY0: Skips the next instruction if VX equals VY
-            if ( V_ [ opcode_ & 0x0f00 ] == V_ [ opcode_ & 0x00f0] )
+            if ( VX == VY )
                 pc_ += 2;
 
             break;
 
 		
 		case 0x6000: // 6XNN: store number NN in register VX
-			V_ [ opcode_ &  0x0f00   ] = ( opcode_ & 0x00ff );
+			VX = NN;
 			break;
 
 
 		case 0x7000: // 7XNN: add the value NN to register VX
-			V_ [ opcode_ & 0x0f00 ] += ( opcode_ & 0x00ff );
+			VX =  ((VX + NN) & 0xFF);
 			break;
 
 
 		case 0x8000: // BEGIN OF 8xxx
 		{
-			switch (opcode_ & 0x000f)
+			switch ( opcode_ & 0x000f )
 			{
 				case 0x0: // 8XY0: store the value of register VY in register VX
-					V_[opcode_ & 0x0f00] = V_[opcode_ & 0x00f0];
+					VX = VY;
 					break;
 
 
 				case 0x1: // 8XY1: set VX to VX | VY
-					V_[opcode_ & 0x0f00] = (V_[opcode_ & 0x0f00] | V_[opcode_ & 0x00f0]);
+					VX = (VY | VX );
 					break;
 
 				case 0x2: // 8XY2: sets VX to VX and VY
-					V_[opcode_ & 0x0f00] = (V_[opcode_ & 0x0f00] & V_[opcode_ & 0x00f0]);
+					VX = (VY & VX);
 					break;
 
 
 				case 0x3: // 8XY3: sets VX to VX xor VY
-					V_[opcode_ & 0x0f00] = (V_[opcode_ & 0x0f00] ^ V_[opcode_ & 0x00f0]);
+					VX = ((VY ^ VX) & 0xFF);
 					break;
 
 
@@ -332,8 +337,8 @@ void Chip8::executeOpcode()
 				{
 					/* demonstracao :
 
-					auto &VX = V_ [ opcode_ & 0x0f00 ];
-					auto &VY = V_ [ opcode_ & 0x00f0 ];
+					auto &VX = V_ [ (opcode_ & 0x0f00)  >> 8];
+					auto &VY = V_ [ (opcode_ & 0x00f0) >> 4];
 
 					unsigned int result = VX + VY;
 
@@ -346,10 +351,10 @@ void Chip8::executeOpcode()
 					*/
 					// otimizado :
 
-					unsigned int result = V_[opcode_ & 0x0f00] + V_[opcode_ & 0x00f0]; // compute sum
-					(result & 0xffffff00) ? V_[0xF] = 1 : V_[0xF] = 0; // check carry
+					unsigned int result = VX + VY; // compute sum
+					V_ [ 0xF ] = ( ( result & 0xffffff00 ) != 0) ? 1 : 0; // check carry
 
-					V_[opcode_ & 0x0f00] = (result & 0xff);
+					VX = (result & 0xff);
 
 
 					break;
@@ -359,9 +364,9 @@ void Chip8::executeOpcode()
 
 				case 0x5: // 8XY5: VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
 
-					V_[0xF] = (V_[opcode_ & 0x0f00] > V_[opcode_ & 0x00f0]); // checking if theres is a borrow
+					V_[0xF] = (VX > VY); // checking if theres is a borrow
 
-					V_[opcode_ & 0x0f00] -= V_[opcode_ & 0x00f0]; // VX -= VY
+					VX -= VY;
 
 					break;
 
@@ -370,8 +375,8 @@ void Chip8::executeOpcode()
 
 
 				case 0x6: // 8XY6: Shifts VX right by one. VF is set to the value of the least significant bit of VX before the shift.
-					V_[0xF] = (V_[opcode_ & 0x0f00] & 0x1); // check the least significant bit
-					V_[0x0f00] >>= 1;
+					V_[0xF] = (VX & 0x1); // check the least significant bit
+					VX >>= 1;
 
 					break;
 
@@ -381,18 +386,18 @@ void Chip8::executeOpcode()
 
 				case 0x7: // 8XY7: Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
 
-					V_[0xF] = (V_[opcode_ & 0x00f0] > V_[opcode_ & 0x0f00]); // check borrow ( VY > VX )
+					V_[0xF] = (VY > VX); // check borrow ( VY > VX )
 
-					V_[0x0f00] = (V_[0x00f0] - V_[0x0f00]);
+					VX = (VY - VX);
 
 					break;
 
 
 
 
-				case 0xE: // Shifts VX left by one. VF is set to the value of the most significant bit of VX before the shift.
-					V_[0xF] = (V_[opcode_ & 0x0f00] & 0x80);  // check the most signifcant bit
-					V_[0x0f00] <<= 1;
+				case 0xE: // 8XYE Shifts VX left by one. VF is set to the value of the most significant bit of VX before the shift.
+					V_[0xF] = ((VX & 0x80) >> 7 );  // check the most signifcant bit
+					VX = (( VX <<  1) & 0xFF);
 
 					break;
 
@@ -408,7 +413,7 @@ void Chip8::executeOpcode()
 
 
 		case 0x9000: // 9XY0: skips the next instruction if VX doesn't equal VY
-			if( V_ [ opcode_ & 0x0f00 ] != V_ [ opcode_ & 0x00f0 ] )
+			if( VX != VY )
 				pc_ += 2;
 			
 			break;
@@ -416,18 +421,18 @@ void Chip8::executeOpcode()
 
 
 		case 0xA000: // ANNN: sets I to the address NNN
-			I_ = (opcode_ & 0x0fff);
+			I_ = NNN;
 			break;
 
 
 
 		case 0xB000: // BNNN: jumps to the address NNN plus V0
-			pc_ = (( opcode_ & 0x0fff ) + V_ [ 0 ]) & 0xFFF;
+			pc_ = (( NNN + V_ [ 0 ]) & 0xFFFF);
 			break;
 
 	
 		case 0xC000: // CXNN: Sets VX to a bitwise operation AND ( & ) between NN and a random number
-			V_ [ opcode_ & 0x0f00 ] =  ( opcode_ & 0x00ff ) & ( std::rand()%0xff );
+			VX =  (( (std::rand()%0xff) & NN ) & 0xFF);
 			break;
 
 		case 0xD000: // DXYN: DRAW INSTRUCTION
@@ -457,32 +462,26 @@ void Chip8::executeOpcode()
 				 If the current value is different from the value in the memory, the bit value will be 1. 
 				 If both values match, the bit value will be 0.
 			*/
-
-
+			//dPrint("DRAWING");
+			
 			V_ [0xF] = 0;
+			
+			static uint8_t Vx = VX, Vy = VY;
+			static int height = N;
 
-			auto Vx = V_ [ opcode_ & 0x0f00], Vy = V_ [ opcode_ & 0x00f0 ];
-			
-			int height = ( opcode_ & 0x000f);
-			
-			for (int j = 0; j < height; j++) 
+			for (int i = 0; i < height; ++i, ++Vy)
 			{
-				auto sprite = memory_ [ I_ + j ];
-				
-				for (int i = 0; i < 8; i++) 
+				static auto _8bitRow  = memory_[ I_ + i ];
+				Vx = VX;
+				for (int j = 0; j < 8; ++j, ++Vx)
 				{
-					int px = (Vx + i) & 63;
-					int py = (Vy + j) & 31;
-					int pos = 64 * py + px;
-					int pixel = (sprite & (1 << (7-i))) != 0;
-
-					V_ [ 0xF ] |= (gfx_ [ pos ] & pixel);
-
-					gfx_ [ pos ] = ~pixel;
+					if( (_8bitRow & (1 << ( 7 - j ))) != 0 )
+						gfx_ [(64 * ( Vy & 31 )) + ( Vx & 63 )] ^= 0xffffffff;
 				}
 			}
 			
 			renderer_->Render(gfx_);
+
 			
 
 			break;
@@ -510,7 +509,7 @@ void Chip8::executeOpcode()
 			switch (opcode_ & 0x000f)
 			{
 				case 0x7: // FX07	Sets VX to the value of the delay timer.
-					V_[opcode_ & 0x0f00] = delayTimer_;
+					VX = delayTimer_;
 					break;
 
 
@@ -520,18 +519,18 @@ void Chip8::executeOpcode()
 				
 
 				case 0x8: // FX18	Sets the sound timer to VX.
-					soundTimer_ = V_[opcode_ & 0x0f00];
+					soundTimer_ = VX;
 					break;
 
 
 
 				case 0xE://	FX1E	Adds VX to I.
-					I_ += V_[opcode_ & 0x0f00];
+					I_ = ( ( I_ + VX) & 0xFFFF);
 					break;
 
 				case 0x9: // FX29   Sets I to the location of the sprite for the character in VX. 
 						  // Characters 0-F (in hexadecimal) are represented by a 4x5 font.
-					I_ = (V_[opcode_ & 0x0f00] & 0xf);
+					I_ = (VX & 0xff);
 
 					break;
 
@@ -541,7 +540,7 @@ void Chip8::executeOpcode()
 						 //the middle digit at I plus 1, and the least significant digit at I plus 2. 
 						 //(In other words, take the decimal representation of VX, place the hundreds digit in memory at location in I, 
 						 //the tens digit at location I + 1, and the ones digit at location I + 2.)
-					auto Vx = V_[opcode_ & 0x0f00];
+					auto Vx = VX;
 
 					memory_[I_ + 2] = Vx % 10;
 					memory_[I_ + 1] = (Vx / 10) % 10;
@@ -558,15 +557,15 @@ void Chip8::executeOpcode()
 					switch (opcode_ & 0x00ff)
 					{
 						case 0x15: // FX15	Sets the delay timer to VX.
-							delayTimer_ = V_[opcode_ & 0x0f00];
+							delayTimer_ = VX;
 							break;
 
 						case 0x55: //FX55	Stores V0 to VX in memory starting at address I
-							std::copy_n(V_, (opcode_ & 0x0f00) + 1, memory_ + I_);
+							std::copy_n(V_, VX + 1, memory_ + I_);
 							break;
 
 						case 0x65: //FX65	Fills V0 to VX with values from memory starting at address I.
-							std::copy_n(memory_ + I_, (opcode_ & 0x0f00) + 1, V_);
+							std::copy_n(memory_ + I_, VX + 1, V_);
 							break;
 
 					}
@@ -588,7 +587,9 @@ void Chip8::executeOpcode()
 		
 		#undef VX
 		#undef VY
-		
+		#undef NNN
+		#undef NN
+		#undef N		
 	}	
 
 	if (soundTimer_ > 0)
