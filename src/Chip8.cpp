@@ -24,14 +24,6 @@ bool Chip8::wantToExit()
 }
 
 
-
-void Chip8::update()
-{
-
-}
-
-
-
 bool Chip8::initGraphics()
 {
     if(!renderer_->Initialize(64,32))
@@ -74,11 +66,11 @@ bool Chip8::initSystems()
 	delayTimer_ = 0;
 	drawFlag_ = false;
 
-	std::srand(std::time(NULL)); 		// seed rand
-	std::fill_n(gfx_,gfxResolution, 0); // Clear display
-	std::fill_n(stack_,STACK_MAX, 0);	// Clear stack
-	std::fill_n(V_,16,0);				// Clear registers V0-VF
-	std::fill_n(memory_,MEMORY_MAX,0); 	// Clear memory
+	std::srand(std::time(0));				// seed rand
+	std::fill_n(gfx_,gfxResolution, 0);		// Clear display
+	std::fill_n(stack_,STACK_MAX, 0);		// Clear stack
+	std::fill_n(V_,16,0);					// Clear registers V0-VF
+	std::fill_n(memory_,MEMORY_MAX,0); 		// Clear memory
 
 	// Load fontset
 	
@@ -158,7 +150,8 @@ void Chip8::emulateCycle()
 
 void Chip8::drawGraphics()
 {
-	renderer_->Render(NULL);
+	renderer_->Render(gfx_);
+	drawFlag_ = false;
 }
 
 
@@ -171,25 +164,10 @@ bool Chip8::getDrawFlag() const
 
 
 
-
-void Chip8::setDrawFlag(const bool value)
+void Chip8::waitKeyPress()
 {
-	drawFlag_ = value;
+	while(!renderer_->IsWindowClosed());
 }
-
-
-
-
-void Chip8::setKeys()
-{
-
-}
-
-
-
-
-
-
 
 
 void Chip8::dispose()
@@ -249,7 +227,7 @@ void Chip8::executeOpcode()
 
 
 				case 0x00E0: // clear screen
-					//renderer_->Render(NULL);
+					std::fill_n(gfx_, gfxResolution, 0);
 					break;
 
 
@@ -465,19 +443,32 @@ void Chip8::executeOpcode()
 			//dPrint("DRAWING");
 			
 			V_ [0xF] = 0;
-			
-			static uint8_t Vx = VX, Vy = VY;
-			static int height = N;
 
-			for (int i = 0; i < height; ++i, ++Vy)
+			unsigned char Vx = VX, Vy = VY;
+			int height = N;
+
+			for (int i = 0; i < height; ++i)
 			{
-				static auto _8bitRow  = memory_[ I_ + i ];
-				Vx = VX;
-				for (int j = 0; j < 8; ++j, ++Vx)
+				unsigned char _8bitRow  = memory_[ I_ + i ];
+
+				for (int j = 0; j < 8; ++j)
 				{
-					if( (_8bitRow & (1 << ( 7 - j ))) != 0 )
-						gfx_ [(64 * ( Vy & 31 )) + ( Vx & 63 )] ^= 0xffffffff;
+					int px = ((Vx + j) & 63);
+					int py = ((Vy + i) & 31);
+
+					int pixelPos = (64 * py) + px;
+
+					int pixel = (_8bitRow & (1 << (7-j))) != 0;
+
+					V_ [0xF] |= ( gfx_ [pixelPos] & pixel );
+
+					gfx_ [pixelPos] ^= ( pixel != 0 ) ? 0xffffffff : 0;
+					
+				
+					
+
 				}
+				
 			}
 			
 			renderer_->Render(gfx_);
@@ -486,6 +477,7 @@ void Chip8::executeOpcode()
 
 			break;
 		}
+
 
 
 		case 0xE000:// BEGIN Exxx
@@ -514,6 +506,7 @@ void Chip8::executeOpcode()
 
 
 				case 0xA: //FX0A	A key press is awaited, and then stored in VX.
+					this->waitKeyPress();
 					break;
 
 				
@@ -530,7 +523,7 @@ void Chip8::executeOpcode()
 
 				case 0x9: // FX29   Sets I to the location of the sprite for the character in VX. 
 						  // Characters 0-F (in hexadecimal) are represented by a 4x5 font.
-					I_ = (VX & 0xff);
+					I_ =  (VX & 0xf);
 
 					break;
 

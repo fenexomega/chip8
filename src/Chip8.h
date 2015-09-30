@@ -26,10 +26,7 @@ public:
     void emulateCycle();
     void drawGraphics();
     bool getDrawFlag() const;
-    void setDrawFlag(const bool value);
-	void setKeys();
-	
-	void update();
+	void waitKeyPress();
 	bool wantToExit();
 	void dispose();
 	
