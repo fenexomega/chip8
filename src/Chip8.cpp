@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <fstream>
 #include <iterator>
-#include <bitset>
 #include "SdlRenderer.h"
 #include "Chip8.h"
 
@@ -133,9 +132,7 @@ bool Chip8::loadRom(const char *romFileName)
 		return false;
 	}
 
-	std::copy(std::istream_iterator<unsigned char>(romFile),
-		std::istream_iterator<unsigned char>(),
-		memory_ + 0x200);
+	romFile.read(((char*)memory_ + 0x200),romFileSize);
 
 	romFile.close();
 
@@ -196,9 +193,11 @@ void Chip8::setKeys()
 
 void Chip8::dispose()
 {
-	if(renderer_ != nullptr)
+	if (renderer_ != nullptr)
+	{
+		renderer_->Dispose();
 		delete renderer_;
-	
+	}
 	renderer_ = nullptr;
 }
 
@@ -219,7 +218,8 @@ Chip8::~Chip8()
 
 void Chip8::executeOpcode()
 {
-	opcode_ = ( memory_[ pc_ ] << 8 | memory_[ pc_ + 1 ] );
+	
+	opcode_ = ( ( memory_[ pc_ ] << 8 ) | memory_ [ pc_ + 1 ] );
 	
 	pc_ += 2;
 
@@ -305,7 +305,7 @@ void Chip8::executeOpcode()
 
 
 		case 0x7000: // 7XNN: add the value NN to register VX
-			VX += NN;
+			VX =  ((VX + NN) & 0xFF);
 			break;
 
 
@@ -319,16 +319,16 @@ void Chip8::executeOpcode()
 
 
 				case 0x1: // 8XY1: set VX to VX | VY
-					VX = ( VX | VY );
+					VX = (VY | VX );
 					break;
 
 				case 0x2: // 8XY2: sets VX to VX and VY
-					VX = (VX & VY);
+					VX = (VY & VX);
 					break;
 
 
 				case 0x3: // 8XY3: sets VX to VX xor VY
-					VX = (VX ^ VY);
+					VX = ((VY ^ VX) & 0xFF);
 					break;
 
 
@@ -351,7 +351,7 @@ void Chip8::executeOpcode()
 					// otimizado :
 
 					unsigned int result = VX + VY; // compute sum
-					(result & 0xffffff00) ? V_[0xF] = 1 : V_[0xF] = 0; // check carry
+					V_ [ 0xF ] = ( ( result & 0xffffff00 ) != 0) ? 1 : 0; // check carry
 
 					VX = (result & 0xff);
 
@@ -395,8 +395,8 @@ void Chip8::executeOpcode()
 
 
 				case 0xE: // 8XYE Shifts VX left by one. VF is set to the value of the most significant bit of VX before the shift.
-					V_[0xF] = (VX & 0x80);  // check the most signifcant bit
-					VX <<= 1;
+					V_[0xF] = ((VX & 0x80) >> 7 );  // check the most signifcant bit
+					VX = (( VX <<  1) & 0xFF);
 
 					break;
 
@@ -426,12 +426,12 @@ void Chip8::executeOpcode()
 
 
 		case 0xB000: // BNNN: jumps to the address NNN plus V0
-			pc_ = ( NNN + V_ [ 0 ]) & 0xFFF;
+			pc_ = (( NNN + V_ [ 0 ]) & 0xFFFF);
 			break;
 
 	
 		case 0xC000: // CXNN: Sets VX to a bitwise operation AND ( & ) between NN and a random number
-			VX =  ( NN  &  std::rand()%0xff );
+			VX =  (( (std::rand()%0xff) & NN ) & 0xFF);
 			break;
 
 		case 0xD000: // DXYN: DRAW INSTRUCTION
@@ -461,20 +461,21 @@ void Chip8::executeOpcode()
 				 If the current value is different from the value in the memory, the bit value will be 1. 
 				 If both values match, the bit value will be 0.
 			*/
-			
+			//dPrint("DRAWING");
 			
 			V_ [0xF] = 0;
 			
-			uint8_t Vx = VX, Vy = VY;
-			unsigned height = N;
+			static uint8_t Vx = VX, Vy = VY;
+			static int height = N;
 
-			for (unsigned i = 0; i < height; ++i, ++Vy)
+			for (int i = 0; i < height; ++i, ++Vy)
 			{
-				std::bitset<8> _8bitRow(memory_[ I_ + i ]);
-				for (int j = 7; j >= 0; --j)
+				static auto _8bitRow  = memory_[ I_ + i ];
+				Vx = VX;
+				for (int j = 0; j < 8; ++j, ++Vx)
 				{
-					if(_8bitRow[j])
-						gfx_[(64 * Vx) + Vy] = 0xffffffff;
+					if( (_8bitRow & (1 << ( 7 - j ))) != 0 )
+						gfx_ [(64 * Vy) + Vx] = 0xffffffff;
 				}
 			}
 			
@@ -523,12 +524,12 @@ void Chip8::executeOpcode()
 
 
 				case 0xE://	FX1E	Adds VX to I.
-					I_ += VX;
+					I_ = ( ( I_ + VX) & 0xFFFF);
 					break;
 
 				case 0x9: // FX29   Sets I to the location of the sprite for the character in VX. 
 						  // Characters 0-F (in hexadecimal) are represented by a 4x5 font.
-					I_ = (VX & 0xf);
+					I_ = (VX & 0xff);
 
 					break;
 
