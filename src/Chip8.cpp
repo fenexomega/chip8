@@ -132,7 +132,8 @@ bool Chip8::loadRom(const char *romFileName)
 		return false;
 	}
 
-	romFile.read(((char*)memory_ + 0x200),romFileSize);
+	std::copy(std::istreambuf_iterator<char>(romFile),
+				std::istreambuf_iterator<char>(), memory_ + 0x200);
 
 	romFile.close();
 
@@ -475,7 +476,7 @@ void Chip8::executeOpcode()
 				for (int j = 0; j < 8; ++j, ++Vx)
 				{
 					if( (_8bitRow & (1 << ( 7 - j ))) != 0 )
-						gfx_ [(64 * Vy) + Vx] = 0xffffffff;
+						gfx_ [(64 * ( Vy & 31 )) + ( Vx & 63 )] ^= 0xffffffff;
 				}
 			}
 			
