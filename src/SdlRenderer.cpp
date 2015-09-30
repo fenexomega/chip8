@@ -27,10 +27,10 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 	}
 	
 
-	m_window = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,width*8,height*12,SDL_WINDOW_RESIZABLE);
+	m_window = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,width *4, height * 6, SDL_WINDOW_RESIZABLE);
 	m_rend = SDL_CreateRenderer(m_window,-1,SDL_RENDERER_ACCELERATED);
 
-	m_texture = SDL_CreateTexture(m_rend, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width,height);
+	m_texture = SDL_CreateTexture(m_rend, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
 
 	if(m_window == nullptr || m_rend == nullptr || m_texture == nullptr)
 	{
@@ -38,10 +38,18 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 		LOG("Couldn't allocate SDL_Window, SDL_Renderer or SDL_Texture.");
 		return false;
 	}
+
 	
+	SDL_SetRenderDrawBlendMode(m_rend, SDL_BLENDMODE_BLEND);
+	SDL_SetTextureBlendMode(m_texture, SDL_BLENDMODE_BLEND);
 
-	SDL_SetRenderDrawBlendMode(m_rend,SDL_BLENDMODE_BLEND);
+	//SDL_SetRenderDrawColor(m_rend, 0, 0, 0, 255);
 
+	
+	SDL_RenderClear(m_rend);
+
+	SDL_RenderPresent(m_rend);
+	
 	return true;
 }
 
@@ -54,12 +62,16 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 void SdlRenderer::Render(const uint32_t *gfx) noexcept
 {
 
+	SDL_RenderClear(m_rend);
 
-	SDL_UpdateTexture(m_texture, nullptr, gfx, 4*64);
+	SDL_UpdateTexture(m_texture, nullptr, gfx, 4 * 64 );
 
 	SDL_RenderCopy(m_rend, m_texture, nullptr, nullptr);
+
+
 	SDL_RenderPresent(m_rend);
-	SDL_Delay(1000 / 60);
+
+	SDL_Delay(1000/60);
 }
 
 

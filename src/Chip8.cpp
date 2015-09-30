@@ -115,7 +115,7 @@ bool Chip8::initSystems()
 bool Chip8::loadRom(const char *romFileName)
 {
 	dPrint("Loading " << romFileName);
-	std::ifstream romFile(romFileName, std::ios::binary);
+	std::ifstream romFile(romFileName, std::ios::ate | std::ios::binary);
 
 
 	if (!romFile.is_open())
@@ -123,9 +123,10 @@ bool Chip8::loadRom(const char *romFileName)
 		dPrint("Error at opening ROM file. Exiting!");
 		return false;
 	}
-	romFile.seekg(0, romFile.end);
+
 	size_t romFileSize = romFile.tellg();
 	romFile.seekg(0, romFile.beg);
+
 	if (romFileSize > romMaxSize)
 	{
 		dPrint("Error, ROM size not compatible. Exiting!");
@@ -460,32 +461,23 @@ void Chip8::executeOpcode()
 				 If the current value is different from the value in the memory, the bit value will be 1. 
 				 If both values match, the bit value will be 0.
 			*/
-
-			return;
+			
+			
 			V_ [0xF] = 0;
+			
+			uint8_t Vx = VX, Vy = VY;
+			unsigned height = N;
 
-			auto Vx = VX, Vy = VY;
-			
-			int height = N;
-			
-			for (int j = 0; j < height; j++) 
+			for (unsigned i = 0; i < height; ++i, ++Vy)
 			{
-				unsigned char sprite = memory_ [ I_ + j ];
-				
-				for (int i = 0; i < 8; i++) 
+				std::bitset<8> _8bitRow(memory_[ I_ + i ]);
+				for (int j = 7; j >= 0; --j)
 				{
-					int px = (Vx + i) & 63;
-					int py = (Vy + j) & 31;
-					int pos = 64 *( py + px );
-					int pixel = ( (sprite & (1 << (7-i))) != 0 );
-
-					V_ [ 0xF ] |= (gfx_ [ pos ] & pixel);
-
-					gfx_ [ pos ] =  ~pixel ;
-
-				}				
+					gfx_[(64 * Vx) + Vy] ^= _8bitRow[j];
+				}
 			}
-			
+
+
 			renderer_->Render(gfx_);
 
 			

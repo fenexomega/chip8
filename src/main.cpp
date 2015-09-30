@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 	if (!myChip8->initSystems())
 		return 1;
 
-	if(!myChip8->loadRom("brix_test_game"))
+	if(!myChip8->loadRom("MAZE"))
 		return 1;
 	
 
@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 	while(!myChip8->wantToExit())
 	{
 	    // Emulate one cycle
-	    myChip8->executeOpcode(); // test phase.
+		myChip8->executeOpcode(); // test phase.
 		//myChip8->drawGraphics();
 	}
 	
