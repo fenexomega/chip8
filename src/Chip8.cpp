@@ -473,11 +473,11 @@ void Chip8::executeOpcode()
 				std::bitset<8> _8bitRow(memory_[ I_ + i ]);
 				for (int j = 7; j >= 0; --j)
 				{
-					gfx_[(64 * Vx) + Vy] ^= _8bitRow[j];
+					if(_8bitRow[j])
+						gfx_[(64 * Vx) + Vy] = 0xffffffff;
 				}
 			}
-
-
+			
 			renderer_->Render(gfx_);
 
 			

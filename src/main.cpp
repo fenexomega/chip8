@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 	if (!myChip8->initSystems())
 		return 1;
 
-	if(!myChip8->loadRom("MAZE"))
+	if(!myChip8->loadRom("BLINKY"))
 		return 1;
 	
 
