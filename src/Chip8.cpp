@@ -71,7 +71,10 @@ bool Chip8::initSystems()
 	opcode_ = 0;      // Reset current opcode
 	I_      = 0;      // Reset index register
 	sp_     = 0;      // Reset stack pointer
+	soundTimer_ = 0;
+	delayTimer_ = 0;
 	drawFlag_ = false;
+
 	std::srand(std::time(NULL)); 		// seed rand
 	std::fill_n(gfx_,gfxResolution, 0); // Clear display
 	std::fill_n(stack_,STACK_MAX, 0);	// Clear stack
@@ -109,6 +112,39 @@ bool Chip8::initSystems()
 
 
 
+bool Chip8::loadRom(const char *romFileName)
+{
+	dPrint("Loading " << romFileName);
+	std::ifstream romFile(romFileName, std::ios::binary);
+
+
+	if (!romFile.is_open())
+	{
+		dPrint("Error at opening ROM file. Exiting!");
+		return false;
+	}
+	romFile.seekg(0, romFile.end);
+	size_t romFileSize = romFile.tellg();
+	romFile.seekg(0, romFile.beg);
+	if (romFileSize > romMaxSize)
+	{
+		dPrint("Error, ROM size not compatible. Exiting!");
+		return false;
+	}
+
+	std::copy(std::istream_iterator<unsigned char>(romFile),
+		std::istream_iterator<unsigned char>(),
+		memory_ + 0x200);
+
+	romFile.close();
+
+	dPrint("Load Done!");
+
+
+	return true;
+}
+
+
 
 
 void Chip8::emulateCycle()
@@ -123,7 +159,7 @@ void Chip8::emulateCycle()
 
 void Chip8::drawGraphics()
 {
-	//renderer_->Render(NULL);
+	renderer_->Render(NULL);
 }
 
 
@@ -152,41 +188,6 @@ void Chip8::setKeys()
 
 
 
-
-
-bool Chip8::loadRom(const char *romFileName)
-{
-	dPrint("Loading " << romFileName);
-	std::ifstream romFile(romFileName, std::ios::in | std::ios::binary | std::ios::ate);
-   
-
-	if(!romFile.is_open())
-	{
-		dPrint("Error at opening ROM file. Exiting!");
-		return false;
-	}
-	
-	size_t romFileSize = romFile.tellg();
-	
-	if(romFileSize > romMaxSize)
-	{
-		dPrint("Error, ROM size not compatible. Exiting!");
-		return false;
-	}
-	
-	romFile.seekg(0,romFile.beg);
-	
-	std::copy(std::istream_iterator<unsigned char>(romFile),
-			std::istream_iterator<unsigned char>(), 
-			memory_ + 0x200);
-	
-	romFile.close();
-	
-	dPrint("Load Done!");
-
-
-	return true;
-}
 
 
 
@@ -246,7 +247,7 @@ void Chip8::executeOpcode()
 
 
 				case 0x00E0: // clear screen
-					//std::fill_n(gfx_, gfxResolution, 0);
+					//renderer_->Render(NULL);
 					break;
 
 
@@ -460,7 +461,7 @@ void Chip8::executeOpcode()
 				 If both values match, the bit value will be 0.
 			*/
 
-
+			return;
 			V_ [0xF] = 0;
 
 			auto Vx = VX, Vy = VY;
@@ -469,18 +470,18 @@ void Chip8::executeOpcode()
 			
 			for (int j = 0; j < height; j++) 
 			{
-				auto sprite = memory_ [ I_ + j ];
+				unsigned char sprite = memory_ [ I_ + j ];
 				
 				for (int i = 0; i < 8; i++) 
 				{
-					int px = (Vx + i);
-					int py = (Vy + j);
-					int pos = 64 * py + px;
+					int px = (Vx + i) & 63;
+					int py = (Vy + j) & 31;
+					int pos = 64 *( py + px );
 					int pixel = ( (sprite & (1 << (7-i))) != 0 );
 
 					V_ [ 0xF ] |= (gfx_ [ pos ] & pixel);
 
-					gfx_ [ pos ] ^= pixel;
+					gfx_ [ pos ] =  ~pixel ;
 
 				}				
 			}

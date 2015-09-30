@@ -1,0 +1,15 @@
+﻿Build started 9/29/2015 9:55:17 PM.
+     1>Project "C:\cygwin64\home\Rafael\Git\github\chip8\VS_BUILD\Chip8\Chip8\Chip8.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Debug\\" /Fd"x64\Debug\vc140.pdb" /Gd /TP /errorReport:prompt -D_SCL_SECURE_NO_WARNINGS ..\..\..\src\SdlRenderer.cpp
+         SdlRenderer.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\cygwin64\home\Rafael\Git\github\chip8\VS_BUILD\Chip8\x64\Debug\Chip8.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\Rafael\Documents\WINDOWS_CPP_LIBS\SDL2\SDL2-2.0.3\lib\x64" SDL2.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\cygwin64\home\Rafael\Git\github\chip8\VS_BUILD\Chip8\x64\Debug\Chip8.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\cygwin64\home\Rafael\Git\github\chip8\VS_BUILD\Chip8\x64\Debug\Chip8.lib" /MACHINE:X64 x64\Debug\Chip8.obj
+         x64\Debug\main.obj
+         x64\Debug\SdlRenderer.obj
+         Chip8.vcxproj -> C:\cygwin64\home\Rafael\Git\github\chip8\VS_BUILD\Chip8\x64\Debug\Chip8.exe
+     1>Done Building Project "C:\cygwin64\home\Rafael\Git\github\chip8\VS_BUILD\Chip8\Chip8\Chip8.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.57
