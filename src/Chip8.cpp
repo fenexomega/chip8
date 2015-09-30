@@ -1,5 +1,6 @@
 #include <ctime>
 #include <algorithm>
+#include <thread>
 #include <fstream>
 #include <iterator>
 #include "SdlRenderer.h"
@@ -164,9 +165,10 @@ bool Chip8::getDrawFlag() const
 
 
 
-void Chip8::waitKeyPress()
+int Chip8::waitKeyPress()
 {
-	while(!renderer_->IsWindowClosed());
+	return 1;
+	//while(!renderer_->IsWindowClosed());
 }
 
 
@@ -190,9 +192,6 @@ Chip8::~Chip8()
 	if(renderer_ != nullptr)
 		this->dispose();
 }
-
-
-
 
 
 void Chip8::executeOpcode()
@@ -506,7 +505,7 @@ void Chip8::executeOpcode()
 
 
 				case 0xA: //FX0A	A key press is awaited, and then stored in VX.
-					this->waitKeyPress();
+					VX = this->waitKeyPress();
 					break;
 
 				

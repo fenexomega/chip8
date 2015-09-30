@@ -18,16 +18,19 @@ constexpr size_t romMaxSize { MEMORY_MAX - 0x200 };
 
 class Chip8
 {
+
+
 public:
     Chip8();
     bool initSystems();
     bool loadRom(const char *romFileName);
+    bool wantToExit();
+    bool getDrawFlag() const;
+  
     void executeOpcode();
     void emulateCycle();
     void drawGraphics();
-    bool getDrawFlag() const;
-	void waitKeyPress();
-	bool wantToExit();
+	int waitKeyPress();
 	void dispose();
 	
 	~Chip8();
