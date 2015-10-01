@@ -96,7 +96,7 @@ bool Chip8::initSystems()
 		0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 	};
 
-	std::copy_n(chip8_fontset, 81, memory_); // copy fontset to memory.
+	std::copy_n(chip8_fontset, 80, memory_); // copy fontset to memory.
 
 	return initGraphics() & initSound() & initInput();
 
@@ -195,7 +195,7 @@ Chip8::~Chip8()
 		this->dispose();
 }
 
-
+constexpr size_t gfxBytes { gfxResolution * 4 };
 void Chip8::executeOpcode()
 {
 	
@@ -228,7 +228,7 @@ void Chip8::executeOpcode()
 
 
 				case 0x00E0: // clear screen
-					std::memset(gfx_, 0, gfxResolution * 4);
+					std::memset(gfx_, 0, gfxBytes);
 					break;
 
 
