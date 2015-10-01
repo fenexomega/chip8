@@ -5,6 +5,7 @@
 #include <iterator>
 
 #include "SdlRenderer.h"
+#include "SdlInput.h"
 #include "Chip8.h"
 
 
@@ -47,7 +48,7 @@ bool Chip8::initSound()
 
 bool Chip8::initInput()
 {
-
+    input_ = new SdlInput;
     return true;
 }
 
@@ -142,8 +143,11 @@ bool Chip8::loadRom(const char *romFileName)
 
 void Chip8::emulateCycle()
 {
-
-	SDL_Delay(1000/60);
+    input_->UpdateKeys();
+    //TODO: Take this code out. Is  just for testing
+    if(input_->IsKeyDown(SDL_SCANCODE_RETURN))
+        dPrint("RETURN Pressed");
+    SDL_Delay(1000/60);
 
 }
 
@@ -168,7 +172,8 @@ bool Chip8::getDrawFlag() const
 int Chip8::waitKeyPress()
 {
 
-	while(!renderer_->IsWindowClosed());
+    while(!renderer_->IsWindowClosed())
+        input_->IsKeyDown(SDL_SCANCODE_RETURN);
 
 	return 1;
 }

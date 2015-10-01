@@ -3,6 +3,7 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include "interfaces/iRenderer.h"
+#include "interfaces/iInput.h"
 #define dPrint(x) std::cout << x << std::endl
 
 
@@ -42,6 +43,7 @@ private:
     
 
 	iRenderer *renderer_;
+    iInput *input_;
     bool drawFlag_;
     unsigned short opcode_;
     unsigned char memory_[MEMORY_MAX];

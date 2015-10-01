@@ -9,19 +9,17 @@ using std::vector;
 
 class SdlInput : public iInput
 {
-// SINGLETON
     // iInput interface
 public:
-    static SdlInput GetSDLInput();
     void UpdateKeys();
     bool IsKeyUp(int key);
     bool IsKeyDown(int key);
     bool IsKeyPressed(int key);
-
-
-private:
     SdlInput();
     ~SdlInput();
+
+private:
+
 
     bool getKey(int i);
 

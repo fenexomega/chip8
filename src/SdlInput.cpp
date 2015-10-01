@@ -9,11 +9,6 @@
 #define NUM_KEYCODES 256
 
 
-SdlInput SdlInput::GetSDLInput()
-{
-    static SdlInput sdlinput;
-    return sdlinput;
-}
 
 SdlInput::SdlInput()
 {

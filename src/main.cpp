@@ -29,6 +29,7 @@ int main(int argc, char **argv)
 	{
 	    // Emulate one cycle
 		myChip8->executeOpcode();
+        myChip8->emulateCycle();
 
 	}
 
