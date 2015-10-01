@@ -24,13 +24,14 @@ public:
     Chip8();
     bool initSystems();
     bool loadRom(const char *romFileName);
-    bool wantToExit();
     bool getDrawFlag() const;
+    bool wantToExit();
   
+    int waitKeyPress();
+
     void executeOpcode();
     void emulateCycle();
     void drawGraphics();
-	int waitKeyPress();
 	void dispose();
 	
 	~Chip8();
