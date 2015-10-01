@@ -1,5 +1,4 @@
 #include <iostream>
-#include <memory>
 #include <SDL2/SDL.h>
 #include "Chip8.h"
 

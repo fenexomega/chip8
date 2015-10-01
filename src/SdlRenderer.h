@@ -1,6 +1,5 @@
 #ifndef SDLRENDERER_H
 #define SDLRENDERER_H
-
 #include <SDL2/SDL.h>
 #include "interfaces/iRenderer.h"
 

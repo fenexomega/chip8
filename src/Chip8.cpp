@@ -1,8 +1,8 @@
 #include <ctime>
 #include <algorithm>
-#include <thread>
 #include <fstream>
 #include <iterator>
+
 #include "SdlRenderer.h"
 #include "Chip8.h"
 
