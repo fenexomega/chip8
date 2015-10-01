@@ -40,6 +40,9 @@ int main(int argc, char **argv)
 	// CLEAN
 	myChip8->dispose();
 	delete myChip8;
+
+
+	std::cin.ignore(1);
 	
 	return 0;
 }

@@ -11,7 +11,7 @@
 
 
 Chip8::Chip8() : 
-	renderer_ ( new SdlRenderer() )
+	renderer_ ( nullptr ), input_ (nullptr )
 {
 	dPrint("Creating Chip8 object...");
 }
@@ -29,6 +29,8 @@ bool Chip8::wantToExit()
 
 bool Chip8::initGraphics()
 {
+	renderer_ = new SdlRenderer();
+
     if(!renderer_->Initialize(64,32))
 		return false;
 
@@ -48,7 +50,7 @@ bool Chip8::initSound()
 
 bool Chip8::initInput()
 {
-    input_ = new SdlInput;
+    input_ = new SdlInput();
     return true;
 }
 
@@ -147,7 +149,8 @@ void Chip8::emulateCycle()
     //TODO: Take this code out. Is  just for testing
     if(input_->IsKeyDown(SDL_SCANCODE_RETURN))
         dPrint("RETURN Pressed");
-    SDL_Delay(1000/60);
+
+   // SDL_Delay(1000/60);
 
 }
 
@@ -181,12 +184,22 @@ int Chip8::waitKeyPress()
 
 void Chip8::dispose()
 {
+	if (input_ != nullptr)
+	{
+		delete input_;
+		input_ = nullptr;
+	}
+
 	if (renderer_ != nullptr)
 	{
 		renderer_->Dispose();
 		delete renderer_;
+		renderer_ = nullptr;
 	}
-	renderer_ = nullptr;
+
+
+	
+	
 }
 
 
@@ -196,7 +209,7 @@ Chip8::~Chip8()
 {
 	dPrint("Destroying Chip8 object...");
 	
-	if(renderer_ != nullptr)
+	if(renderer_ != nullptr || input_ != nullptr)
 		this->dispose();
 }
 

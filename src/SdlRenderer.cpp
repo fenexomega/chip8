@@ -7,7 +7,7 @@
 SdlRenderer::SdlRenderer() :
 	m_window (nullptr), m_rend (nullptr), m_texture (nullptr),  m_userWannaClose (false)
 {
-	LOG("Creating SdlRenderer object");
+	LOG("Creating SdlRenderer object...");
 }
 
 
@@ -56,8 +56,6 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 void SdlRenderer::Render(const void *gfx) noexcept
 {
 	
-	
-
 	SDL_UpdateTexture(m_texture, nullptr, gfx, 4 * 64 );
 
 	SDL_RenderCopy(m_rend, m_texture, nullptr, nullptr);

@@ -12,13 +12,13 @@
 
 SdlInput::SdlInput()
 {
-
+	LOG("Creating SdlInput object...");
 
 }
 
 SdlInput::~SdlInput()
 {
-
+	LOG("Destroying SdlInput object...");
 }
 
 bool SdlInput::getKey(int i)
