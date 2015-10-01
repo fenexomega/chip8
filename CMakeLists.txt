@@ -16,7 +16,7 @@ file(GLOB_RECURSE HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}  src/*.h)
 
 
 # Linkar .cpp para este binário (que tem o nome do projeto)
-add_executable(${PROJECT_NAME} ${SRCS})
+add_executable(${PROJECT_NAME} ${HEADERS} ${SRCS})
 
 # Linkar bibliotecas dinâmicas
 TARGET_LINK_LIBRARIES( ${PROJECT_NAME} ${SDL2_LIBRARY} )

@@ -13,8 +13,6 @@
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  Dr. Fritz Mehner (fgm), mehner.fritz@fh-swf.de
- *   Organization:  FH Südwestfalen, Iserlohn
  *
  * =====================================================================================
  */
@@ -39,9 +37,7 @@ public:
 	virtual void Dispose() = 0;
 
 
-	virtual ~iRenderer(){}; // needed for destroying an object from a iRenderer pointer.
-
-
+    virtual ~iRenderer(){} // needed for destroying an object from a iRenderer pointer.
 
 };
 
