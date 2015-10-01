@@ -28,8 +28,9 @@ class iRenderer
 // pure abstract class, better for VCPP build, and performance.
 public:
 	virtual bool Initialize(const int,const int) = 0; 
+
 		
-	virtual void Render(const uint32_t *gfx) = 0;
+	virtual void Render(const void *gfx) = 0;
 
 
 	virtual bool IsWindowClosed() = 0;

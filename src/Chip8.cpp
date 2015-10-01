@@ -1,4 +1,5 @@
 #include <ctime>
+#include <cstring>
 #include <algorithm>
 #include <fstream>
 #include <iterator>
@@ -95,7 +96,7 @@ bool Chip8::initSystems()
 		0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 	};
 
-	std::copy_n(chip8_fontset, 80, memory_); // copy fontset to memory.
+	std::copy_n(chip8_fontset, 81, memory_); // copy fontset to memory.
 
 	return initGraphics() & initSound() & initInput();
 
@@ -152,7 +153,6 @@ void Chip8::emulateCycle()
 void Chip8::drawGraphics()
 {
 	renderer_->Render(gfx_);
-	drawFlag_ = false;
 }
 
 
@@ -167,8 +167,10 @@ bool Chip8::getDrawFlag() const
 
 int Chip8::waitKeyPress()
 {
+
+	while(!renderer_->IsWindowClosed());
+
 	return 1;
-	//while(!renderer_->IsWindowClosed());
 }
 
 
@@ -226,7 +228,7 @@ void Chip8::executeOpcode()
 
 
 				case 0x00E0: // clear screen
-					std::fill_n(gfx_, gfxResolution, 0);
+					std::memset(gfx_, 0, gfxResolution * 4);
 					break;
 
 
@@ -461,7 +463,7 @@ void Chip8::executeOpcode()
 
 					V_ [0xF] |= ( gfx_ [pixelPos] & pixel );
 
-					gfx_ [pixelPos] ^= ( pixel != 0 ) ? 0xffffffff : 0;
+					gfx_ [pixelPos] ^= ( pixel != 0 ) ? ~0 : 0;
 					
 				
 					
@@ -522,7 +524,7 @@ void Chip8::executeOpcode()
 
 				case 0x9: // FX29   Sets I to the location of the sprite for the character in VX. 
 						  // Characters 0-F (in hexadecimal) are represented by a 4x5 font.
-					I_ =  (VX & 0xf);
+					I_ = (VX) * 5;
 
 					break;
 
@@ -553,11 +555,13 @@ void Chip8::executeOpcode()
 							break;
 
 						case 0x55: //FX55	Stores V0 to VX in memory starting at address I
-							std::copy_n(V_, VX + 1, memory_ + I_);
+							std::memcpy(memory_ + I_, V_, (VX + 1));
+							//I_ = I_ + 1 + ((opcode_ & 0x0F00) >> 8);
 							break;
 
 						case 0x65: //FX65	Fills V0 to VX with values from memory starting at address I.
-							std::copy_n(memory_ + I_, VX + 1, V_);
+							std::memcpy(V_, memory_ + I_, (VX + 1));
+							//I_ = I_ + 1 + ((opcode_ & 0x0F00) >> 8);
 							break;
 
 					}
