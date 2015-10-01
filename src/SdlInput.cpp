@@ -31,7 +31,7 @@ void SdlInput::UpdateKeys() noexcept
 
     SDL_PumpEvents();
     m_keys = SDL_GetKeyboardState(NULL);
-    int i;
+    static int i;
 
     // Just a clean for speed up
 

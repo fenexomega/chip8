@@ -25,7 +25,8 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 		return false;
 	}
 	
-
+	m_pitch = width * 4;
+	
 	m_window = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,width * 4 , height * 6 , SDL_WINDOW_RESIZABLE);
 
 	m_rend = SDL_CreateRenderer(m_window,-1,SDL_RENDERER_ACCELERATED);
@@ -45,7 +46,7 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 	SDL_RenderClear(m_rend);
 
 	SDL_RenderPresent(m_rend);
-	
+		
 	return true;
 }
 
@@ -58,7 +59,7 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 void SdlRenderer::Render(const void *gfx) noexcept
 {
 	
-	SDL_UpdateTexture(m_texture, nullptr, gfx, 4 * 64 );
+	SDL_UpdateTexture(m_texture, nullptr, gfx, m_pitch);
 
 	SDL_RenderCopy(m_rend, m_texture, nullptr, nullptr);
 

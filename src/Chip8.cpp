@@ -154,9 +154,9 @@ void Chip8::updateCycle() noexcept
 	{
 		if( soundTimer_ == 1)
 		{
-			std::printf("\a");
-			std::fflush(stdout);  // the flush is needed for some reason...
-		}
+			std::printf("\a"); 
+			std::fflush(stdout); // the flush is needed for some reason...
+ 		}
 		--soundTimer_;
 	}
 	if (delayTimer_ > 0)
