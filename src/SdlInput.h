@@ -2,9 +2,7 @@
 #define SDLINPUT_H
 
 #include <vector>
-#include <unordered_map>
 #include "interfaces/iInput.h"
-#include <SDL2/SDL.h>
 
 using std::vector;
 
@@ -12,24 +10,22 @@ class SdlInput : public iInput
 {
     // iInput interface
 public:
-    void UpdateKeys();
-    bool IsKeyUp(int key);
-    bool IsKeyDown(int key);
-    bool IsKeyPressed(int key);
+    void UpdateKeys() noexcept;
+    bool IsKeyUp(const int key)         const noexcept;
+    bool IsKeyDown(const int key)       const noexcept;
+    bool IsKeyPressed(const int key)    const noexcept;
+    int GetPressedKeyValue()            const noexcept;
     SdlInput();
     ~SdlInput();
 
 private:
-    bool getKey(int i);
+    bool getKey(const int i) const noexcept;
 
-	SDL_Event m_event;
     vector<int> m_upKeys;
     vector<int> m_downKeys;
     vector<int> m_currentKeys;
-    const Uint8* m_keys;
+    const uint8_t* m_keys;
     bool m_userWannaCloseWindow;
-	std::unordered_map<int, int> m_keymap;
-
 
 };
 

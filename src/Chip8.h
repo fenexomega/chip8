@@ -3,8 +3,6 @@
 #include <iostream>
 #include "interfaces/iRenderer.h"
 #include "interfaces/iInput.h"
-#define LOG(x) std::cout << x << std::endl
-
 
 #define MEMORY_MAX 0xFFF
 #define STACK_MAX 16
@@ -26,14 +24,14 @@ public:
     
     bool initSystems();
     bool loadRom(const char *romFileName);
-    bool getDrawFlag() const;
-    bool wantToExit();
+    bool getDrawFlag() const noexcept;
+    bool wantToExit() const noexcept;
   
     int waitKeyPress();
 
-    void executeOpcode();
-    void emulateCycle();
-    void drawGraphics();
+    void executeInstruction() noexcept;
+    void updateCycle()  noexcept;
+    void drawGraphics() noexcept;
 	void dispose();
 	
 	~Chip8();

@@ -18,45 +18,6 @@ Chip8::Chip8() :
 
 
 
-bool Chip8::wantToExit()
-{
-	return renderer_->IsWindowClosed();
-}
-
-
-
-
-bool Chip8::initGraphics()
-{
-	renderer_ = new SdlRenderer();
-
-    if(!renderer_->Initialize(64,32))
-		return false;
-
-   
-    return true;
-}
-
-
-
-
-bool Chip8::initSound()
-{
-
-    return true;
-}
-
-
-
-bool Chip8::initInput()
-{
-    input_ = new SdlInput();
-    return true;
-}
-
-
-
-
 
 bool Chip8::initSystems()
 {
@@ -108,6 +69,38 @@ bool Chip8::initSystems()
 
 
 
+bool Chip8::initGraphics()
+{
+	renderer_ = new SdlRenderer();
+
+    if(!renderer_->Initialize(64,32))
+		return false;
+
+   
+    return true;
+}
+
+
+
+
+bool Chip8::initSound()
+{
+
+    return true;
+}
+
+
+
+bool Chip8::initInput()
+{
+    input_ = new SdlInput();
+    return true;
+}
+
+
+
+
+
 bool Chip8::loadRom(const char *romFileName)
 {
 	LOG("Loading " << romFileName);
@@ -141,30 +134,37 @@ bool Chip8::loadRom(const char *romFileName)
 
 
 
-
-void Chip8::emulateCycle()
+bool Chip8::wantToExit() const noexcept
 {
-  	input_->UpdateKeys();
-    //TODO: Take this code out. Is  just for testing
-    if(input_->IsKeyDown(SDL_SCANCODE_RETURN))
-        LOG("RETURN Pressed");
+	return renderer_->IsWindowClosed();
+}
 
-   // SDL_Delay(1000/60);
+
+
+void Chip8::updateCycle() noexcept
+{
+	input_->UpdateKeys();
+    //TODO: Take this code out. Is  just for testing
+    //if(input_->IsKeyDown(SDL_SCANCODE_RETURN))
+        //LOG("RETURN Pressed");
+
+
 
 }
 
 
 
 
-void Chip8::drawGraphics()
+void Chip8::drawGraphics() noexcept
 {
 	renderer_->Render(gfx_);
+	drawFlag_ = false;
 }
 
 
 
 
-bool Chip8::getDrawFlag() const
+bool Chip8::getDrawFlag() const noexcept
 {
 	return drawFlag_;
 }
@@ -173,9 +173,23 @@ bool Chip8::getDrawFlag() const
 
 int Chip8::waitKeyPress()
 {	
+	#define NO_KEY_PRESSED -1
 
-	return 0xf;
-        
+	int key = NO_KEY_PRESSED;
+
+	while(key == NO_KEY_PRESSED)// waiting for key, not ready
+	{
+
+		this->updateCycle();
+		key = input_->GetPressedKeyValue();
+
+		if(this->wantToExit())
+			break;
+	}
+	
+	return key;
+       
+	#undef NO_KEY_PRESSED
     
 }
 
@@ -212,7 +226,7 @@ Chip8::~Chip8()
 }
 
 
-void Chip8::executeOpcode()
+void Chip8::executeInstruction() noexcept
 {
 	
 	opcode_ = ( ( memory_[ pc_ ] << 8 ) | memory_ [ pc_ + 1 ] );
@@ -488,7 +502,7 @@ void Chip8::executeOpcode()
 				
 			}
 			
-			renderer_->Render(gfx_);
+			drawFlag_ = true;
 
 			
 
@@ -527,7 +541,7 @@ void Chip8::executeOpcode()
 
 
 				case 0xA: //FX0A	A key press is awaited, and then stored in VX.
-					VX = this->waitKeyPress();
+					VX = ( this->waitKeyPress() & 0xf );
 					break;
 
 				
@@ -611,7 +625,7 @@ void Chip8::executeOpcode()
 	if (soundTimer_ > 0)
 	{
 		if( soundTimer_ == 1)
-			std::printf("\a");
+			std::cout << "\a";
 		--soundTimer_;
 	}
 	if (delayTimer_ > 0)

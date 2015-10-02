@@ -25,10 +25,12 @@ int main(int argc, char **argv)
 
 	while(!myChip8->wantToExit())
 	{
-	    // Emulate one cycle
-		myChip8->executeOpcode();
-        myChip8->emulateCycle();
+		myChip8->updateCycle(); // update system/cycle status/time
 
+		myChip8->executeInstruction(); // read opcode, execute it
+		
+        if(myChip8->getDrawFlag())
+        	myChip8->drawGraphics(); 
 	}
 
 
