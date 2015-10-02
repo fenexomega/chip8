@@ -1,5 +1,6 @@
 #include <iostream>
 #include <SDL2/SDL.h>
+
 #include "Chip8.h"
 
 int main(int argc, char **argv)
@@ -40,7 +41,7 @@ int main(int argc, char **argv)
 	delete myChip8;
 
 
-//	std::cin.ignore(1); for LOG read
+	std::cin.ignore(1); //for LOG read
 	
 	return 0;
 }

@@ -10,7 +10,14 @@
 
 
 
-SdlInput::SdlInput()
+SdlInput::SdlInput() : 
+	m_keymap{
+		{ SDLK_1, 0x1 },{ SDLK_2, 0x2 },{ SDLK_3, 0x3 },{ SDLK_4, 0xC },
+		{ SDLK_q, 0x4 },{ SDLK_w, 0x5 },{ SDLK_e, 0x6 },{ SDLK_r, 0xD },
+		{ SDLK_a, 0x7 },{ SDLK_s, 0x8 },{ SDLK_d, 0x9 },{ SDLK_f, 0xE },
+		{ SDLK_z, 0xA },{ SDLK_x, 0x0 },{ SDLK_c, 0xB },{ SDLK_v, 0xF },
+		{ SDLK_5, 0x5 },{ SDLK_6, 0x6 },{ SDLK_7, 0x7 },
+		{ SDLK_8, 0x8 },{ SDLK_9, 0x9 },{ SDLK_0, 0x0 }}
 {
 	LOG("Creating SdlInput object...");
 
@@ -64,8 +71,33 @@ bool SdlInput::IsKeyDown(int key)
 
 bool SdlInput::IsKeyPressed(int key)
 {
-    return find(m_currentKeys.begin(),m_currentKeys.end(),key) != m_currentKeys.end();
+   // return find(m_currentKeys.begin(),m_currentKeys.end(),key) != m_currentKeys.end();
+	SDL_PollEvent(&m_event);
+	switch (m_event.type)
+	{
+		case SDL_KEYUP:
+		case SDL_KEYDOWN:
+			auto itr = m_keymap.find(m_event.key.keysym.sym);
+			if (itr != m_keymap.end())
+				return (itr->second == key);
+	}
 
+	return false;
+	
+	
 }
 
-
+int SdlInput::GetPressedKeyValue()
+{	
+	SDL_PollEvent(&m_event);
+	switch(m_event.type)
+	{
+		case SDL_KEYUP:
+		case SDL_KEYDOWN:
+			auto itr = m_keymap.find(m_event.key.keysym.sym);
+			if (itr != m_keymap.end())
+				return itr->second;
+	}
+	
+	return -1;
+}
