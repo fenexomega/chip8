@@ -24,14 +24,14 @@ public:
     
     bool initSystems();
     bool loadRom(const char *romFileName);
-    bool getDrawFlag() const noexcept;
+	bool getDrawFlag() const noexcept;
     bool wantToExit() const noexcept;
   
     int waitKeyPress();
 
-    void executeInstruction() noexcept;
+	void executeInstruction() noexcept ;
     void updateCycle()  noexcept;
-    void drawGraphics() noexcept;
+	void drawGraphics() noexcept;
 	void dispose();
 	
 	~Chip8();
@@ -59,5 +59,6 @@ private:
     
 
 };
+
 
 #endif // CHIP8_H

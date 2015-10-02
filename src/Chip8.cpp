@@ -154,7 +154,7 @@ void Chip8::updateCycle() noexcept
 	if (soundTimer_ > 0)
 	{
 		if( soundTimer_ == 1)
-			std::cout << "\a"; // not beeping in my Arch Linux, but beeps in my Windows 7 ...
+			std::printf("\a"); // checking the beep problem in linux ...
 		--soundTimer_;
 	}
 	if (delayTimer_ > 0)
@@ -165,15 +165,11 @@ void Chip8::updateCycle() noexcept
 }
 
 
-
-
 void Chip8::drawGraphics() noexcept
 {
 	renderer_->Render(gfx_);
 	drawFlag_ = false;
 }
-
-
 
 
 bool Chip8::getDrawFlag() const noexcept
