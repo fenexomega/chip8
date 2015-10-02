@@ -1,9 +1,7 @@
 #include <ctime>
 #include <cstring>
-#include <ncurses.h>
 #include <algorithm>
 #include <fstream>
-#include <iterator>
 
 #include "SdlRenderer.h"
 #include "SdlInput.h"
