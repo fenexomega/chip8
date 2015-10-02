@@ -23,8 +23,6 @@ int main(int argc, char **argv)
 	
 
 
-
-
 	while(!myChip8->wantToExit())
 	{
 	    // Emulate one cycle
@@ -42,7 +40,7 @@ int main(int argc, char **argv)
 	delete myChip8;
 
 
-//	std::cin.ignore(1); for LOG read
+	//std::cin.ignore(1); //for LOG read
 	
 	return 0;
 }

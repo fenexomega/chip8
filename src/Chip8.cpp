@@ -13,11 +13,8 @@
 Chip8::Chip8() : 
 	renderer_ ( nullptr ), input_ (nullptr )
 {
-	dPrint("Creating Chip8 object...");
+	LOG("Creating Chip8 object...");
 }
-
-
-
 
 
 
@@ -25,6 +22,8 @@ bool Chip8::wantToExit()
 {
 	return renderer_->IsWindowClosed();
 }
+
+
 
 
 bool Chip8::initGraphics()
@@ -37,6 +36,7 @@ bool Chip8::initGraphics()
    
     return true;
 }
+
 
 
 
@@ -61,7 +61,7 @@ bool Chip8::initInput()
 bool Chip8::initSystems()
 {
 
-	dPrint("Initializing Chip8 Systems...");
+	LOG("Initializing Chip8 Systems...");
 
 	pc_     = 0x200;  // Program counter starts at 0x200
 	opcode_ = 0;      // Reset current opcode
@@ -110,31 +110,30 @@ bool Chip8::initSystems()
 
 bool Chip8::loadRom(const char *romFileName)
 {
-	dPrint("Loading " << romFileName);
+	LOG("Loading " << romFileName);
 	std::ifstream romFile(romFileName, std::ios::ate | std::ios::binary);
-
 
 	if (!romFile.is_open())
 	{
-		dPrint("Error at opening ROM file. Exiting!");
+		LOG("Error at opening ROM file. Exiting!");
 		return false;
 	}
 
 	size_t romFileSize = romFile.tellg();
+
 	romFile.seekg(0, romFile.beg);
 
 	if (romFileSize > romMaxSize)
 	{
-		dPrint("Error, ROM size not compatible. Exiting!");
+		LOG("Error, ROM size not compatible. Exiting!");
 		return false;
 	}
 
-	std::copy(std::istreambuf_iterator<char>(romFile),
-				std::istreambuf_iterator<char>(), memory_ + 0x200);
+	romFile.read((char*)memory_ + 0x200, romFileSize);
 
 	romFile.close();
 
-	dPrint("Load Done!");
+	LOG("Load Done!");
 
 
 	return true;
@@ -145,10 +144,10 @@ bool Chip8::loadRom(const char *romFileName)
 
 void Chip8::emulateCycle()
 {
-    input_->UpdateKeys();
+  	input_->UpdateKeys();
     //TODO: Take this code out. Is  just for testing
     if(input_->IsKeyDown(SDL_SCANCODE_RETURN))
-        dPrint("RETURN Pressed");
+        LOG("RETURN Pressed");
 
    // SDL_Delay(1000/60);
 
@@ -173,12 +172,11 @@ bool Chip8::getDrawFlag() const
 
 
 int Chip8::waitKeyPress()
-{
+{	
 
-    while(!renderer_->IsWindowClosed())
-        input_->IsKeyDown(SDL_SCANCODE_RETURN);
-
-	return 1;
+	return 0xf;
+        
+    
 }
 
 
@@ -207,13 +205,13 @@ void Chip8::dispose()
 
 Chip8::~Chip8()
 {
-	dPrint("Destroying Chip8 object...");
+	LOG("Destroying Chip8 object...");
 	
 	if(renderer_ != nullptr || input_ != nullptr)
 		this->dispose();
 }
 
-constexpr size_t gfxBytes { gfxResolution * 4 };
+
 void Chip8::executeOpcode()
 {
 	
@@ -459,7 +457,7 @@ void Chip8::executeOpcode()
 				 If the current value is different from the value in the memory, the bit value will be 1. 
 				 If both values match, the bit value will be 0.
 			*/
-			//dPrint("DRAWING");
+			//LOG("DRAWING");
 			
 			V_ [0xF] = 0;
 
@@ -504,10 +502,14 @@ void Chip8::executeOpcode()
 			switch (opcode_ & 0x000f)
 			{
 				case 0xE: // EX9E: Skips the next instruction if the key stored in VX is pressed.
+					if(input_->IsKeyPressed(VX))
+						pc_ += 2;
 					break;
 
 
 				case 0x1: //0xEXA1	Skips the next instruction if the key stored in VX isn't pressed.
+					if(!input_->IsKeyPressed(VX))
+						pc_ += 2;
 					break;
 			}			
 			
@@ -573,12 +575,12 @@ void Chip8::executeOpcode()
 							break;
 
 						case 0x55: //FX55	Stores V0 to VX in memory starting at address I
-							std::memcpy(memory_ + I_, V_, (VX + 1));
+							std::memcpy(memory_ + I_, V_, ((opcode_ & 0x0f00) >> 8) + 1);
 							//I_ = I_ + 1 + ((opcode_ & 0x0F00) >> 8);
 							break;
 
 						case 0x65: //FX65	Fills V0 to VX with values from memory starting at address I.
-							std::memcpy(V_, memory_ + I_, (VX + 1));
+							std::memcpy(V_, memory_ + I_, ((opcode_ & 0x0f00 ) >> 8) + 1);
 							//I_ = I_ + 1 + ((opcode_ & 0x0F00) >> 8);
 							break;
 
@@ -607,11 +609,14 @@ void Chip8::executeOpcode()
 	}	
 
 	if (soundTimer_ > 0)
+	{
+		if( soundTimer_ == 1)
+			std::printf("\a");
 		--soundTimer_;
-
+	}
 	if (delayTimer_ > 0)
 		--delayTimer_;
-
+	
     
 
 }

@@ -1,17 +1,17 @@
 #ifndef CHIP8_H
 #define CHIP8_H
 #include <iostream>
-#include <SDL2/SDL.h>
 #include "interfaces/iRenderer.h"
 #include "interfaces/iInput.h"
-#define dPrint(x) std::cout << x << std::endl
+#define LOG(x) std::cout << x << std::endl
 
 
 #define MEMORY_MAX 0xFFF
 #define STACK_MAX 16
 
-constexpr size_t gfxResolution { 64 * 32 };
-constexpr size_t romMaxSize { MEMORY_MAX - 0x200 };
+constexpr int gfxResolution { 64 * 32 };
+constexpr int gfxBytes{ gfxResolution * 4 };
+constexpr int romMaxSize { MEMORY_MAX - 0x200 };
 
 // Telmac operated 3.58MHz / 2
 // Chip8 timers count down at 60Hz .
@@ -23,6 +23,7 @@ class Chip8
 
 public:
     Chip8();
+    
     bool initSystems();
     bool loadRom(const char *romFileName);
     bool getDrawFlag() const;
@@ -40,9 +41,8 @@ private:
     bool initGraphics();
     bool initSound();
     bool initInput();
-    
 
-	iRenderer *renderer_;
+    iRenderer *renderer_;
     iInput *input_;
     bool drawFlag_;
     unsigned short opcode_;

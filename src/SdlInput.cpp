@@ -10,7 +10,7 @@
 
 
 
-SdlInput::SdlInput()
+SdlInput::SdlInput() 
 {
 	LOG("Creating SdlInput object...");
 
@@ -64,8 +64,10 @@ bool SdlInput::IsKeyDown(int key)
 
 bool SdlInput::IsKeyPressed(int key)
 {
-    return find(m_currentKeys.begin(),m_currentKeys.end(),key) != m_currentKeys.end();
+   return find(m_currentKeys.begin(),m_currentKeys.end(),key) != m_currentKeys.end();
+	
 
+	
+	
+	
 }
-
-
