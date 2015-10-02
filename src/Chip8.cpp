@@ -113,7 +113,6 @@ bool Chip8::loadRom(const char *romFileName)
 	LOG("Loading " << romFileName);
 	std::ifstream romFile(romFileName, std::ios::ate | std::ios::binary);
 
-
 	if (!romFile.is_open())
 	{
 		LOG("Error at opening ROM file. Exiting!");
@@ -121,6 +120,7 @@ bool Chip8::loadRom(const char *romFileName)
 	}
 
 	size_t romFileSize = romFile.tellg();
+
 	romFile.seekg(0, romFile.beg);
 
 	if (romFileSize > romMaxSize)
@@ -129,8 +129,7 @@ bool Chip8::loadRom(const char *romFileName)
 		return false;
 	}
 
-	std::copy(std::istreambuf_iterator<char>(romFile),
-				std::istreambuf_iterator<char>(), memory_ + 0x200);
+	romFile.read((char*)memory_ + 0x200, romFileSize);
 
 	romFile.close();
 
@@ -145,10 +144,10 @@ bool Chip8::loadRom(const char *romFileName)
 
 void Chip8::emulateCycle()
 {
-  	//input_->UpdateKeys();
+  	input_->UpdateKeys();
     //TODO: Take this code out. Is  just for testing
-    //if(input_->IsKeyDown(SDL_SCANCODE_RETURN))
-        //LOG("RETURN Pressed");
+    if(input_->IsKeyDown(SDL_SCANCODE_RETURN))
+        LOG("RETURN Pressed");
 
    // SDL_Delay(1000/60);
 
@@ -173,11 +172,9 @@ bool Chip8::getDrawFlag() const
 
 
 int Chip8::waitKeyPress()
-{
-	int key;
-	for (key = 0; key == -1; key = input_->GetPressedKeyValue())
+{	
 
-	return key;
+	return 0xf;
         
     
 }

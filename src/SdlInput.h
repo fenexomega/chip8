@@ -16,7 +16,6 @@ public:
     bool IsKeyUp(int key);
     bool IsKeyDown(int key);
     bool IsKeyPressed(int key);
-	int GetPressedKeyValue();
     SdlInput();
     ~SdlInput();
 
