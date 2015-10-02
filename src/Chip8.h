@@ -20,40 +20,41 @@ class Chip8
 
 
 public:
-    Chip8();
-    
-    bool initSystems();
-    bool loadRom(const char *romFileName);
+	Chip8();
+	
+	bool initSystems();
+	bool loadRom(const char *romFileName);
 	bool getDrawFlag() const noexcept;
-    bool wantToExit() const noexcept;
+	bool wantToExit() const noexcept;
   
-    int waitKeyPress();
-
+	int waitKeyPress();
+	
 	void executeInstruction() noexcept ;
-    void updateCycle()  noexcept;
+	void updateCycle()  noexcept;
 	void drawGraphics() noexcept;
 	void dispose();
-	
+
 	~Chip8();
 private:
-    bool initGraphics();
-    bool initSound();
-    bool initInput();
+	bool initGraphics();
+	bool initSound();
+	bool initInput();
 
-    iRenderer *renderer_;
-    iInput *input_;
-    bool drawFlag_;
-    unsigned short opcode_;
-    unsigned char memory_[MEMORY_MAX];
-    unsigned char V_[16];
-    unsigned short I_;
-    unsigned short pc_;
-    uint32_t gfx_[gfxResolution];
-    unsigned char delayTimer_;
-    unsigned char soundTimer_;
-    unsigned short stack_[STACK_MAX];
-    unsigned short sp_;
-    unsigned char key_[16];
+	iRenderer *renderer_;
+	iInput *input_;
+	
+	bool drawFlag_;
+	unsigned short opcode_;
+	unsigned char memory_[MEMORY_MAX];
+	unsigned char V_[16];
+	unsigned short I_;
+	unsigned short pc_;
+	uint32_t gfx_[gfxResolution];
+	unsigned char delayTimer_;
+	unsigned char soundTimer_;
+	unsigned short stack_[STACK_MAX];
+	unsigned short sp_;
+	unsigned char key_[16];
 
 
     

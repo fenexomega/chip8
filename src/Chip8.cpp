@@ -1,5 +1,6 @@
 #include <ctime>
 #include <cstring>
+#include <ncurses.h>
 #include <algorithm>
 #include <fstream>
 #include <iterator>
@@ -154,7 +155,10 @@ void Chip8::updateCycle() noexcept
 	if (soundTimer_ > 0)
 	{
 		if( soundTimer_ == 1)
-			std::printf("\a"); // checking the beep problem in linux ...
+		{
+			std::printf("\a");
+			std::fflush(stdout);  // the flush is needed for some reason...
+		}
 		--soundTimer_;
 	}
 	if (delayTimer_ > 0)
