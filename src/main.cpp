@@ -29,8 +29,8 @@ int main(int argc, char **argv)
 
 		myChip8->executeInstruction(); // read opcode, execute it
 		
-        if(myChip8->getDrawFlag())
-        	myChip8->drawGraphics(); 
+		if(myChip8->getDrawFlag())
+			myChip8->drawGraphics(); 
 	}
 
 

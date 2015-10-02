@@ -148,7 +148,19 @@ void Chip8::updateCycle() noexcept
     //if(input_->IsKeyDown(SDL_SCANCODE_RETURN))
         //LOG("RETURN Pressed");
 
+	
+	//OPTIONAL: calc cycle time to match the 3.58Mhz from original system which Chip8 were used.
 
+	if (soundTimer_ > 0)
+	{
+		if( soundTimer_ == 1)
+			std::cout << "\a"; // not beeping in my Arch Linux, but beeps in my Windows 7 ...
+		--soundTimer_;
+	}
+	if (delayTimer_ > 0)
+		--delayTimer_;
+	
+    
 
 }
 
@@ -621,16 +633,5 @@ void Chip8::executeInstruction() noexcept
 		#undef NN
 		#undef N		
 	}	
-
-	if (soundTimer_ > 0)
-	{
-		if( soundTimer_ == 1)
-			std::cout << "\a";
-		--soundTimer_;
-	}
-	if (delayTimer_ > 0)
-		--delayTimer_;
-	
-    
 
 }
