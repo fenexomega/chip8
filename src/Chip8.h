@@ -1,7 +1,6 @@
 #ifndef CHIP8_H
 #define CHIP8_H
 #include <iostream>
-#include <SDL2/SDL.h>
 #include "interfaces/iRenderer.h"
 #include "interfaces/iInput.h"
 #define dPrint(x) std::cout << x << std::endl
@@ -23,6 +22,7 @@ class Chip8
 
 public:
     Chip8();
+    
     bool initSystems();
     bool loadRom(const char *romFileName);
     bool getDrawFlag() const;
@@ -40,9 +40,8 @@ private:
     bool initGraphics();
     bool initSound();
     bool initInput();
-    
 
-	iRenderer *renderer_;
+    iRenderer *renderer_;
     iInput *input_;
     bool drawFlag_;
     unsigned short opcode_;

@@ -27,7 +27,9 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 	
 
 	m_window = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,width * 4 , height * 6 , SDL_WINDOW_RESIZABLE);
+
 	m_rend = SDL_CreateRenderer(m_window,-1,SDL_RENDERER_ACCELERATED);
+	
 	m_texture = SDL_CreateTexture(m_rend, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
 
 

@@ -23,8 +23,6 @@ int main(int argc, char **argv)
 	
 
 
-
-
 	while(!myChip8->wantToExit())
 	{
 	    // Emulate one cycle

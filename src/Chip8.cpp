@@ -18,13 +18,12 @@ Chip8::Chip8() :
 
 
 
-
-
-
 bool Chip8::wantToExit()
 {
 	return renderer_->IsWindowClosed();
 }
+
+
 
 
 bool Chip8::initGraphics()
@@ -37,6 +36,7 @@ bool Chip8::initGraphics()
    
     return true;
 }
+
 
 
 
@@ -145,10 +145,10 @@ bool Chip8::loadRom(const char *romFileName)
 
 void Chip8::emulateCycle()
 {
-    input_->UpdateKeys();
+  	input_->UpdateKeys();
     //TODO: Take this code out. Is  just for testing
-    if(input_->IsKeyDown(SDL_SCANCODE_RETURN))
-        dPrint("RETURN Pressed");
+    //if(input_->IsKeyDown(SDL_SCANCODE_RETURN))
+        //dPrint("RETURN Pressed");
 
    // SDL_Delay(1000/60);
 
@@ -174,11 +174,10 @@ bool Chip8::getDrawFlag() const
 
 int Chip8::waitKeyPress()
 {
-
-    while(!renderer_->IsWindowClosed())
-        input_->IsKeyDown(SDL_SCANCODE_RETURN);
-
-	return 1;
+	
+	return 0x3;
+        
+    
 }
 
 
@@ -213,7 +212,7 @@ Chip8::~Chip8()
 		this->dispose();
 }
 
-constexpr size_t gfxBytes { gfxResolution * 4 };
+
 void Chip8::executeOpcode()
 {
 	
@@ -232,7 +231,7 @@ void Chip8::executeOpcode()
 	#define NNN (opcode_ & 0x0fff)
 	#define NN (opcode_ & 0x00ff)
 	#define N (opcode_ & 0x000f)
-	
+	constexpr size_t gfxBytes { gfxResolution * 4 };
 	switch( opcode_ & 0xf000 )
 	{
 		
@@ -504,10 +503,14 @@ void Chip8::executeOpcode()
 			switch (opcode_ & 0x000f)
 			{
 				case 0xE: // EX9E: Skips the next instruction if the key stored in VX is pressed.
+					if(input_->IsKeyDown(VX))
+						pc_ += 2;
 					break;
 
 
 				case 0x1: //0xEXA1	Skips the next instruction if the key stored in VX isn't pressed.
+					if(!input_->IsKeyDown(VX))
+						pc_ += 2;
 					break;
 			}			
 			
@@ -607,11 +610,14 @@ void Chip8::executeOpcode()
 	}	
 
 	if (soundTimer_ > 0)
+	{
+		if( soundTimer_ == 1)
+			std::printf("\a");
 		--soundTimer_;
-
+	}
 	if (delayTimer_ > 0)
 		--delayTimer_;
-
+	
     
 
 }
