@@ -18,20 +18,18 @@ constexpr int romMaxSize { MEMORY_MAX - 0x200 };
 
 class Chip8
 {
-
-
 public:
 	Chip8();
-	bool initSystems();
-	bool loadRom(const char *romFileName);
+	bool initSystems() noexcept;
+	bool loadRom(const char *romFileName) noexcept;
 	bool getDrawFlag() const noexcept;
 	bool wantToExit() const noexcept;
 	void executeInstruction() noexcept ;
 	void updateCycle()  noexcept;
 	void drawGraphics() noexcept;
-	void dispose();
-
+	void dispose() noexcept;
 	~Chip8();
+
 private:
 	bool initGraphics();
 	bool initInput();
@@ -52,8 +50,7 @@ private:
 	unsigned short stack_[STACK_MAX];
 	unsigned short sp_;
 	unsigned char key_[16];
-	std::chrono::high_resolution_clock clockRate;
-    
+
 
 };
 

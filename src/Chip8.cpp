@@ -16,8 +16,6 @@ Chip8::Chip8() :
 }
 
 
-
-
 bool Chip8::initSystems()
 {
 
