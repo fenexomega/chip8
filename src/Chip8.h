@@ -20,20 +20,20 @@ class Chip8
 {
 public:
 	Chip8();
-	bool initSystems() noexcept;
-	bool loadRom(const char *romFileName) noexcept;
+	bool initSystems();
+	bool loadRom(const char *romFileName);
 	bool getDrawFlag() const noexcept;
 	bool wantToExit() const noexcept;
 	void executeInstruction() noexcept ;
 	void updateCycle()  noexcept;
 	void drawGraphics() noexcept;
-	void dispose() noexcept;
+	void dispose();
 	~Chip8();
 
 private:
 	bool initGraphics();
 	bool initInput();
-	int waitKeyPress();
+	int waitKeyPress() noexcept;
 
 	iRenderer *renderer_;
 	iInput *input_;

@@ -95,7 +95,7 @@ bool Chip8::loadRom(const char *romFileName)
 		return false;
 	}
 
-	size_t romFileSize = romFile.tellg();
+	std::streamoff romFileSize = romFile.tellg();
 	romFile.seekg(0, romFile.beg);
 
 	if (romFileSize > romMaxSize)
@@ -163,7 +163,7 @@ bool Chip8::getDrawFlag() const noexcept
 
 
 
-int Chip8::waitKeyPress()
+int Chip8::waitKeyPress() noexcept
 {	
 	
 	int key = NO_KEY_PRESSED;
