@@ -37,7 +37,7 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 	if(m_window == nullptr || m_rend == nullptr || m_texture == nullptr)
 	{
 
-		LOG("Couldn't allocate SDL_Window, SDL_Renderer or SDL_Texture.");
+		LOG("Couldn't allocate SDL_Window, SDL_Renderer or SDL_Texture: Error: " << SDL_GetError());
 		return false;
 	}
 

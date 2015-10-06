@@ -8,16 +8,16 @@
 
 
 
-SdlInput::SdlInput() : m_keys ( nullptr ) 
+SdlInput::SdlInput() noexcept : 
+	m_keys ( nullptr ) 
 {
 	LOG("Creating SdlInput object...");
 
 }
 
-SdlInput::~SdlInput()
+SdlInput::~SdlInput() noexcept
 {
 	LOG("Destroying SdlInput object...");
-	m_keys = nullptr;
 }
 
 bool SdlInput::getKey(const int i) const noexcept
@@ -31,9 +31,9 @@ void SdlInput::UpdateKeys() noexcept
 
     SDL_PumpEvents();
     m_keys = SDL_GetKeyboardState(NULL);
-    static int i;
+    static int i = 0;
 
-    // Just a clean for speed up
+    // Just a clean for speed up, not using up / down keys for input right now
 
     /*m_upKeys.clear();
     for(i = 0; i < NUM_KEYCODES; i++)
@@ -71,6 +71,7 @@ bool SdlInput::IsKeyDown(int key) const noexcept
 
 }
 
+
 bool SdlInput::IsKeyPressed(int key) const noexcept
 {
    return find(m_currentKeys.begin(),m_currentKeys.end(),key) != m_currentKeys.end();
@@ -80,8 +81,5 @@ bool SdlInput::IsKeyPressed(int key) const noexcept
 
 int SdlInput::GetPressedKeyValue() const noexcept
 {
-	if(m_currentKeys.size() > 0)
-		return m_currentKeys[0];
-	else
-		return -1;
+	return ((m_currentKeys.size() > 0) ? m_currentKeys[0] : NO_KEY_PRESSED);
 }

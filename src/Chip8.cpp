@@ -61,7 +61,7 @@ bool Chip8::initSystems()
 
 	std::copy_n(chip8_fontset, 80, memory_); // copy fontset to memory.
 
-	return initGraphics() & initSound() & initInput();
+	return initGraphics() & initInput();
 
 }
 
@@ -71,21 +71,7 @@ bool Chip8::initSystems()
 bool Chip8::initGraphics()
 {
 	renderer_ = new SdlRenderer();
-
-    if(!renderer_->Initialize(64,32))
-		return false;
-
-   
-    return true;
-}
-
-
-
-
-bool Chip8::initSound()
-{
-
-    return true;
+	return renderer_->Initialize(64, 32);
 }
 
 
@@ -112,7 +98,6 @@ bool Chip8::loadRom(const char *romFileName)
 	}
 
 	size_t romFileSize = romFile.tellg();
-
 	romFile.seekg(0, romFile.beg);
 
 	if (romFileSize > romMaxSize)
@@ -147,14 +132,13 @@ void Chip8::updateCycle() noexcept
     //if(input_->IsKeyDown(SDL_SCANCODE_RETURN))
         //LOG("RETURN Pressed");
 
-	
 	//OPTIONAL: calc cycle time to match the 3.58Mhz from original system which Chip8 were used.
 
 	if (soundTimer_ > 0)
 	{
 		if( soundTimer_ == 1)
 		{
-			std::printf("\a"); 
+			std::printf("\a"); // play beep, yes chip8 only had beeps, dont know about super chip8 though
 			std::fflush(stdout); // the flush is needed for some reason...
  		}
 		--soundTimer_;
@@ -183,11 +167,10 @@ bool Chip8::getDrawFlag() const noexcept
 
 int Chip8::waitKeyPress()
 {	
-	#define NO_KEY_PRESSED -1
-
+	
 	int key = NO_KEY_PRESSED;
 
-	while(key == NO_KEY_PRESSED)// waiting for key, not ready
+	while(key == NO_KEY_PRESSED)
 	{
 
 		this->updateCycle();
@@ -211,10 +194,8 @@ void Chip8::dispose()
 		delete input_;
 		input_ = nullptr;
 	}
-
 	if (renderer_ != nullptr)
 	{
-		renderer_->Dispose();
 		delete renderer_;
 		renderer_ = nullptr;
 	}
@@ -223,8 +204,6 @@ void Chip8::dispose()
 	
 	
 }
-
-
 
 
 Chip8::~Chip8()

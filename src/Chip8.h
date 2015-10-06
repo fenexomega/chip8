@@ -1,6 +1,7 @@
 #ifndef CHIP8_H
 #define CHIP8_H
 #include <iostream>
+#include <chrono>
 #include "interfaces/iRenderer.h"
 #include "interfaces/iInput.h"
 
@@ -21,14 +22,10 @@ class Chip8
 
 public:
 	Chip8();
-	
 	bool initSystems();
 	bool loadRom(const char *romFileName);
 	bool getDrawFlag() const noexcept;
 	bool wantToExit() const noexcept;
-  
-	int waitKeyPress();
-	
 	void executeInstruction() noexcept ;
 	void updateCycle()  noexcept;
 	void drawGraphics() noexcept;
@@ -37,8 +34,8 @@ public:
 	~Chip8();
 private:
 	bool initGraphics();
-	bool initSound();
 	bool initInput();
+	int waitKeyPress();
 
 	iRenderer *renderer_;
 	iInput *input_;
@@ -55,8 +52,7 @@ private:
 	unsigned short stack_[STACK_MAX];
 	unsigned short sp_;
 	unsigned char key_[16];
-
-
+	std::chrono::high_resolution_clock clockRate;
     
 
 };

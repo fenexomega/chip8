@@ -15,8 +15,8 @@ public:
     bool IsKeyDown(const int key)       const noexcept;
     bool IsKeyPressed(const int key)    const noexcept;
     int GetPressedKeyValue()            const noexcept;
-    SdlInput();
-    ~SdlInput();
+    SdlInput() noexcept;
+    ~SdlInput() noexcept;
 
 private:
     bool getKey(const int i) const noexcept;
