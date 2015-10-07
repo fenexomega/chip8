@@ -1,5 +1,6 @@
 #include "SdlRenderer.h"
 
+constexpr int fps { 1000 / 60 };
 
 
 
@@ -9,9 +10,6 @@ SdlRenderer::SdlRenderer() :
 {
 	LOG("Creating SdlRenderer object...");
 }
-
-
-
 
 
 
@@ -60,14 +58,11 @@ void SdlRenderer::Render(const void *gfx) noexcept
 {
 	
 	SDL_UpdateTexture(m_texture, nullptr, gfx, m_pitch);
-
 	SDL_RenderCopy(m_rend, m_texture, nullptr, nullptr);
-
 	SDL_RenderPresent(m_rend);
 
-	SDL_Delay(1000/60);
+	SDL_Delay(fps);
 }
-
 
 
 
@@ -83,9 +78,6 @@ void SdlRenderer::UpdateWindowState() noexcept
 		m_userWannaClose = true;
 	
 }
-
-
-
 
 
 
@@ -110,8 +102,6 @@ void SdlRenderer::Dispose() noexcept
 
 
 
-
-
 SdlRenderer::~SdlRenderer()
 {
 
@@ -122,29 +112,3 @@ SdlRenderer::~SdlRenderer()
 	SDL_Quit();
 }
 
-
-
-
-
-
-/* SdlRender Tests
-int main()
-{
-	iRenderer *renderer_ = new SdlRenderer;
-
-	renderer_->initialize();
-	SDL_Delay(5000);
-	renderer_->dispose();
-	SDL_Delay(3000);
-	renderer_->dispose();
-	SDL_Delay(3000);
-	renderer_->initialize();
-	SDL_Delay(5000);
-	renderer_->dispose();
-	SDL_Delay(3000);
-
-
-	
-
-}
-*/

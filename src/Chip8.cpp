@@ -118,7 +118,8 @@ bool Chip8::loadRom(const char *romFileName)
 
 bool Chip8::wantToExit() const noexcept
 {
-	return renderer_->IsWindowClosed();
+	// the type returned by the operation || is a bool, and operator | returns a int, with || we avoid casting to return a bool
+	return renderer_->IsWindowClosed() || ( input_->GetPressedKeyValue() == SDL_SCANCODE_ESCAPE );
 }
 
 
@@ -142,7 +143,7 @@ void Chip8::updateCycle() noexcept
 		--soundTimer_;
 	}
 	if (delayTimer_ > 0)
-		--delayTimer_;
+            --delayTimer_;
 	
     
 
@@ -173,6 +174,8 @@ int Chip8::waitKeyPress() noexcept
 
 		if(this->wantToExit())
 			return 0;
+
+		this->drawGraphics();
 	} while(key == NO_KEY_PRESSED);
 	
 	return key;
@@ -443,18 +446,15 @@ void Chip8::executeInstruction() noexcept
 				 If the current value is different from the value in the memory, the bit value will be 1. 
 				 If both values match, the bit value will be 0.
 			*/
-			//LOG("DRAWING");
-
+			//LOG("DRAWING")	
 
 			V_ [0xF] = 0;
-
 			uint8_t Vx = VX, Vy = VY;
 			int height = N;
 
 			for (int i = 0; i < height; ++i)
 			{
 				uint8_t _8bitRow  = memory_[ I_ + i ];
-
 				for (int j = 0; j < 8; ++j)
 				{
 					int px = ((Vx + j) & 63);
@@ -467,16 +467,15 @@ void Chip8::executeInstruction() noexcept
 					V_ [0xF] |= ( ( gfx_ [pixelPos] > 0) & pixel );
 
 					gfx_ [pixelPos] ^= ( pixel ) ? ~0 : 0;
+					
 				}
-				
+		
 			}
 			drawFlag_ = true;
-			
-			
 
 			break;
 		}
-
+	
 
 
 		case 0xE000:// BEGIN Exxx

@@ -1,6 +1,6 @@
-#include "SdlInput.h"
-#include <SDL2/SDL.h>
 #include <algorithm>
+#include <SDL2/SDL.h>
+#include "SdlInput.h"
 
 
 // Max of keycodes to check. This covers all the ascii table.
