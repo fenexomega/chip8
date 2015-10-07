@@ -1,7 +1,5 @@
 #ifndef CHIP8_H
 #define CHIP8_H
-#include <iostream>
-#include <chrono>
 #include "interfaces/iRenderer.h"
 #include "interfaces/iInput.h"
 
@@ -34,23 +32,21 @@ private:
 	bool initGraphics();
 	bool initInput();
 	int waitKeyPress() noexcept;
-
-	iRenderer *renderer_;
-	iInput *input_;
 	
 	bool drawFlag_;
-	unsigned short opcode_;
-	unsigned char memory_[MEMORY_MAX];
-	unsigned char V_[16];
-	unsigned short I_;
-	unsigned short pc_;
-	uint32_t gfx_[gfxResolution];
-	unsigned char delayTimer_;
-	unsigned char soundTimer_;
-	unsigned short stack_[STACK_MAX];
-	unsigned short sp_;
-	unsigned char key_[16];
+	iRenderer *renderer_;
+	iInput *input_;
 
+	uint32_t *gfx_;
+	uint8_t *memory_;
+	uint8_t V_[16];
+	uint8_t delayTimer_;
+	uint8_t soundTimer_;
+	uint16_t opcode_;
+	uint16_t I_;
+	uint16_t pc_;
+	uint16_t stack_[STACK_MAX];
+	uint16_t sp_;
 
 };
 

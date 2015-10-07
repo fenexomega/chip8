@@ -1,6 +1,5 @@
 #ifndef SDLINPUT_H
 #define SDLINPUT_H
-
 #include <vector>
 #include "interfaces/iInput.h"
 
