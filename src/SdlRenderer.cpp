@@ -99,15 +99,9 @@ bool SdlRenderer::IsWindowClosed() noexcept
 
 void SdlRenderer::Dispose() noexcept
 {
-	SDL_RenderClear(m_rend);
-
-	if(m_texture != nullptr)
-		SDL_DestroyTexture(m_texture);
-	if(m_rend != nullptr)
-		SDL_DestroyRenderer(m_rend);
-	if(m_window != nullptr)
-		SDL_DestroyWindow(m_window);
-
+	SDL_DestroyTexture(m_texture);
+	SDL_DestroyRenderer(m_rend);
+	SDL_DestroyWindow(m_window);
 	m_texture = nullptr;
 	m_rend = nullptr;
 	m_window = nullptr;

@@ -10,9 +10,10 @@
 
 
 Chip8::Chip8() : 
-	renderer_ ( nullptr ), input_ (nullptr )
+	renderer_ ( nullptr ), input_ ( nullptr ), gfx_ (nullptr), memory_ ( nullptr )
 {
 	LOG("Creating Chip8 object...");
+	
 }
 
 
@@ -28,6 +29,9 @@ bool Chip8::initSystems()
 	soundTimer_ = 0;
 	delayTimer_ = 0;
 	drawFlag_ = false;
+	memory_ = new uint8_t[MEMORY_MAX];
+	gfx_ = new uint32_t[gfxResolution];
+
 
 	std::srand(std::time(0));				// seed rand
 	std::fill_n(gfx_,gfxResolution, 0);		// Clear display
@@ -37,7 +41,7 @@ bool Chip8::initSystems()
 
 	// Load fontset
 	
-	unsigned char chip8_fontset[80] 
+	uint8_t chip8_fontset[80] 
 	{
 		0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
 		0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -81,9 +85,6 @@ bool Chip8::initInput()
 }
 
 
-
-
-
 bool Chip8::loadRom(const char *romFileName)
 {
 	LOG("Loading " << romFileName);
@@ -95,7 +96,7 @@ bool Chip8::loadRom(const char *romFileName)
 		return false;
 	}
 
-	std::streamoff romFileSize = romFile.tellg();
+	std::streampos romFileSize = romFile.tellg();
 	romFile.seekg(0, romFile.beg);
 
 	if (romFileSize > romMaxSize)
@@ -115,7 +116,6 @@ bool Chip8::loadRom(const char *romFileName)
 }
 
 
-
 bool Chip8::wantToExit() const noexcept
 {
 	return renderer_->IsWindowClosed();
@@ -125,7 +125,7 @@ bool Chip8::wantToExit() const noexcept
 
 void Chip8::updateCycle() noexcept
 {
-	input_->UpdateKeys();
+	input_->UpdateKeys(); 
     //TODO: Take this code out. Is  just for testing
     //if(input_->IsKeyDown(SDL_SCANCODE_RETURN))
         //LOG("RETURN Pressed");
@@ -136,7 +136,7 @@ void Chip8::updateCycle() noexcept
 	{
 		if( soundTimer_ == 1)
 		{
-			std::printf("\a"); // play beep, yes chip8 only had beeps, dont know about super chip8 though
+			std::printf("\a"); // play beep, yes chip8 only had beeps, don't know about super chip8 though
 			std::fflush(stdout); // the flush is needed for some reason...
  		}
 		--soundTimer_;
@@ -165,42 +165,26 @@ bool Chip8::getDrawFlag() const noexcept
 
 int Chip8::waitKeyPress() noexcept
 {	
-	
 	int key = NO_KEY_PRESSED;
-
-	while(key == NO_KEY_PRESSED)
+	do
 	{
-
 		this->updateCycle();
 		key = input_->GetPressedKeyValue();
 
 		if(this->wantToExit())
-			break;
-	}
+			return 0;
+	} while(key == NO_KEY_PRESSED);
 	
 	return key;
-       
-	#undef NO_KEY_PRESSED
     
 }
 
-
+/* After use Chip8::dispose(), be sure to call, chip8::initialize again before you use the object. */
 void Chip8::dispose()
 {
-	if (input_ != nullptr)
-	{
-		delete input_;
-		input_ = nullptr;
-	}
-	if (renderer_ != nullptr)
-	{
-		delete renderer_;
-		renderer_ = nullptr;
-	}
-
-
+	delete input_;  delete renderer_; delete[] gfx_;  delete[] memory_;
 	
-	
+	input_ = nullptr; renderer_ = nullptr; gfx_ = nullptr; memory_ = nullptr;
 }
 
 
@@ -208,7 +192,7 @@ Chip8::~Chip8()
 {
 	LOG("Destroying Chip8 object...");
 	
-	if(renderer_ != nullptr || input_ != nullptr)
+	if(renderer_ != nullptr || input_ != nullptr || gfx_ != nullptr || memory_ != nullptr)
 		this->dispose();
 }
 
@@ -216,6 +200,7 @@ Chip8::~Chip8()
 void Chip8::executeInstruction() noexcept
 {
 	
+
 	opcode_ = ( ( memory_[ pc_ ] << 8 ) | memory_ [ pc_ + 1 ] );
 	
 	pc_ += 2;
@@ -225,7 +210,7 @@ void Chip8::executeInstruction() noexcept
 	// N: 4 bit constant
 	// X and Y: (4-bit value) register identifier
 	
-	// para maioria dos casos VX e VY:
+	// para maior parte dos casos VX e VY:
 	#define VX V_ [ ( (opcode_ & 0x0f00 ) >> 8)  ]
 	#define VY V_ [ ( (opcode_ & 0x00f0 ) >> 4)  ]
 	#define NNN (opcode_ & 0x0fff)
@@ -250,7 +235,7 @@ void Chip8::executeInstruction() noexcept
 
 
 
-				case 0x00EE: // return from a subrotine ( unwind stack )
+				case 0x00EE: // return from a subroutine ( unwind stack )
 					if (sp_ > 0)
 						pc_ = stack_[--sp_];
 					
@@ -266,7 +251,7 @@ void Chip8::executeInstruction() noexcept
 			break;
 	
 
-		case 0x2000: // 2NNN: Calls subrotine at address NNN
+		case 0x2000: // 2NNN: Calls subroutine at address NNN
 			if (sp_	 < 16)
 				stack_ [ sp_++ ] = pc_;
 			
@@ -347,7 +332,7 @@ void Chip8::executeInstruction() noexcept
 					*/
 					// otimizado :
 
-					unsigned int result = VX + VY; // compute sum
+					int result = VX + VY; // compute sum
 					V_ [ 0xF ] = ( ( result & 0xffffff00 ) != 0) ? 1 : 0; // check carry
 
 					VX = (result & 0xff);
@@ -392,7 +377,7 @@ void Chip8::executeInstruction() noexcept
 
 
 				case 0xE: // 8XYE Shifts VX left by one. VF is set to the value of the most significant bit of VX before the shift.
-					V_[0xF] = ((VX & 0x80) >> 7 );  // check the most signifcant bit
+					V_[0xF] = ((VX & 0x80) >> 7 );  // check the most significant bit
 					VX = (( VX <<  1) & 0xFF);
 
 					break;
@@ -428,7 +413,7 @@ void Chip8::executeInstruction() noexcept
 
 	
 		case 0xC000: // CXNN: Sets VX to a bitwise operation AND ( & ) between NN and a random number
-			VX =  (( (std::rand()%0xff) & NN ) & 0xFF);
+			VX =  ((std::rand()%0xff) & NN );
 			break;
 
 		case 0xD000: // DXYN: DRAW INSTRUCTION
@@ -441,10 +426,10 @@ void Chip8::executeInstruction() noexcept
 				Draws a sprite at coordinate (VX, VY) 
 				that has a width of 8 pixels and a height of N pixels.
 				Each row of 8 pixels is read as bit-coded starting from memory location I; 
-				I value doesn’t change after the execution of this instruction. 
+				I value doesn't change after the execution of this instruction. 
 				As described above, 
 				VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, 
-				and to 0 if that doesn’t happen.
+				and to 0 if that doesn't happen.
 
 
 
@@ -459,15 +444,16 @@ void Chip8::executeInstruction() noexcept
 				 If both values match, the bit value will be 0.
 			*/
 			//LOG("DRAWING");
-			
+
+
 			V_ [0xF] = 0;
 
-			unsigned char Vx = VX, Vy = VY;
+			uint8_t Vx = VX, Vy = VY;
 			int height = N;
 
 			for (int i = 0; i < height; ++i)
 			{
-				unsigned char _8bitRow  = memory_[ I_ + i ];
+				uint8_t _8bitRow  = memory_[ I_ + i ];
 
 				for (int j = 0; j < 8; ++j)
 				{
@@ -476,21 +462,16 @@ void Chip8::executeInstruction() noexcept
 
 					int pixelPos = (64 * py) + px;
 
-					int pixel = (_8bitRow & (1 << (7-j))) != 0;
+					bool pixel = (_8bitRow & (1 << (7-j))) != 0;
 
-					V_ [0xF] |= ( gfx_ [pixelPos] & pixel );
+					V_ [0xF] |= ( ( gfx_ [pixelPos] > 0) & pixel );
 
-					gfx_ [pixelPos] ^= ( pixel != 0 ) ? ~0 : 0;
-					
-				
-					
-
+					gfx_ [pixelPos] ^= ( pixel ) ? ~0 : 0;
 				}
 				
 			}
-			
 			drawFlag_ = true;
-
+			
 			
 
 			break;
@@ -528,7 +509,7 @@ void Chip8::executeInstruction() noexcept
 
 
 				case 0xA: //FX0A	A key press is awaited, and then stored in VX.
-					VX = ( this->waitKeyPress() & 0xf );
+					VX = ( this->waitKeyPress() );
 					break;
 
 				
@@ -555,7 +536,7 @@ void Chip8::executeInstruction() noexcept
 						 //the middle digit at I plus 1, and the least significant digit at I plus 2. 
 						 //(In other words, take the decimal representation of VX, place the hundreds digit in memory at location in I, 
 						 //the tens digit at location I + 1, and the ones digit at location I + 2.)
-					auto Vx = VX;
+					uint8_t Vx = VX;
 
 					memory_[I_ + 2] = Vx % 10;
 					memory_[I_ + 1] = (Vx / 10) % 10;
