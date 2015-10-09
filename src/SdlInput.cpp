@@ -35,10 +35,8 @@ inline void SdlInput::UpdateKeys() noexcept
 	m_keys = SDL_GetKeyboardState(NULL);
 	/*
 	//static int i = 0;
-
-
-
-	/*m_upKeys.clear();
+	
+	m_upKeys.clear();
 	for(i = 0; i < NUM_KEYCODES; i++)
 	if(!getKey(i) && (find(m_currentKeys.begin(),m_currentKeys.end(),i) != m_currentKeys.end()) )
 	m_upKeys.push_back(i);
@@ -90,7 +88,7 @@ bool SdlInput::IsKeyPressed(const int key)  const noexcept
 
 int SdlInput::GetPressedKeyValue() const noexcept
 {
-	auto itr = std::find_if(m_currentKeys.begin(), m_currentKeys.end(), [&m_keys = m_keys](const std::pair<int,int> &keyPair) { return m_keys[keyPair.first] == SDL_TRUE; });
+	auto itr = std::find_if(m_currentKeys.begin(), m_currentKeys.end(), [&](const std::pair<int,int> &keyPair){return m_keys[keyPair.second] == SDL_TRUE;});
 	return (itr != m_currentKeys.end()) ? itr->first : NO_KEY_PRESSED;
 }
 

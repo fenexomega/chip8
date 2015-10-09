@@ -114,6 +114,42 @@ bool Chip8::loadRom(const char *romFileName)
 	return true;
 }
 
+void Chip8::updateCycle() noexcept
+{
+	input_->UpdateKeys();
+	
+	/* use this code if you want to check the key values that are send to chip8 core.
+	static int key;
+	if ((key = input_->GetPressedKeyValue()) != NO_KEY_PRESSED)
+		LOG(key << " Pressed");
+	*/
+
+	if (soundTimer_ > 0)
+	{
+		if (soundTimer_ == 1)
+		{
+			// just temporary beep for tests, it is not very much portable, nor emulates exactly the orignal sound
+			std::printf("\a");
+			std::fflush(stdout);
+		}
+		--soundTimer_;
+	}
+
+	
+	if (delayTimer_ > 0)
+	{
+		static auto delayTimeCounter = std::clock();
+		// TODO: optimize time delay, optimize precision.
+		if ((std::clock() - delayTimeCounter) >= 16666)
+		{
+			--delayTimer_;
+			delayTimeCounter = std::clock();
+		}
+	}
+
+}
+
+
 
 
 
