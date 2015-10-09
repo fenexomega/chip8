@@ -22,10 +22,10 @@ bool Chip8::initSystems()
 
 	LOG("Initializing Chip8 Systems...");
 
-	pc_     = 0x200;  // Program counter starts at 0x200
-	opcode_ = 0;      // Reset current opcode
-	I_      = 0;      // Reset index register
-	sp_     = 0;      // Reset stack pointer
+	pc_	 = 0x200;  // Program counter starts at 0x200
+	opcode_ = 0;	  // Reset current opcode
+	I_	  = 0;	  // Reset index register
+	sp_	 = 0;	  // Reset stack pointer
 	soundTimer_ = 0;
 	delayTimer_ = 0;
 	drawFlag_ = false;
@@ -80,8 +80,8 @@ bool Chip8::initGraphics()
 
 bool Chip8::initInput()
 {
-    input_ = new SdlInput();
-    return true;
+	input_ = new SdlInput();
+	return true;
 }
 
 
@@ -127,7 +127,7 @@ inline bool Chip8::wantToExit() const noexcept
 inline void Chip8::updateCycle() noexcept
 {
 	input_->UpdateKeys();
-    /* use this code if you want to check the key values that are send to chip8 core.
+	/* use this code if you want to check the key values that are send to chip8 core.
 	int key;
 	if ((key = input_->GetPressedKeyValue()) != NO_KEY_PRESSED)
 		LOG(key << " Pressed");
@@ -147,9 +147,9 @@ inline void Chip8::updateCycle() noexcept
 		--soundTimer_;
 	}
 	if (delayTimer_ > 0)
-            --delayTimer_;
+		--delayTimer_;
 	
-    
+	
 
 }
 
@@ -183,7 +183,7 @@ int Chip8::waitKeyPress() noexcept
 	} while(key == NO_KEY_PRESSED);
 	
 	return key;
-    
+	
 }
 
 /* After use Chip8::dispose(), be sure to call, chip8::initialize again before you use the object. */
@@ -268,24 +268,24 @@ void Chip8::executeInstruction() noexcept
 
 		case 0x3000: // 3XNN: Skips the next instruction if VX equals NN
 			if ( VX == NN )
-                pc_ += 2;
+				pc_ += 2;
 
-            break;
-
-
-
-        case 0x4000: // 4XNN: Skips the next instruction if VX doesn't equal NN
-            if ( VX != NN )
-                pc_ += 2;
-
-            break;
+			break;
 
 
-        case 0x5000: // 5XY0: Skips the next instruction if VX equals VY
-            if ( VX == VY )
-                pc_ += 2;
 
-            break;
+		case 0x4000: // 4XNN: Skips the next instruction if VX doesn't equal NN
+			if ( VX != NN )
+				pc_ += 2;
+
+			break;
+
+
+		case 0x5000: // 5XY0: Skips the next instruction if VX equals VY
+			if ( VX == VY )
+				pc_ += 2;
+
+			break;
 
 		
 		case 0x6000: // 6XNN: store number NN in register VX

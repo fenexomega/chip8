@@ -24,7 +24,7 @@ SdlInput::~SdlInput() noexcept
 
 bool SdlInput::getKey(const int i) const noexcept
 {
-    return m_keys[i] == SDL_TRUE;
+	return m_keys[i] == SDL_TRUE;
 }
 
 
