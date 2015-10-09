@@ -2,7 +2,6 @@
 #include <cstring>
 #include <algorithm>
 #include <fstream>
-#include <windows.h>
 #include "SdlRenderer.h"
 #include "SdlInput.h"
 #include "Chip8.h"
