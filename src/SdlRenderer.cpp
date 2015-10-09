@@ -61,7 +61,7 @@ void SdlRenderer::Render(const void *gfx) noexcept
 	SDL_RenderCopy(m_rend, m_texture, nullptr, nullptr);
 	SDL_RenderPresent(m_rend);
 
-	//SDL_Delay(fps);
+	SDL_Delay(fps);
 }
 
 

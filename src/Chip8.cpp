@@ -114,6 +114,7 @@ bool Chip8::loadRom(const char *romFileName)
 	return true;
 }
 
+
 void Chip8::updateCycle() noexcept
 {
 	input_->UpdateKeys();
@@ -139,8 +140,10 @@ void Chip8::updateCycle() noexcept
 	if (delayTimer_ > 0)
 	{
 		static auto delayTimeCounter = std::clock();
+		constexpr int decrementSpeed = ( CLOCKS_PER_SEC / 60 );
+		
 		// TODO: optimize time delay, optimize precision.
-		if ((std::clock() - delayTimeCounter) >= 16666)
+		if ((std::clock() - delayTimeCounter) >= decrementSpeed)
 		{
 			--delayTimer_;
 			delayTimeCounter = std::clock();
@@ -148,9 +151,6 @@ void Chip8::updateCycle() noexcept
 	}
 
 }
-
-
-
 
 
 uint8_t Chip8::waitKeyPress() noexcept

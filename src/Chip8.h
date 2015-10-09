@@ -26,8 +26,8 @@ public:
 	bool loadRom(const char *romFileName);
 	inline bool getDrawFlag() const noexcept;
 	inline bool wantToExit() const noexcept;
-	void executeInstruction() noexcept ;
 	void updateCycle()  noexcept;
+	void executeInstruction() noexcept ;
 	inline void drawGraphics() noexcept;
 	void dispose();
 	~Chip8();
@@ -74,6 +74,8 @@ inline void Chip8::drawGraphics() noexcept
 	renderer_->Render(gfx_);
 	drawFlag_ = false;
 }
+
+
 
 
 
