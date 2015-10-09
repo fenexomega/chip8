@@ -1,8 +1,7 @@
 #ifndef CHIP8_H
 #define CHIP8_H
-#include <chrono>
 #include <cstdio>
-#include <chrono>
+#include <ctime>
 #include <SDL2/SDL.h>
 #undef main // for windows builds
 #include "interfaces/iRenderer.h"
@@ -63,14 +62,28 @@ inline bool Chip8::wantToExit() const noexcept
 }
 
 
+inline bool Chip8::getDrawFlag() const noexcept
+{
+	return drawFlag_;
+}
+
+
+
+inline void Chip8::drawGraphics() noexcept
+{
+	renderer_->Render(gfx_);
+	drawFlag_ = false;
+}
+
+
 inline void Chip8::updateCycle() noexcept
 {
 	input_->UpdateKeys();
 	
 	/* use this code if you want to check the key values that are send to chip8 core.
-	int key;
+	static int key;
 	if ((key = input_->GetPressedKeyValue()) != NO_KEY_PRESSED)
-	LOG(key << " Pressed");
+		LOG(key << " Pressed");
 	*/
 
 	if (soundTimer_ > 0)
@@ -87,30 +100,18 @@ inline void Chip8::updateCycle() noexcept
 	
 	if (delayTimer_ > 0)
 	{
-		static auto delayTimeCounter = std::chrono::system_clock::now();
-		// TODO: optmize time delay, optmize precision.
-		if ((std::chrono::system_clock::now() - delayTimeCounter) >= std::chrono::milliseconds(60))
+		static auto delayTimeCounter = std::clock();
+		// TODO: optimize time delay, optimize precision.
+		if ((std::clock() - delayTimeCounter) >= 10)
 		{
 			--delayTimer_;
-			delayTimeCounter = std::chrono::system_clock::now();
+			delayTimeCounter = std::clock();
 		}
 	}
 
 }
 
 
-inline bool Chip8::getDrawFlag() const noexcept
-{
-	return drawFlag_;
-}
-
-
-
-inline void Chip8::drawGraphics() noexcept
-{
-	renderer_->Render(gfx_);
-	drawFlag_ = false;
-}
 
 
 

@@ -7,10 +7,10 @@
 #define NUM_KEYCODES 256
 
 SdlInput::SdlInput() noexcept :
-m_currentKeys{ { SDL_SCANCODE_1, 0x1 }, {SDL_SCANCODE_2, 0x2}, { SDL_SCANCODE_3, 0x3 }, {SDL_SCANCODE_4,0xc}, 
-				{SDL_SCANCODE_Q, 0x4},{ SDL_SCANCODE_W, 0x5}, { SDL_SCANCODE_E, 0x6}, { SDL_SCANCODE_R, 0xd}, 
-				{ SDL_SCANCODE_A, 0x7}, { SDL_SCANCODE_S,0x8},{ SDL_SCANCODE_D,0x9}, { SDL_SCANCODE_F,0xe}, 
-				{ SDL_SCANCODE_Z,0xa}, { SDL_SCANCODE_X,0x0}, { SDL_SCANCODE_C,0xb}, { SDL_SCANCODE_V,0xf}, 
+m_currentKeys{ {  0x1, SDL_SCANCODE_1 }, { 0x2, SDL_SCANCODE_2 }, { 0x3, SDL_SCANCODE_3 }, { 0xc, SDL_SCANCODE_4 },
+				{ 0x4, SDL_SCANCODE_Q }, { 0x5, SDL_SCANCODE_W }, { 0x6, SDL_SCANCODE_E }, { 0xd, SDL_SCANCODE_R },
+				{ 0x7, SDL_SCANCODE_A }, { 0x8, SDL_SCANCODE_S }, { 0x9, SDL_SCANCODE_D }, { 0xe, SDL_SCANCODE_F },
+				{ 0xa, SDL_SCANCODE_Z }, { 0x0, SDL_SCANCODE_X }, { 0xb, SDL_SCANCODE_C }, { 0xf, SDL_SCANCODE_V },
 				{ SDL_SCANCODE_ESCAPE, SDL_SCANCODE_ESCAPE} }
 {
 	LOG("Creating SdlInput object...");
@@ -83,21 +83,15 @@ bool SdlInput::IsKeyDown(int key) const noexcept
 
 bool SdlInput::IsKeyPressed(const int key)  const noexcept
 {
-	for (auto itr = m_currentKeys.begin(); itr != m_currentKeys.end(); itr++)
-		if (itr->second == key)
-			return m_keys[itr->first] == SDL_TRUE;
-
-	return false;
+	auto itr = m_currentKeys.find(key);
+	return ( itr != m_currentKeys.end() ) ? m_keys[itr->second] == SDL_TRUE : false;
 }
 
 
 int SdlInput::GetPressedKeyValue() const noexcept
 {
-	for (auto itr = m_currentKeys.begin(); itr != m_currentKeys.end(); itr++)
-		if (m_keys[itr->first] == SDL_TRUE)
-			return itr->second;
-
-	return NO_KEY_PRESSED;
+	auto itr = std::find_if(m_currentKeys.begin(), m_currentKeys.end(), [&m_keys = m_keys](const std::pair<int,int> &keyPair) { return m_keys[keyPair.first] == SDL_TRUE; });
+	return (itr != m_currentKeys.end()) ? itr->first : NO_KEY_PRESSED;
 }
 
 

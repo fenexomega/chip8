@@ -1,7 +1,7 @@
-#include <ctime>
 #include <cstring>
 #include <algorithm>
 #include <fstream>
+
 #include "SdlRenderer.h"
 #include "SdlInput.h"
 #include "Chip8.h"

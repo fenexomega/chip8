@@ -1,6 +1,6 @@
 #include "SdlRenderer.h"
 
-constexpr int fps { 1000 / 60 };
+constexpr int fps { 1000/60 };
 
 
 

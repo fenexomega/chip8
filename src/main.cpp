@@ -1,5 +1,4 @@
 #include "Chip8.h"
-
 int main(int argc, char **argv)
 {
 	
@@ -18,16 +17,16 @@ int main(int argc, char **argv)
 	if (!myChip8->loadRom(argv[1]))
 		return 1;
 
-
 	while (!myChip8->wantToExit())
 	{
+
 		myChip8->updateCycle();
 		myChip8->executeInstruction();
 		if (myChip8->getDrawFlag())
 			myChip8->drawGraphics();
-	
-	}
 
+
+	}
 	// CLEAN
 	myChip8->dispose();
 	delete myChip8;
