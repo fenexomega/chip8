@@ -1,14 +1,9 @@
-#include <SDL2/SDL.h>
 #include "Chip8.h"
 
 int main(int argc, char **argv)
 {
 
-
-
-
-
-	if (argc < 2)
+	if (argc < 1)
 	{
 		std::cout << "No game to load, exiting." << std::endl;
 		return 0;
@@ -20,14 +15,14 @@ int main(int argc, char **argv)
 	if (!myChip8->initSystems())
 		return 1;
 
-	if (!myChip8->loadRom(argv[1]))
+	if (!myChip8->loadRom("BRIX"))
 		return 1;
 
 
 	while (!myChip8->wantToExit())
 	{
-		myChip8->executeInstruction();
 		myChip8->updateCycle();
+		myChip8->executeInstruction();
 		if (myChip8->getDrawFlag())
 			myChip8->drawGraphics();
 	
