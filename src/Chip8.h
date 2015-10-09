@@ -31,12 +31,12 @@ public:
 private:
 	bool initGraphics();
 	bool initInput();
-	int waitKeyPress() noexcept;
+	uint8_t waitKeyPress() noexcept;
 	
 	bool drawFlag_;
 	iRenderer *renderer_;
 	iInput *input_;
-
+	
 	uint32_t *gfx_;
 	uint8_t *memory_;
 	uint8_t V_[16];

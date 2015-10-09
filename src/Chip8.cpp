@@ -105,7 +105,7 @@ bool Chip8::loadRom(const char *romFileName)
 		return false;
 	}
 
-	romFile.read((char*)memory_ + 0x200, romFileSize);
+	romFile.read(reinterpret_cast<char*>(memory_ + 0x200), romFileSize);
 
 	romFile.close();
 
@@ -138,12 +138,12 @@ inline void Chip8::updateCycle() noexcept
 		
 	if (soundTimer_ > 0)
 	{
-		if( soundTimer_ == 1)
+		if (soundTimer_ == 1)
 		{
 			// just temporary beep for tests, it is not very much portable, nor emulates exactly the orignal sound
-			std::printf("\a");  
-			std::fflush(stdout); 
- 		}
+			std::printf("\a");
+			std::fflush(stdout);
+		}
 		--soundTimer_;
 	}
 	if (delayTimer_ > 0)
@@ -168,21 +168,20 @@ bool Chip8::getDrawFlag() const noexcept
 
 
 
-int Chip8::waitKeyPress() noexcept
+uint8_t Chip8::waitKeyPress() noexcept
 {	
 	int key = NO_KEY_PRESSED;
 	do
 	{
 		this->updateCycle();
-
 		if (this->wantToExit())
 			return 0;
-
 		key = input_->GetPressedKeyValue();
-		this->drawGraphics();
+		renderer_->Render(gfx_);
+
 	} while(key == NO_KEY_PRESSED);
 	
-	return key;
+	return ( key & 0xff ) ;
 	
 }
 
