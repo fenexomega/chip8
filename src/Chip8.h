@@ -1,5 +1,10 @@
 #ifndef CHIP8_H
 #define CHIP8_H
+#include <chrono>
+#include <cstdio>
+#include <chrono>
+#include <SDL2/SDL.h>
+#undef main // for windows builds
 #include "interfaces/iRenderer.h"
 #include "interfaces/iInput.h"
 
@@ -20,11 +25,11 @@ public:
 	Chip8();
 	bool initSystems();
 	bool loadRom(const char *romFileName);
-	bool getDrawFlag() const noexcept;
+	inline bool getDrawFlag() const noexcept;
 	inline bool wantToExit() const noexcept;
 	void executeInstruction() noexcept ;
 	inline void updateCycle()  noexcept;
-	void drawGraphics() noexcept;
+	inline void drawGraphics() noexcept;
 	void dispose();
 	~Chip8();
 
@@ -49,6 +54,64 @@ private:
 	uint16_t sp_;
 
 };
+
+
+inline bool Chip8::wantToExit() const noexcept
+{
+	// the type returned by the operation || is a bool, and operator | returns a int, with || we avoid casting i think..
+	return renderer_->IsWindowClosed() || (input_->GetPressedKeyValue() == SDL_SCANCODE_ESCAPE);
+}
+
+
+inline void Chip8::updateCycle() noexcept
+{
+	input_->UpdateKeys();
+	
+	/* use this code if you want to check the key values that are send to chip8 core.
+	int key;
+	if ((key = input_->GetPressedKeyValue()) != NO_KEY_PRESSED)
+	LOG(key << " Pressed");
+	*/
+
+	if (soundTimer_ > 0)
+	{
+		if (soundTimer_ == 1)
+		{
+			// just temporary beep for tests, it is not very much portable, nor emulates exactly the orignal sound
+			std::printf("\a");
+			std::fflush(stdout);
+		}
+		--soundTimer_;
+	}
+
+	
+	if (delayTimer_ > 0)
+	{
+		static auto delayTimeCounter = std::chrono::system_clock::now();
+		// TODO: optmize time delay, optmize precision.
+		if ((std::chrono::system_clock::now() - delayTimeCounter) >= std::chrono::milliseconds(60))
+		{
+			--delayTimer_;
+			delayTimeCounter = std::chrono::system_clock::now();
+		}
+	}
+
+}
+
+
+inline bool Chip8::getDrawFlag() const noexcept
+{
+	return drawFlag_;
+}
+
+
+
+inline void Chip8::drawGraphics() noexcept
+{
+	renderer_->Render(gfx_);
+	drawFlag_ = false;
+}
+
 
 
 #endif // CHIP8_H

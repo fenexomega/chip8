@@ -2,7 +2,7 @@
 #include <cstring>
 #include <algorithm>
 #include <fstream>
-
+#include <windows.h>
 #include "SdlRenderer.h"
 #include "SdlInput.h"
 #include "Chip8.h"
@@ -115,56 +115,6 @@ bool Chip8::loadRom(const char *romFileName)
 	return true;
 }
 
-
-inline bool Chip8::wantToExit() const noexcept
-{
-	// the type returned by the operation || is a bool, and operator | returns a int, with || we avoid casting i think..
-	return renderer_->IsWindowClosed() || ( input_->GetPressedKeyValue() == SDL_SCANCODE_ESCAPE );
-}
-
-
-
-inline void Chip8::updateCycle() noexcept
-{
-	input_->UpdateKeys();
-	/* use this code if you want to check the key values that are send to chip8 core.
-	int key;
-	if ((key = input_->GetPressedKeyValue()) != NO_KEY_PRESSED)
-		LOG(key << " Pressed");
-	*/
-
-
-	
-		
-	if (soundTimer_ > 0)
-	{
-		if (soundTimer_ == 1)
-		{
-			// just temporary beep for tests, it is not very much portable, nor emulates exactly the orignal sound
-			std::printf("\a");
-			std::fflush(stdout);
-		}
-		--soundTimer_;
-	}
-	if (delayTimer_ > 0)
-		--delayTimer_;
-	
-	
-
-}
-
-
-void Chip8::drawGraphics() noexcept
-{
-	renderer_->Render(gfx_);
-	drawFlag_ = false;
-}
-
-
-bool Chip8::getDrawFlag() const noexcept
-{
-	return drawFlag_;
-}
 
 
 

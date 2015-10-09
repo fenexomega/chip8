@@ -32,8 +32,9 @@ int main(int argc, char **argv)
 	myChip8->dispose();
 	delete myChip8;
 
-
+	
 	//std::cin.ignore(1); //for LOG read
+
 	
 	return 0;
 }
