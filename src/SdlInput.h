@@ -1,30 +1,28 @@
 #ifndef SDLINPUT_H
 #define SDLINPUT_H
-#include <vector>
+#include <unordered_map>
 #include "interfaces/iInput.h"
 
-using std::vector;
+
+using std::unordered_map;
 
 class SdlInput : public iInput
 {
-    // iInput interface
+	// iInput interface
 public:
-    void UpdateKeys() noexcept;
-    bool IsKeyUp(const int key)         const noexcept;
-    bool IsKeyDown(const int key)       const noexcept;
-    bool IsKeyPressed(const int key)    const noexcept;
-    int GetPressedKeyValue()            const noexcept;
-    SdlInput() noexcept;
-    ~SdlInput() noexcept;
+	inline void UpdateKeys() noexcept;
+	//virtual bool IsKeyUp(const int key) const noexcept;
+	//virtual bool IsKeyDown(const int key) const noexcept;
+	bool IsKeyPressed(const int key)	const noexcept;
+	int GetPressedKeyValue()			const noexcept;
+	SdlInput() noexcept;
+	~SdlInput() noexcept;
 
 private:
-    bool getKey(const int i) const noexcept;
-
-    vector<int> m_upKeys;
-    vector<int> m_downKeys;
-    vector<int> m_currentKeys;
-    const uint8_t* m_keys;
-    bool m_userWannaCloseWindow;
+	bool getKey(const int i) const noexcept;
+	unordered_map<int,int> m_currentKeys;
+	const uint8_t* m_keys;
+	
 
 };
 

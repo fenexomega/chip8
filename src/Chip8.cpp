@@ -22,10 +22,10 @@ bool Chip8::initSystems()
 
 	LOG("Initializing Chip8 Systems...");
 
-	pc_     = 0x200;  // Program counter starts at 0x200
-	opcode_ = 0;      // Reset current opcode
-	I_      = 0;      // Reset index register
-	sp_     = 0;      // Reset stack pointer
+	pc_	 = 0x200;  // Program counter starts at 0x200
+	opcode_ = 0;	  // Reset current opcode
+	I_	  = 0;	  // Reset index register
+	sp_	 = 0;	  // Reset stack pointer
 	soundTimer_ = 0;
 	delayTimer_ = 0;
 	drawFlag_ = false;
@@ -80,8 +80,8 @@ bool Chip8::initGraphics()
 
 bool Chip8::initInput()
 {
-    input_ = new SdlInput();
-    return true;
+	input_ = new SdlInput();
+	return true;
 }
 
 
@@ -116,36 +116,40 @@ bool Chip8::loadRom(const char *romFileName)
 }
 
 
-bool Chip8::wantToExit() const noexcept
+inline bool Chip8::wantToExit() const noexcept
 {
-	// the type returned by the operation || is a bool, and operator | returns a int, with || we avoid casting to return a bool
+	// the type returned by the operation || is a bool, and operator | returns a int, with || we avoid casting i think..
 	return renderer_->IsWindowClosed() || ( input_->GetPressedKeyValue() == SDL_SCANCODE_ESCAPE );
 }
 
 
 
-void Chip8::updateCycle() noexcept
+inline void Chip8::updateCycle() noexcept
 {
-	input_->UpdateKeys(); 
-    //TODO: Take this code out. Is  just for testing
-    //if(input_->IsKeyDown(SDL_SCANCODE_RETURN))
-        //LOG("RETURN Pressed");
+	input_->UpdateKeys();
+	/* use this code if you want to check the key values that are send to chip8 core.
+	int key;
+	if ((key = input_->GetPressedKeyValue()) != NO_KEY_PRESSED)
+		LOG(key << " Pressed");
+	*/
 
-	//OPTIONAL: calc cycle time to match the 3.58Mhz from original system which Chip8 were used.
 
+	
+		
 	if (soundTimer_ > 0)
 	{
 		if( soundTimer_ == 1)
 		{
-			std::printf("\a"); // play beep, yes chip8 only had beeps, don't know about super chip8 though
-			std::fflush(stdout); // the flush is needed for some reason...
+			// just temporary beep for tests, it is not very much portable, nor emulates exactly the orignal sound
+			std::printf("\a");  
+			std::fflush(stdout); 
  		}
 		--soundTimer_;
 	}
 	if (delayTimer_ > 0)
-            --delayTimer_;
+		--delayTimer_;
 	
-    
+	
 
 }
 
@@ -170,16 +174,16 @@ int Chip8::waitKeyPress() noexcept
 	do
 	{
 		this->updateCycle();
-		key = input_->GetPressedKeyValue();
 
-		if(this->wantToExit())
+		if (this->wantToExit())
 			return 0;
 
+		key = input_->GetPressedKeyValue();
 		this->drawGraphics();
 	} while(key == NO_KEY_PRESSED);
 	
 	return key;
-    
+	
 }
 
 /* After use Chip8::dispose(), be sure to call, chip8::initialize again before you use the object. */
@@ -264,24 +268,24 @@ void Chip8::executeInstruction() noexcept
 
 		case 0x3000: // 3XNN: Skips the next instruction if VX equals NN
 			if ( VX == NN )
-                pc_ += 2;
+				pc_ += 2;
 
-            break;
-
-
-
-        case 0x4000: // 4XNN: Skips the next instruction if VX doesn't equal NN
-            if ( VX != NN )
-                pc_ += 2;
-
-            break;
+			break;
 
 
-        case 0x5000: // 5XY0: Skips the next instruction if VX equals VY
-            if ( VX == VY )
-                pc_ += 2;
 
-            break;
+		case 0x4000: // 4XNN: Skips the next instruction if VX doesn't equal NN
+			if ( VX != NN )
+				pc_ += 2;
+
+			break;
+
+
+		case 0x5000: // 5XY0: Skips the next instruction if VX equals VY
+			if ( VX == VY )
+				pc_ += 2;
+
+			break;
 
 		
 		case 0x6000: // 6XNN: store number NN in register VX

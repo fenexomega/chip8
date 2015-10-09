@@ -21,9 +21,9 @@ public:
 	bool initSystems();
 	bool loadRom(const char *romFileName);
 	bool getDrawFlag() const noexcept;
-	bool wantToExit() const noexcept;
+	inline bool wantToExit() const noexcept;
 	void executeInstruction() noexcept ;
-	void updateCycle()  noexcept;
+	inline void updateCycle()  noexcept;
 	void drawGraphics() noexcept;
 	void dispose();
 	~Chip8();

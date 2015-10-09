@@ -4,14 +4,14 @@
 /*
  * =====================================================================================
  *
- *       Filename:  iRenderer.h
+ *	   Filename:  iRenderer.h
  *
- *    Description:  
+ *	Description:  
  *
- *        Version:  1.0
- *        Created:  26-09-2015 15:50:13
- *       Revision:  none
- *       Compiler:  gcc
+ *		Version:  1.0
+ *		Created:  26-09-2015 15:50:13
+ *	   Revision:  none
+ *	   Compiler:  gcc
  *
  *
  * =====================================================================================
@@ -37,7 +37,7 @@ public:
 	virtual void Dispose() = 0;
 
 
-    virtual ~iRenderer(){} // needed for destroying an object from a iRenderer pointer.
+	virtual ~iRenderer(){} // needed for destroying an object from a iRenderer pointer.
 
 };
 
