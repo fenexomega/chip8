@@ -160,7 +160,7 @@ void Chip8::updateCycle() noexcept
 		if (soundTimer_ == 1)
 		{
 			// just temporary beep for tests, it is not very much portable, nor emulates exactly the orignal sound
-			std::printf('\a');
+			std::printf("\a");
 			std::fflush(stdout);
 		}
 		--soundTimer_;
