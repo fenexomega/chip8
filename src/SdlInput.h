@@ -19,8 +19,8 @@ public:
 	~SdlInput() noexcept;
 
 private:
-	bool getKey(const int i) const noexcept;
-	unordered_map<int,int> m_currentKeys;
+	//bool getKey(const int i) const noexcept;
+	const unordered_map<int,int> m_currentKeys;
 	const uint8_t* m_keys;
 	
 
