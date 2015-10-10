@@ -1,4 +1,6 @@
 #include <cstring>
+#include <cstdio>
+#include <ctime>
 #include <algorithm>
 #include <fstream>
 

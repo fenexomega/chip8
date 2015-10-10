@@ -1,7 +1,5 @@
 #ifndef CHIP8_H
 #define CHIP8_H
-#include <cstdio>
-#include <ctime>
 #include <SDL2/SDL.h>
 #undef main // for windows builds
 #include "interfaces/iRenderer.h"

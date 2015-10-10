@@ -7,9 +7,9 @@ int main(int argc, char **argv)
 		std::cout << "No game to load, exiting." << std::endl;
 		return 0;
 	}
-		
-	Chip8 *myChip8 = new Chip8();
 	
+	Chip8 *myChip8 = new Chip8();
+
 
 	if (!myChip8->initSystems())
 		return 1;
@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 		myChip8->executeInstruction();
 		if (myChip8->getDrawFlag())
 			myChip8->drawGraphics();
-	
+
 	}
 
 	// CLEAN
