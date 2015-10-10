@@ -8,11 +8,11 @@
 
 //all 16 keys of TelMac + ESC
 SdlInput::SdlInput() noexcept :
-m_currentKeys{ {  0x1, SDL_SCANCODE_KP_7 }, { 0x2, SDL_SCANCODE_KP_8 }, { 0x3, SDL_SCANCODE_KP_9 }, { 0xc, SDL_SCANCODE_KP_MULTIPLY },
+m_currentKeys{ 			{ 0x1, SDL_SCANCODE_KP_7 }, { 0x2, SDL_SCANCODE_KP_8 }, { 0x3, SDL_SCANCODE_KP_9 }, { 0xc, SDL_SCANCODE_KP_MULTIPLY },
 				{ 0x4, SDL_SCANCODE_KP_4 }, { 0x5, SDL_SCANCODE_KP_5 }, { 0x6, SDL_SCANCODE_KP_6 }, { 0xd, SDL_SCANCODE_KP_MINUS },
 				{ 0x7, SDL_SCANCODE_KP_1 }, { 0x8, SDL_SCANCODE_KP_2 }, { 0x9, SDL_SCANCODE_KP_3 }, { 0xe, SDL_SCANCODE_KP_PLUS },
 				{ 0xa, SDL_SCANCODE_KP_0 }, { 0x0, SDL_SCANCODE_KP_COMMA }, { 0xb, SDL_SCANCODE_KP_ENTER }, { 0xf, SDL_SCANCODE_KP_PERIOD },
-				{ SDL_SCANCODE_ESCAPE, SDL_SCANCODE_ESCAPE} }
+				{ SDL_SCANCODE_ESCAPE, SDL_SCANCODE_ESCAPE}, { SDL_SCANCODE_RETURN, SDL_SCANCODE_RETURN } }
 {
 	LOG("Creating SdlInput object...");
 	this->UpdateKeys();
@@ -34,8 +34,7 @@ SdlInput::~SdlInput() noexcept
 
 bool SdlInput::IsKeyPressed(const int key)  const noexcept
 {
-	auto itr = m_currentKeys.find(key);
-	return (itr != m_currentKeys.end()) ? m_keys[itr->second] == SDL_TRUE : false;
+	return m_keys[ 	m_currentKeys.find(key)->second ] == SDL_TRUE;
 }
 
 

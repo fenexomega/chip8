@@ -23,9 +23,9 @@ bool Chip8::initSystems()
 
 	LOG("Initializing Chip8 Systems...");
 
-	pc_	 = 0x200;  // Program counter starts at 0x200
-	opcode_ = 0;	  // Reset current opcode
-	I_	  = 0;	  // Reset index register
+	pc_	 = 0x200; // Program counter starts at 0x200
+	opcode_  = 0;	  // Reset current opcode
+	I_	 = 0;	  // Reset index register
 	sp_	 = 0;	  // Reset stack pointer
 	soundTimer_ = 0;
 	delayTimer_ = 0;
@@ -34,10 +34,10 @@ bool Chip8::initSystems()
 	gfx_ = new uint32_t[gfxResolution];
 
 
-	std::srand(std::time(0));				// seed rand
+	std::srand(std::time(0));			// seed rand
 	std::fill_n(gfx_,gfxResolution, 0);		// Clear display
 	std::fill_n(stack_,STACK_MAX, 0);		// Clear stack
-	std::fill_n(V_,16,0);					// Clear registers V0-VF
+	std::fill_n(V_,16,0);				// Clear registers V0-VF
 	std::fill_n(memory_,MEMORY_MAX,0); 		// Clear memory
 
 	// Load fontset
@@ -68,22 +68,6 @@ bool Chip8::initSystems()
 
 }
 
-
-
-
-bool Chip8::initGraphics()
-{
-	renderer_ = new SdlRenderer();
-	return renderer_->Initialize(64, 32);
-}
-
-
-
-bool Chip8::initInput()
-{
-	input_ = new SdlInput();
-	return true;
-}
 
 
 bool Chip8::loadRom(const char *romFileName)
@@ -117,11 +101,55 @@ bool Chip8::loadRom(const char *romFileName)
 }
 
 
+
+
+bool Chip8::initGraphics()
+{
+	renderer_ = new SdlRenderer();
+	return renderer_->Initialize(64, 32);
+}
+
+
+
+bool Chip8::initInput()
+{
+	input_ = new SdlInput();
+	return true;
+}
+
+
+
+void Chip8::reset() noexcept
+{
+	
+	pc_	 = 0x200; // Program counter starts at 0x200
+	opcode_  = 0;	  // Reset current opcode
+	I_	 = 0;	  // Reset index register
+	sp_	 = 0;	  // Reset stack pointer
+	soundTimer_ = 0;
+	delayTimer_ = 0;
+	drawFlag_ = false;
+	std::fill_n(gfx_, gfxResolution, 0);
+	std::fill_n(stack_, STACK_MAX, 0);
+
+}
+
+
+
 void Chip8::updateCycle() noexcept
 {
 	input_->UpdateKeys();
 	
-	/* use this code if you want to check the key values that are send to chip8 core.
+	// check if machine is reseted
+	if( input_->IsKeyPressed(SDL_SCANCODE_RETURN) )
+	{
+		this->reset();	
+		return;
+	}
+	
+
+
+	/*use this code if you want to check the key values that are send to chip8 core.
 	static int key;
 	if ((key = input_->GetPressedKeyValue()) != NO_KEY_PRESSED)
 		LOG(key << " Pressed");
@@ -132,7 +160,7 @@ void Chip8::updateCycle() noexcept
 		if (soundTimer_ == 1)
 		{
 			// just temporary beep for tests, it is not very much portable, nor emulates exactly the orignal sound
-			std::printf("\a");
+			std::printf('\a');
 			std::fflush(stdout);
 		}
 		--soundTimer_;

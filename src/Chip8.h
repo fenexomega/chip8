@@ -33,6 +33,7 @@ public:
 private:
 	bool initGraphics();
 	bool initInput();
+	void reset() noexcept;
 	uint8_t waitKeyPress() noexcept;
 	
 	bool drawFlag_;
