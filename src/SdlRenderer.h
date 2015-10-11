@@ -1,6 +1,9 @@
 #ifndef SDLRENDERER_H
 #define SDLRENDERER_H
-#include <SDL2/SDL.h>
+
+struct SDL_Window;
+struct SDL_Renderer;
+struct SDL_Texture;
 #include "interfaces/iRenderer.h"
 
 

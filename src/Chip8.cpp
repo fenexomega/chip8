@@ -122,16 +122,16 @@ bool Chip8::initInput()
 void Chip8::reset() noexcept
 {
 	
-	pc_	 = 0x200; // Program counter starts at 0x200
-	opcode_  = 0;	  // Reset current opcode
-	I_	 = 0;	  // Reset index register
-	sp_	 = 0;	  // Reset stack pointer
+	pc_	 = 0x200;
+	opcode_  = 0;	
+	I_ = 0;			
+	sp_ = 0;
 	soundTimer_ = 0;
 	delayTimer_ = 0;
 	drawFlag_ = false;
-	std::fill_n(gfx_, gfxResolution, 0);
-	std::fill_n(stack_, STACK_MAX, 0);
-	std::fill_n(V_,16,0);
+	std::memset(gfx_, 0, gfxResolution * sizeof(uint32_t));
+	std::memset(stack_,0,  STACK_MAX * sizeof(uint16_t));
+	std::memset(V_,0, 16 * sizeof(uint8_t));
 
 }
 
@@ -204,7 +204,6 @@ uint8_t Chip8::waitKeyPress() noexcept
 void Chip8::dispose()
 {
 	delete input_;  delete renderer_; delete[] gfx_;  delete[] memory_;
-	
 	input_ = nullptr; renderer_ = nullptr; gfx_ = nullptr; memory_ = nullptr;
 }
 
