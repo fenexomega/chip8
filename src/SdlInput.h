@@ -20,7 +20,7 @@ public:
 
 private:
 	//bool getKey(const int i) const noexcept;
-	const unordered_map<int,int> m_currentKeys;
+	const unordered_map<int,SDL_Scancode> m_currentKeys;
 	const uint8_t* m_keys;
 	
 
