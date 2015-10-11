@@ -131,6 +131,7 @@ void Chip8::reset() noexcept
 	drawFlag_ = false;
 	std::fill_n(gfx_, gfxResolution, 0);
 	std::fill_n(stack_, STACK_MAX, 0);
+	std::fill_n(V_,16,0);
 
 }
 
