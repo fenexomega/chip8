@@ -1,6 +1,7 @@
 #ifndef SDLINPUT_H
 #define SDLINPUT_H
 #include <unordered_map>
+#include <SDL2/SDL.h>
 #include "interfaces/iInput.h"
 
 
@@ -20,7 +21,7 @@ public:
 
 private:
 	//bool getKey(const int i) const noexcept;
-	const unordered_map<int,SDL_Scancode> m_currentKeys;
+	unordered_map<int,SDL_Scancode> m_currentKeys;
 	const uint8_t* m_keys;
 	
 

@@ -1,3 +1,4 @@
+#include <SDL2/SDL.h>
 #include "SdlRenderer.h"
 
 constexpr int fps { 1000/ 60 };
