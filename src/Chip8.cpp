@@ -161,8 +161,8 @@ void Chip8::updateCycle() noexcept
 		if (soundTimer_ == 1)
 		{
 			// just temporary beep for tests, it is not very much portable, nor emulates exactly the orignal sound
-			std::printf("\a");
-			std::fflush(stdout);
+			//std::printf("\a");
+			//std::fflush(stdout);
 		}
 		--soundTimer_;
 	}
@@ -247,6 +247,17 @@ void Chip8::executeInstruction() noexcept
 				case 0x0000: // 0NNN " calls RCA 1802 program at address NNN. not necessary for most ROMs. "
 					break;
 
+				case 0x00C0: // 00CN: scroll screen down N lines  ( SuperChip ) 
+					LOG("Scrolling down");
+					break;
+
+				case 0x00FB: // scroll screen 4 pixels right ( SuperChip )
+					LOG("Scrolling Right");
+					break;
+
+				case 0x00FC: // scroll screen 4 pixels left  ( SuperChip )
+					LOG("Scrolling Left");
+					break;
 
 
 				case 0x00E0: // clear screen
@@ -440,59 +451,52 @@ void Chip8::executeInstruction() noexcept
 		{
 			// from : http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
 
-			/*	Drawing pixels: 
+			/*	Drawing pixels:
 				The opcode responsible for drawing to our display is 0xDXYN. The Wikipedia description tells us the following:
 
-				Draws a sprite at coordinate (VX, VY) 
+				Draws a sprite at coordinate (VX, VY)
 				that has a width of 8 pixels and a height of N pixels.
-				Each row of 8 pixels is read as bit-coded starting from memory location I; 
-				I value doesn't change after the execution of this instruction. 
-				As described above, 
-				VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, 
+				Each row of 8 pixels is read as bit-coded starting from memory location I;
+				I value doesn't change after the execution of this instruction.
+				As described above,
+				VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn,
 				and to 0 if that doesn't happen.
 
-
-
-				As the description of the opcode is telling us, 
-				the Chip 8 actually draws on the screen by drawing sprites. 
-				It will give us the location of where the sprite needs to be drawn 
+				As the description of the opcode is telling us,
+				the Chip 8 actually draws on the screen by drawing sprites.
+				It will give us the location of where the sprite needs to be drawn
 				(the opcode tells us which V register we need to check to fetch the X and Y coordinates) and the number of rows (N).
-				 The width of each sprite is fixed (8 bits / 1 byte). 
-				 The state of each pixel is set by using a bitwise XOR operation. 
-				 This means that it will compare the current pixel state with the current value in the memory. 
-				 If the current value is different from the value in the memory, the bit value will be 1. 
+				 The width of each sprite is fixed (8 bits / 1 byte).
+				 The state of each pixel is set by using a bitwise XOR operation.
+				 This means that it will compare the current pixel state with the current value in the memory.
+				 If the current value is different from the value in the memory, the bit value will be 1.
 				 If both values match, the bit value will be 0.
 			*/
-			//LOG("DRAWING")	
-
-			V_ [0xF] = 0;
+			V_[0xF] = 0;
 			uint8_t Vx = VX, Vy = VY;
 			int height = N;
 
-			for (int i = 0; i < height; ++i)
-			{
-				uint8_t _8bitRow  = memory_[ I_ + i ];
-				for (int j = 0; j < 8; ++j)
+				for (int i = 0; i < height; ++i)
 				{
-					int px = ((Vx + j) & 63);
-					int py = ((Vy + i) & 31);
+					uint8_t _8bitRow = memory_[I_ + i];
+					for (int j = 0; j < 8; ++j)
+					{
+						int px = ((Vx + j) & 63);
+						int py = ((Vy + i) & 31);
 
-					int pixelPos = (64 * py) + px;
+						int pixelPos = (64 * py) + px;
 
-					bool pixel = (_8bitRow & (1 << (7-j))) != 0;
+						bool pixel = (_8bitRow & (1 << (7 - j))) != 0;
 
-					V_ [0xF] |= ( ( gfx_ [pixelPos] > 0) & pixel );
+						V_[0xF] |= ((gfx_[pixelPos] > 0) & pixel);
 
-					gfx_ [pixelPos] ^= ( pixel ) ? ~0 : 0;
-					
+						gfx_[pixelPos] ^= (pixel) ? ~0 : 0;
+					}
 				}
-		
-			}
-			drawFlag_ = true;
 
-			break;
+				drawFlag_ = true;
+				break;
 		}
-	
 
 
 		case 0xE000:// BEGIN Exxx
