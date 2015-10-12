@@ -9,6 +9,7 @@
 
 #define MEMORY_MAX 0xFFF
 #define STACK_MAX 16
+#define V_REGISTERS_MAX 16
 
 constexpr int gfxResolution { 64 * 32 };
 constexpr int gfxBytes{ gfxResolution * 4 };
@@ -41,7 +42,7 @@ private:
 	
 	uint32_t *gfx_;
 	uint8_t *memory_;
-	uint8_t V_[16];
+	uint8_t V_[V_REGISTERS_MAX];
 	uint8_t delayTimer_;
 	uint8_t soundTimer_;
 	uint16_t opcode_;

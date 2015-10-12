@@ -35,10 +35,10 @@ bool Chip8::initSystems()
 
 
 	std::srand(std::time(0));			// seed rand
-	std::fill_n(gfx_,gfxResolution, 0);		// Clear display
-	std::fill_n(stack_,STACK_MAX, 0);		// Clear stack
-	std::fill_n(V_,16,0);				// Clear registers V0-VF
-	std::fill_n(memory_,MEMORY_MAX,0); 		// Clear memory
+	std::memset(gfx_, 0, gfxResolution * sizeof(uint32_t));		// Clear display
+	std::memset(stack_, 0, STACK_MAX * sizeof(uint16_t));		// Clear stack
+	std::memset(V_, 0, V_REGISTERS_MAX * sizeof(uint8_t));				// Clear registers V0-VF
+	std::memset(memory_, 0, MEMORY_MAX * sizeof(uint8_t)); 		// Clear memory
 
 	// Load fontset
 	
@@ -62,7 +62,7 @@ bool Chip8::initSystems()
 		0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 	};
 
-	std::copy_n(chip8_fontset, 80, memory_); // copy fontset to memory.
+	std::memcpy(memory_,chip8_fontset, 80 * sizeof(uint8_t)); // copy fontset to memory.
 
 	return initGraphics() & initInput();
 
@@ -73,16 +73,17 @@ bool Chip8::initSystems()
 bool Chip8::loadRom(const char *romFileName)
 {
 	LOG("Loading " << romFileName);
-	std::ifstream romFile(romFileName, std::ios::ate | std::ios::binary);
+	std::FILE *romFile = std::fopen(romFileName,"rb");
 
-	if (!romFile.is_open())
+	if (romFile == nullptr)
 	{
 		LOG("Error at opening ROM file. Exiting!");
 		return false;
 	}
 
-	std::streampos romFileSize = romFile.tellg();
-	romFile.seekg(0, romFile.beg);
+	std::fseek(romFile, 0, SEEK_END);
+	long romFileSize = std::ftell(romFile);
+	std::fseek(romFile, 0, SEEK_SET);
 
 	if (romFileSize > romMaxSize)
 	{
@@ -90,12 +91,10 @@ bool Chip8::loadRom(const char *romFileName)
 		return false;
 	}
 
-	romFile.read(reinterpret_cast<char*>(memory_ + 0x200), romFileSize);
+	std::fread(memory_ + 0x200, 1, romFileSize, romFile);
 
-	romFile.close();
-
+	std::fclose(romFile);
 	LOG("Load Done!");
-
 
 	return true;
 }
@@ -147,38 +146,25 @@ void Chip8::updateCycle() noexcept
 		this->reset();	
 		return;
 	}
-	
-
 
 	/*use this code if you want to check the key values that are send to chip8 core.
 	static int key;
 	if ((key = input_->GetPressedKeyValue()) != NO_KEY_PRESSED)
 		LOG(key << " Pressed");
 	*/
+	// timer:
+	static std::clock_t timerCounter = std::clock();
 
-	if (soundTimer_ > 0)
+	if ((std::clock() - timerCounter) > CLOCKS_PER_SEC / 60)
 	{
-		if (soundTimer_ == 1)
-		{
-			// just temporary beep for tests, it is not very much portable, nor emulates exactly the orignal sound
-			//std::printf("\a");
-			//std::fflush(stdout);
-		}
-		--soundTimer_;
-	}
-
-	
-	if (delayTimer_ > 0)
-	{
-		static auto delayTimeCounter = std::clock();
-		constexpr int decrementSpeed = ( CLOCKS_PER_SEC / 60 );  
-		// TODO: optimize time delay, optimize precision.
-		if ((std::clock() - delayTimeCounter) >= decrementSpeed)
-		{
+		if (soundTimer_ > 0)
+			--soundTimer_;
+		if (delayTimer_ > 0)
 			--delayTimer_;
-			delayTimeCounter = std::clock();
-		}
+
+		timerCounter = std::clock();
 	}
+
 
 }
 
@@ -364,7 +350,7 @@ void Chip8::executeInstruction() noexcept
 					// otimizado :
 
 					int result = VX + VY; // compute sum
-					V_ [ 0xF ] = ( ( result & 0xffffff00 ) != 0) ? 1 : 0; // check carry
+					V_ [ 0xF ] = ( ( result & 0xff00 ) != 0) ? 1 : 0; // check carry
 
 					VX = (result & 0xff);
 
@@ -578,12 +564,12 @@ void Chip8::executeInstruction() noexcept
 
 						case 0x55: //FX55	Stores V0 to VX in memory starting at address I
 							std::memcpy(memory_ + I_, V_, ((opcode_ & 0x0f00) >> 8) + 1);
-							//I_ = I_ + 1 + ((opcode_ & 0x0F00) >> 8);
+			
 							break;
 
 						case 0x65: //FX65	Fills V0 to VX with values from memory starting at address I.
 							std::memcpy(V_, memory_ + I_, ((opcode_ & 0x0f00 ) >> 8) + 1);
-							//I_ = I_ + 1 + ((opcode_ & 0x0F00) >> 8);
+						
 							break;
 
 					}
