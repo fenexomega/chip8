@@ -23,12 +23,10 @@ public:
 
 	~SdlRenderer();
 private:
-	void UpdateWindowState() noexcept;
-
+	inline bool CheckWindowState() noexcept;
 	SDL_Window *m_window;
 	SDL_Renderer *m_rend;
 	SDL_Texture *m_texture;
-	bool m_userWannaClose;
 	int m_pitch;
 	
 

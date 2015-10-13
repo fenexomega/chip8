@@ -7,7 +7,7 @@ constexpr int fps { 1000/ 60 };
 
 
 SdlRenderer::SdlRenderer() :
-	m_window (nullptr), m_rend (nullptr), m_texture (nullptr),  m_userWannaClose (false)
+	m_window (nullptr), m_rend (nullptr), m_texture (nullptr)
 {
 	LOG("Creating SdlRenderer object...");
 }
@@ -18,7 +18,7 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 {
 
 
-	if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
+	if(SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
 		LOG("Couldn't start the application: " << SDL_GetError());
 		return false;
@@ -51,17 +51,12 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 
 
 
-
-
-
-
 void SdlRenderer::Render(const void *gfx) noexcept
 {
 	
 	SDL_UpdateTexture(m_texture, nullptr, gfx, m_pitch);
 	SDL_RenderCopy(m_rend, m_texture, nullptr, nullptr);
 	SDL_RenderPresent(m_rend);
-
 	SDL_Delay(fps);
 }
 
@@ -71,12 +66,12 @@ void SdlRenderer::Render(const void *gfx) noexcept
 
 
 
-void SdlRenderer::UpdateWindowState() noexcept
+inline bool SdlRenderer::CheckWindowState() noexcept
 {
 	static SDL_Event event;
 	SDL_PollEvent(&event);
-	if(event.type == SDL_QUIT)
-		m_userWannaClose = true;
+	return (event.type == SDL_QUIT);
+		
 	
 }
 
@@ -84,8 +79,8 @@ void SdlRenderer::UpdateWindowState() noexcept
 
 bool SdlRenderer::IsWindowClosed() noexcept
 {
-	UpdateWindowState();
-	return m_userWannaClose;
+	
+	return CheckWindowState();
 }
 
 

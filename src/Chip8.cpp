@@ -35,10 +35,10 @@ bool Chip8::initSystems()
 
 
 	std::srand(std::time(0));			// seed rand
-	std::memset(gfx_, 0, gfxResolution * sizeof(uint32_t));		// Clear display
-	std::memset(stack_, 0, STACK_MAX * sizeof(uint16_t));		// Clear stack
-	std::memset(V_, 0, V_REGISTERS_MAX * sizeof(uint8_t));				// Clear registers V0-VF
-	std::memset(memory_, 0, MEMORY_MAX * sizeof(uint8_t)); 		// Clear memory
+	std::memset(gfx_, 0, gfxResolution 	* sizeof(uint32_t));		// Clear display
+	std::memset(stack_, 0, STACK_MAX 	* sizeof(uint16_t));		// Clear stack
+	std::memset(V_, 0, V_REGISTERS_MAX 	* sizeof(uint8_t));			// Clear registers V0-VF
+	std::memset(memory_, 0, MEMORY_MAX 	* sizeof(uint8_t)); 		// Clear memory
 
 	// Load fontset
 	
@@ -128,9 +128,9 @@ void Chip8::reset() noexcept
 	soundTimer_ = 0;
 	delayTimer_ = 0;
 	drawFlag_ = false;
-	std::memset(gfx_, 0, gfxResolution * sizeof(uint32_t));
-	std::memset(stack_,0,  STACK_MAX * sizeof(uint16_t));
-	std::memset(V_,0, 16 * sizeof(uint8_t));
+	std::memset(gfx_, 0, gfxResolution 	* sizeof(uint32_t));
+	std::memset(stack_,0, STACK_MAX 	* sizeof(uint16_t));
+	std::memset(V_, 0, V_REGISTERS_MAX	* sizeof(uint8_t));
 
 }
 
@@ -153,8 +153,8 @@ void Chip8::updateCycle() noexcept
 		LOG(key << " Pressed");
 	*/
 	// timer:
-	static std::clock_t timerCounter = std::clock();
 
+	static std::clock_t timerCounter = std::clock();
 	if ((std::clock() - timerCounter) > CLOCKS_PER_SEC / 60)
 	{
 		if (soundTimer_ > 0)
@@ -174,12 +174,10 @@ uint8_t Chip8::waitKeyPress() noexcept
 	int key = NO_KEY_PRESSED;
 	do
 	{
-		this->updateCycle();
+		input_->UpdateKeys();
 		if (this->wantToExit())
 			return 0;
 		key = input_->GetPressedKeyValue();
-		renderer_->Render(gfx_);
-
 	} while(key == NO_KEY_PRESSED);
 	
 	return ( key & 0xff ) ;
@@ -459,6 +457,7 @@ void Chip8::executeInstruction() noexcept
 				 If both values match, the bit value will be 0.
 			*/
 			V_[0xF] = 0;
+
 			uint8_t Vx = VX, Vy = VY;
 			int height = N;
 
@@ -482,6 +481,8 @@ void Chip8::executeInstruction() noexcept
 
 				drawFlag_ = true;
 				break;
+		
+
 		}
 
 

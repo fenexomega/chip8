@@ -4,7 +4,7 @@
 
 int main(int argc, char **argv)
 {
-	
+
 	if (argc < 2)
 	{
 		std::cout << "No game to load, exiting." << std::endl;
