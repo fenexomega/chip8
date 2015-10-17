@@ -10,8 +10,7 @@
 #define MEMORY_MAX 0xFFF
 #define STACK_MAX 16
 #define V_REGISTERS_MAX 16
-constexpr int gfxResolution { 64 * 32 };
-constexpr int gfxBytes{ gfxResolution * sizeof(uint32_t) };
+
 constexpr int romMaxSize { MEMORY_MAX - 0x200 };
 
 
@@ -49,7 +48,8 @@ private:
 	uint16_t pc_;
 	uint16_t stack_[STACK_MAX];
 	uint16_t sp_;
-
+	size_t gfxBytes;
+	size_t gfxResolution;
 };
 
 

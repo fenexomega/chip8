@@ -3,21 +3,25 @@ cmake_minimum_required(VERSION 2.8)
 
 
 #compiler
-set(CMAKE_CXX_COMPILER "clang++")
 
 
 # CXX_FLAGS
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Winline -Wall -Wextra -std=c++0x")
 
+#######################################################################################
+#######################################################################################
+
+# BUILD TYPES
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
-endif(CMAKE_BUILD_TYPE STREQUAL "Release")
+elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
-endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+
+endif()
 
 
 # ADICIONAR MODULES EXTERNOS

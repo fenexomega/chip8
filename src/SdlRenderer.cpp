@@ -17,7 +17,7 @@ SdlRenderer::SdlRenderer() :
 bool SdlRenderer::Initialize(const int width,const int height) noexcept
 {
 
-
+	
 	if(SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
 		LOG("Couldn't start the application: " << SDL_GetError());
