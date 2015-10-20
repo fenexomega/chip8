@@ -1,16 +1,20 @@
 #ifndef CHIP8_H
 #define CHIP8_H
+
 #include <SDL2/SDL.h>
-#undef main // for windows builds
 #include "interfaces/iRenderer.h"
 #include "interfaces/iInput.h"
+#include "resolution_t.h"
+#undef main // for windows builds
+
+class iRenderer;
+class iInput;
 
 
 
 #define MEMORY_MAX 0xFFF
 #define STACK_MAX 16
 #define V_REGISTERS_MAX 16
-
 constexpr int romMaxSize { MEMORY_MAX - 0x200 };
 
 
@@ -33,11 +37,15 @@ private:
 	bool initInput();
 	void reset() noexcept;
 	uint8_t waitKeyPress() noexcept;
-	
+
 	bool drawFlag_;
+	bool interrupted_;
+
 	iRenderer *renderer_;
 	iInput *input_;
-	
+	resolution_t gfxResolution_;
+	size_t gfxBytes_;
+
 	uint32_t *gfx_;
 	uint8_t *memory_;
 	uint8_t V_[V_REGISTERS_MAX];
@@ -48,15 +56,15 @@ private:
 	uint16_t pc_;
 	uint16_t stack_[STACK_MAX];
 	uint16_t sp_;
-	size_t gfxBytes;
-	size_t gfxResolution;
+
+
+
 };
 
 
 inline bool Chip8::wantToExit() const noexcept
 {
-	// the type returned by the operation || is a bool, and operator | returns a int, with || we avoid casting i think..
-	return renderer_->IsWindowClosed() || (input_->GetPressedKeyValue() == SDL_SCANCODE_ESCAPE);
+	return renderer_->IsWindowClosed() || (input_->GetPressedKeyValue() == SDL_SCANCODE_ESCAPE) || interrupted_;
 }
 
 

@@ -11,7 +11,7 @@
 
 
 Chip8::Chip8() : 
-	renderer_ ( nullptr ), input_ ( nullptr ), gfx_ (nullptr), memory_ ( nullptr )
+	drawFlag_ (false), interrupted_ (false), renderer_ ( nullptr ), input_ ( nullptr ), gfx_ (nullptr), memory_ ( nullptr )
 {
 	LOG("Creating Chip8 object...");
 	
@@ -27,17 +27,23 @@ bool Chip8::initSystems()
 	opcode_  = 0;		// Reset current opcode
 	I_	 = 0;	  		// Reset index register
 	sp_	 = 0;			// Reset stack pointer
-	soundTimer_ = 0;
+	soundTimer_ = 0;	
 	delayTimer_ = 0;
 	drawFlag_ = false;
-	memory_ = new uint8_t[MEMORY_MAX];
-	gfxResolution = 64 * 32;
-	gfxBytes = (gfxResolution * sizeof(uint32_t));
-	gfx_ = new uint32_t[gfxResolution];
-	
+	gfxResolution_.set(64,32);
+	gfxBytes_ = (gfxResolution_ * sizeof(uint32_t));
 
+	memory_ = new uint8_t[MEMORY_MAX];
+	gfx_ = new uint32_t[ gfxResolution_ ];
+
+	if((memory_ == nullptr) || (gfx_ == nullptr))
+	{
+		LOG("Cannot allocate memory for GFX or emulated Memory");
+		return false;
+	}
+	
 	std::srand(std::time(0));										// seed rand
-	std::memset(gfx_, 0, gfxResolution 	* sizeof(uint32_t));		// Clear display
+	std::memset(gfx_, 0, gfxResolution_ * sizeof(uint32_t));		// Clear display
 	std::memset(stack_, 0, STACK_MAX 	* sizeof(uint16_t));		// Clear stack
 	std::memset(V_, 0, V_REGISTERS_MAX 	* sizeof(uint8_t));			// Clear registers V0-VF
 	std::memset(memory_, 0, MEMORY_MAX 	* sizeof(uint8_t)); 		// Clear memory
@@ -103,16 +109,16 @@ bool Chip8::loadRom(const char *romFileName)
 
 bool Chip8::initGraphics()
 {
-	renderer_ = new SdlRenderer();
-	return renderer_->Initialize(64, 32);
+	renderer_ = new(std::nothrow) SdlRenderer();
+	return ( renderer_ != nullptr ) ? renderer_->Initialize(gfxResolution_.x_, gfxResolution_.y_) : false;
 }
 
 
 
 bool Chip8::initInput()
 {
-	input_ = new SdlInput();
-	return true;
+	input_ = new(std::nothrow) SdlInput();
+	return input_ != nullptr;
 }
 
 
@@ -127,7 +133,7 @@ void Chip8::reset() noexcept
 	soundTimer_ = 0;
 	delayTimer_ = 0;
 	drawFlag_ = false;
-	std::memset(gfx_, 0, gfxResolution 	* sizeof(uint32_t));
+	std::memset(gfx_, 0, gfxResolution_ * sizeof(uint32_t));
 	std::memset(stack_,0, STACK_MAX 	* sizeof(uint16_t));
 	std::memset(V_, 0, V_REGISTERS_MAX	* sizeof(uint8_t));
 
@@ -140,7 +146,7 @@ void Chip8::updateCycle() noexcept
 	input_->UpdateKeys();
 	
 	// check if machine is reseted
-	if( input_->IsKeyPressed(SDL_SCANCODE_RETURN) )
+	if(input_->IsKeyPressed(SDL_SCANCODE_RETURN))
 	{
 		this->reset();	
 		return;
@@ -236,23 +242,32 @@ void Chip8::executeInstruction() noexcept
 
 				case 0x00FB: // scroll screen 4 pixels right ( SuperChip )
 					LOG("Scrolling Right");
-					std::copy(gfx_, gfx_ + gfxResolution, gfx_ + 1);
 					break;
 
 				case 0x00FC: // scroll screen 4 pixels left  ( SuperChip )
-				{	LOG("Scrolling Left");
-					std::copy_backward(gfx_+(gfxResolution - 5), gfx_ + gfxResolution, gfx_ + (gfxResolution - 1));
+					LOG("Scrolling Left");					
 					break;
-				}
-				case 0x00FF:
+				
+				case 0x00FF: // increase resolution ( SuperChip )
 				{
+					
 					delete[] gfx_;
-					gfxResolution = 128*64;
-					gfx_ = new uint32_t[gfxResolution];
-					gfxBytes =  gfxResolution * sizeof(uint32_t);
+					gfxResolution_.set(128,64);
+					gfx_ = new(std::nothrow) uint32_t[gfxResolution_];
+
+					if(gfx_ == nullptr)
+					{
+						LOG("Can't allocate space for GFX 128x64");
+						interrupted_ = true;
+						break;
+					}
+
+					gfxBytes_ =  gfxResolution_ * sizeof(uint32_t);
 					renderer_->Dispose();
-					if(! renderer_->Initialize(128,64))
-						std::exit(1);
+					renderer_->Initialize(128,64);
+					
+
+
 					
 					break;
 				}
@@ -260,7 +275,7 @@ void Chip8::executeInstruction() noexcept
 
 
 				case 0x00E0: // clear screen
-					std::memset(gfx_, 0, gfxBytes);
+					std::memset(gfx_, 0, gfxBytes_);
 					break;
 
 
