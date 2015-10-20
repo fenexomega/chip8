@@ -42,7 +42,7 @@ bool SdlInput::IsKeyPressed(const int key)  const noexcept
 int SdlInput::GetPressedKeyValue() const noexcept
 {
 	auto itr = std::find_if(m_currentKeys.begin(), m_currentKeys.end(),
-		[&](const std::pair<int,SDL_Scancode> &keyPair) {return m_keys[keyPair.second] == SDL_TRUE; });
+		[&](const std::pair<const int,SDL_Scancode> &keyPair) {return m_keys[keyPair.second] == SDL_TRUE; });
 	return (itr != m_currentKeys.end()) ? itr->first : NO_KEY_PRESSED;
 }
 
