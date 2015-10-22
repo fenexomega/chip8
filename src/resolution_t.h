@@ -7,35 +7,35 @@ struct resolution_t
 {
 
 	inline resolution_t();
-	inline resolution_t(size_t x, size_t y);
+	inline resolution_t(const int new_x, const int new_y);
 
-	inline void set(size_t x, size_t y);
+	inline void set(const int newX, const int newY);
 	inline operator size_t();
 
 
-	size_t x_, y_;
-	size_t total_;
+	int x, y;
+	size_t total;
 
 };
 
 
-inline resolution_t::resolution_t() : x_ (0), y_(0), total_(0)
+inline resolution_t::resolution_t() : x(0), y(0), total(0)
 {}
 
-inline resolution_t::resolution_t(size_t x, size_t y) : x_ (x), y_(y), total_(x*y)
-{}	
+inline resolution_t::resolution_t(const int new_x, const int new_y) : x(new_x), y(new_y), total(x*y)
+{}
 
 
-inline void resolution_t::set(size_t x, size_t y)
+inline void resolution_t::set(const int new_x, const int new_y)
 {
-	x_ = x;
-	y_ = y;
-	total_ = x_ * y_;
+	x = new_x;
+	y = new_y;
+	total = x * y;
 }
 
 inline resolution_t::operator size_t()
 {
-	return total_;
+	return total;
 }
 
 

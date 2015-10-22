@@ -7,9 +7,6 @@
 #include "resolution_t.h"
 #undef main // for windows builds
 
-class iRenderer;
-class iInput;
-
 
 
 #define MEMORY_MAX 0xFFF
@@ -18,17 +15,38 @@ class iInput;
 constexpr int romMaxSize { MEMORY_MAX - 0x200 };
 
 
+
+
+/*
+* With the possibility of implementing a GUI for this emulator
+* I have added more Interfaces to the Chip8 class
+* Hope I didn't make it hard to read.
+*
+* Basicaly, we do not use exceptions, so we have to try to keep most things with C algorithms
+* for that reason our functions are noexcept.
+* if an exception is throw from a C++ algorithm library, the program will terminate.
+*
+* if a Chip8 member function have the chance to fail. it have to return a bool ( true for success , false for failure )
+* if the failure is critcal, the function have to set interrupted_ flag to true, and return false indicating failure.
+*
+*/
+
 class Chip8
 {
 public:
 	Chip8();
-	bool initSystems();
-	bool loadRom(const char *romFileName);
+	bool initSystems() noexcept;
+	bool loadRom(const char *romFileName) noexcept;
+
 	inline bool getDrawFlag() const noexcept;
 	inline bool wantToExit() const noexcept;
-	void updateCycle()  noexcept;
-	void executeInstruction() noexcept ;
 	inline void drawGraphics() noexcept;
+	inline void cleanFlags() noexcept;
+	
+	bool setResolution(const int x, const int y) noexcept;
+	void updateCpuState()  noexcept;
+	void executeInstruction() noexcept;
+
 	void dispose();
 	~Chip8();
 
@@ -41,10 +59,12 @@ private:
 	bool drawFlag_;
 	bool interrupted_;
 
-	iRenderer *renderer_;
-	iInput *input_;
 	resolution_t gfxResolution_;
 	size_t gfxBytes_;
+
+	iRenderer *renderer_;
+	iInput *input_;
+
 
 	uint32_t *gfx_;
 	uint8_t *memory_;
@@ -62,9 +82,19 @@ private:
 };
 
 
+
+
+inline void Chip8::cleanFlags() noexcept
+{
+	drawFlag_ = false;
+	interrupted_ = false;
+}
+
+
+
 inline bool Chip8::wantToExit() const noexcept
 {
-	return renderer_->IsWindowClosed() || (input_->GetPressedKeyValue() == SDL_SCANCODE_ESCAPE) || interrupted_;
+	return renderer_->IsWindowClosed() || input_->IsKeyPressed(SDL_SCANCODE_ESCAPE) || interrupted_;
 }
 
 

@@ -1,8 +1,8 @@
 #include <cstring>
 #include <cstdio>
 #include <ctime>
-#include <algorithm>
-#include <fstream>
+#include <typeinfo>
+
 
 #include "SdlRenderer.h"
 #include "SdlInput.h"
@@ -11,14 +11,50 @@
 
 
 Chip8::Chip8() : 
-	drawFlag_ (false), interrupted_ (false), renderer_ ( nullptr ), input_ ( nullptr ), gfx_ (nullptr), memory_ ( nullptr )
+	drawFlag_ (false), interrupted_ (false), gfxResolution_(64,32), 
+	renderer_ ( nullptr ), input_ ( nullptr ), gfx_ (nullptr), memory_ ( nullptr )
+	
 {
 	LOG("Creating Chip8 object...");
 	
 }
 
+/* After use Chip8::dispose(), be sure to call, chip8::initSystems() again before you use the object. */
+void Chip8::dispose()
+{
+	delete input_;  delete renderer_; delete[] gfx_;  delete[] memory_;
+	input_ = nullptr; renderer_ = nullptr; gfx_ = nullptr; memory_ = nullptr;
+}
 
-bool Chip8::initSystems()
+
+Chip8::~Chip8()
+{
+	LOG("Destroying Chip8 object...");
+	
+	if(renderer_ != nullptr || input_ != nullptr || gfx_ != nullptr || memory_ != nullptr)
+		this->dispose();
+}
+
+
+
+
+bool Chip8::initGraphics()
+{
+	renderer_ = new(std::nothrow) SdlRenderer();
+	return ( renderer_ != nullptr ) ? renderer_->Initialize(gfxResolution_.x, gfxResolution_.y) : false;
+}
+
+
+
+bool Chip8::initInput()
+{
+	input_ = new(std::nothrow) SdlInput();
+	return input_ != nullptr;
+}
+
+
+
+bool Chip8::initSystems() noexcept
 {
 
 	LOG("Initializing Chip8 Systems...");
@@ -30,15 +66,15 @@ bool Chip8::initSystems()
 	soundTimer_ = 0;	
 	delayTimer_ = 0;
 	drawFlag_ = false;
-	gfxResolution_.set(64,32);
-	gfxBytes_ = (gfxResolution_ * sizeof(uint32_t));
-
-	memory_ = new uint8_t[MEMORY_MAX];
-	gfx_ = new uint32_t[ gfxResolution_ ];
+	
+	gfxBytes_ 	= (gfxResolution_ * sizeof(uint32_t));
+	memory_ 	= new uint8_t[MEMORY_MAX];
+	gfx_ 		= new uint32_t[ gfxResolution_ ];
 
 	if((memory_ == nullptr) || (gfx_ == nullptr))
 	{
-		LOG("Cannot allocate memory for GFX or emulated Memory");
+		LOG("Cannot allocate memory for GFX or emulated Memory, interrupting Chip8 instance.");
+		interrupted_ = true;
 		return false;
 	}
 	
@@ -70,29 +106,43 @@ bool Chip8::initSystems()
 	};
 	std::memcpy(memory_,chip8_fontset, 80 * sizeof(uint8_t)); // copy fontset to memory.
 
-	return initGraphics() & initInput();
+	if(! ( initGraphics() & initInput() ) )
+	{
+		LOG("Can't initialize Graphics (" << typeid(*renderer_).name() << ")," <<
+			" or Input (" << typeid(*input_).name() << "), interrupting Chip8 instance.");
+		interrupted_ = true;
+		return false;
+	}
+
+	return true;
 }
 
 
 
-bool Chip8::loadRom(const char *romFileName)
+bool Chip8::loadRom(const char *romFileName) noexcept
 {
 	LOG("Loading " << romFileName);
 	std::FILE *romFile = std::fopen(romFileName,"rb");
 
 	if (romFile == nullptr)
 	{
-		LOG("Error at opening ROM file. Exiting!");
+		LOG("Error at opening ROM file, interrupting Chip8 instance.");
+		interrupted_ = true;
 		return false;
 	}
 
+	// get file size
 	std::fseek(romFile, 0, SEEK_END);
 	long romFileSize = std::ftell(romFile);
 	std::fseek(romFile, 0, SEEK_SET);
 
+	// check if file size will not overflow emulated memory size
 	if (romFileSize > romMaxSize)
 	{
-		LOG("Error, ROM size not compatible. Exiting!");
+		LOG("Error, ROM size not compatible, interrupting Chip8 instance.");
+		std::fclose(romFile);
+
+		interrupted_ = true;
 		return false;
 	}
 
@@ -106,33 +156,15 @@ bool Chip8::loadRom(const char *romFileName)
 
 
 
-
-bool Chip8::initGraphics()
-{
-	renderer_ = new(std::nothrow) SdlRenderer();
-	return ( renderer_ != nullptr ) ? renderer_->Initialize(gfxResolution_.x_, gfxResolution_.y_) : false;
-}
-
-
-
-bool Chip8::initInput()
-{
-	input_ = new(std::nothrow) SdlInput();
-	return input_ != nullptr;
-}
-
-
-
 void Chip8::reset() noexcept
 {
-	
+	this->cleanFlags();
 	pc_	 = 0x200;
 	opcode_  = 0;	
 	I_ = 0;			
 	sp_ = 0;
 	soundTimer_ = 0;
 	delayTimer_ = 0;
-	drawFlag_ = false;
 	std::memset(gfx_, 0, gfxResolution_ * sizeof(uint32_t));
 	std::memset(stack_,0, STACK_MAX 	* sizeof(uint16_t));
 	std::memset(V_, 0, V_REGISTERS_MAX	* sizeof(uint8_t));
@@ -141,25 +173,18 @@ void Chip8::reset() noexcept
 
 
 
-void Chip8::updateCycle() noexcept
+void Chip8::updateCpuState() noexcept
 {
+	static std::clock_t timerCounter = std::clock();
+
 	input_->UpdateKeys();
 	
-	// check if machine is reseted
+	// check if reset button is pressed
 	if(input_->IsKeyPressed(SDL_SCANCODE_RETURN))
-	{
-		this->reset();	
-		return;
-	}
+		this->reset();
 
-	/*use this code if you want to check the key values that are send to chip8 core.
-	static int key;
-	if ((key = input_->GetPressedKeyValue()) != NO_KEY_PRESSED)
-		LOG(key << " Pressed");
-	*/
-	// timer:
 
-	static std::clock_t timerCounter = std::clock();
+	// decrease the timers by 1 every 60th of 1 second
 	if ((std::clock() - timerCounter) > CLOCKS_PER_SEC / 60)
 	{
 		if (soundTimer_ > 0)
@@ -174,6 +199,39 @@ void Chip8::updateCycle() noexcept
 }
 
 
+
+
+
+bool Chip8::setResolution(const int x, const int y) noexcept
+{
+	delete[] gfx_;
+	gfxResolution_.set(x,y);
+	gfxBytes_ =  gfxResolution_ * sizeof(uint32_t);
+
+	gfx_ = new(std::nothrow) uint32_t[gfxResolution_];
+
+	if(gfx_ == nullptr)
+	{
+		LOG("Can't allocate space for GFX in mode " << x << "x" << y << ", interrupting Chip8 instance.");
+		interrupted_ = true;
+		return false;
+	}
+
+	// clean renderer_ and Initialize with new resolution.
+	renderer_->Dispose();
+	if( !renderer_->Initialize(x,y) )
+	{
+		LOG("Can't initialize Renderer (" << typeid(*renderer_).name() << ") in mode " << x << "x" << y << " , interrupting Chip8 instance.");
+		interrupted_ = true;
+		return false;
+	}
+
+
+
+	return true;				
+}
+
+
 uint8_t Chip8::waitKeyPress() noexcept
 {	
 	int key = NO_KEY_PRESSED;
@@ -183,27 +241,14 @@ uint8_t Chip8::waitKeyPress() noexcept
 		if (this->wantToExit())
 			return 0;
 		key = input_->GetPressedKeyValue();
+
 	} while(key == NO_KEY_PRESSED);
 	
-	return ( key & 0xff ) ;
+	return key;
 	
 }
 
-/* After use Chip8::dispose(), be sure to call, chip8::initialize again before you use the object. */
-void Chip8::dispose()
-{
-	delete input_;  delete renderer_; delete[] gfx_;  delete[] memory_;
-	input_ = nullptr; renderer_ = nullptr; gfx_ = nullptr; memory_ = nullptr;
-}
 
-
-Chip8::~Chip8()
-{
-	LOG("Destroying Chip8 object...");
-	
-	if(renderer_ != nullptr || input_ != nullptr || gfx_ != nullptr || memory_ != nullptr)
-		this->dispose();
-}
 
 
 void Chip8::executeInstruction() noexcept
@@ -248,32 +293,11 @@ void Chip8::executeInstruction() noexcept
 					LOG("Scrolling Left");					
 					break;
 				
-				case 0x00FF: // increase resolution ( SuperChip )
-				{
-					
-					delete[] gfx_;
-					gfxResolution_.set(128,64);
-					gfx_ = new(std::nothrow) uint32_t[gfxResolution_];
-
-					if(gfx_ == nullptr)
-					{
-						LOG("Can't allocate space for GFX 128x64");
-						interrupted_ = true;
-						break;
-					}
-
-					gfxBytes_ =  gfxResolution_ * sizeof(uint32_t);
-					renderer_->Dispose();
-					renderer_->Initialize(128,64);
-					
-
-
-					
+				case 0x00FF: // increase resolution to 128x64 ( SuperChip )
+					this->setResolution(128,64);
 					break;
-				}
 				
-
-
+				
 				case 0x00E0: // clear screen
 					std::memset(gfx_, 0, gfxBytes_);
 					break;
