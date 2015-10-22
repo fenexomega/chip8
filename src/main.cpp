@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 	}
 	
 
-	begin:
+
 
 	Chip8 *myChip8 = new(std::nothrow) Chip8();
 	if(myChip8 == nullptr)
@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 
 	myChip8->dispose();
 	delete myChip8;
-	goto begin;
+
 	
 	//std::cin.ignore(1); //for LOG read
 
