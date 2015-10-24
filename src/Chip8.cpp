@@ -22,6 +22,7 @@ Chip8::Chip8() :
 /* After use Chip8::dispose(), be sure to call, chip8::initSystems() again before you use the object. */
 void Chip8::dispose()
 {
+	renderer_->Dispose();
 	delete input_;  delete renderer_; delete[] gfx_;  delete[] memory_;
 	input_ = nullptr; renderer_ = nullptr; gfx_ = nullptr; memory_ = nullptr;
 }

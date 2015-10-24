@@ -5,7 +5,7 @@
 int main(int argc, char **argv)
 {
 
-	if (argc < 1)
+	if (argc < 2)
 	{
 		std::cout << "No game to load, exiting." << std::endl;
 		return 0;
@@ -15,6 +15,8 @@ int main(int argc, char **argv)
 
 
 	Chip8 *myChip8 = new(std::nothrow) Chip8();
+
+	
 	if(myChip8 == nullptr)
 	{
 		LOG("can't allocate memory for Chip8: ("<< sizeof(Chip8) << " Bytes), or memory problem.");
@@ -28,7 +30,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	if(!myChip8->loadRom("BRIX"))
+	if(!myChip8->loadRom(argv[1]))
 	{
 		myChip8->dispose();
 		delete myChip8;

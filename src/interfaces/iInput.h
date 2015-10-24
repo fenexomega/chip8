@@ -3,7 +3,13 @@
 
 #include <iostream>
 #define LOG(X) std::cout << X << std::endl
+
+
+
+
 #define NO_KEY_PRESSED -1
+#define ESCAPE_KEY_CODE -2
+
 
 class iInput
 {

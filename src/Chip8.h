@@ -94,7 +94,7 @@ inline void Chip8::cleanFlags() noexcept
 
 inline bool Chip8::wantToExit() const noexcept
 {
-	return renderer_->IsWindowClosed() || input_->IsKeyPressed(SDL_SCANCODE_ESCAPE) || interrupted_;
+	return renderer_->IsWindowClosed() || input_->IsKeyPressed(ESCAPE_KEY_CODE) || interrupted_;
 }
 
 
