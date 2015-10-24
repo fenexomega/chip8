@@ -26,7 +26,8 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 	
 	m_pitch = width * 4;
 	
-	m_window = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED, width * 4, height * 6, SDL_WINDOW_RESIZABLE);
+	m_window = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,
+									SDL_WINDOWPOS_CENTERED, width * 4, height * 6, SDL_WINDOW_RESIZABLE);
 	
 	if(m_window == nullptr)
 	{
@@ -52,8 +53,8 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 	{
 
 		LOG("Couldn't allocate SDL_Texture. Error: " << SDL_GetError());
-		SDL_DestroyWindow(m_window);
 		SDL_DestroyRenderer(m_rend);
+		SDL_DestroyWindow(m_window);
 		return false;
 	}
 

@@ -51,8 +51,8 @@ public:
 	~Chip8();
 
 private:
-	bool initGraphics();
-	bool initInput();
+	bool initGraphics() noexcept;
+	bool initInput() noexcept;
 	void reset() noexcept;
 	uint8_t waitKeyPress() noexcept;
 

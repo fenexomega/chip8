@@ -9,7 +9,7 @@
 
 #define NO_KEY_PRESSED -1
 #define ESCAPE_KEY_CODE -2
-
+#define RETURN_KEY_CODE -3
 
 class iInput
 {

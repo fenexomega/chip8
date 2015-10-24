@@ -39,7 +39,7 @@ Chip8::~Chip8()
 
 
 
-bool Chip8::initGraphics()
+bool Chip8::initGraphics() noexcept
 {
 	renderer_ = new(std::nothrow) SdlRenderer();
 	return ( renderer_ != nullptr ) ? renderer_->Initialize(gfxResolution_.x, gfxResolution_.y) : false;
@@ -47,7 +47,7 @@ bool Chip8::initGraphics()
 
 
 
-bool Chip8::initInput()
+bool Chip8::initInput() noexcept
 {
 	input_ = new(std::nothrow) SdlInput();
 	return input_ != nullptr;
@@ -69,8 +69,8 @@ bool Chip8::initSystems() noexcept
 	drawFlag_ = false;
 	
 	gfxBytes_ 	= (gfxResolution_ * sizeof(uint32_t));
-	memory_ 	= new uint8_t[MEMORY_MAX];
-	gfx_ 		= new uint32_t[ gfxResolution_ ];
+	memory_ 	= new(std::nothrow) uint8_t[MEMORY_MAX];
+	gfx_ 		= new(std::nothrow) uint32_t[ gfxResolution_ ];
 
 	if((memory_ == nullptr) || (gfx_ == nullptr))
 	{
@@ -181,7 +181,7 @@ void Chip8::updateCpuState() noexcept
 	input_->UpdateKeys();
 	
 	// check if reset button is pressed
-	if(input_->IsKeyPressed(SDL_SCANCODE_RETURN))
+	if(input_->IsKeyPressed(RETURN_KEY_CODE))
 		this->reset();
 
 
