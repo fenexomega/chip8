@@ -1,9 +1,6 @@
 #ifndef IINPUT
 #define IINPUT
 
-#include <iostream>
-#define LOG(X) std::cout << X << std::endl
-
 
 
 

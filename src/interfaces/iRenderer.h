@@ -1,29 +1,12 @@
 #ifndef IRENDERER_H
 #define IRENDERER_H
 
-/*
- * =====================================================================================
- *
- *	   Filename:  iRenderer.h
- *
- *	Description:  
- *
- *		Version:  1.0
- *		Created:  26-09-2015 15:50:13
- *	   Revision:  none
- *	   Compiler:  gcc
- *
- *
- * =====================================================================================
- */
 
-#include <iostream>
-#define LOG(X) std::cout << X << std::endl
 
 
 class iRenderer
 {
-// pure abstract class, better for VCPP build, and performance.
+
 public:
 	virtual bool Initialize(const int,const int) = 0; 
 

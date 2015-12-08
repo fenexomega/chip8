@@ -20,10 +20,14 @@ struct resolution_t
 
 
 inline resolution_t::resolution_t() : x(0), y(0), total(0)
-{}
+{
+
+}
 
 inline resolution_t::resolution_t(const int new_x, const int new_y) : x(new_x), y(new_y), total(x*y)
-{}
+{
+
+}
 
 
 inline void resolution_t::set(const int new_x, const int new_y)

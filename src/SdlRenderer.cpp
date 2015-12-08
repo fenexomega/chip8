@@ -1,23 +1,48 @@
+#include <cassert>
 #include <SDL2/SDL.h>
 #include "SdlRenderer.h"
+#include "utility/log.h"
 
 constexpr int fps { 1000/ 60 };
 
 
 
 
-SdlRenderer::SdlRenderer() :
-	m_window (nullptr), m_rend (nullptr), m_texture (nullptr)
+SdlRenderer::SdlRenderer() 
+	:	m_window (nullptr), m_rend (nullptr), m_texture (nullptr), m_needToDispose(false)
 {
 	LOG("Creating SdlRenderer object...");
 }
 
 
+void SdlRenderer::Dispose() noexcept
+{
+	SDL_DestroyTexture(m_texture);
+	SDL_DestroyRenderer(m_rend);
+	SDL_DestroyWindow(m_window);
+	m_needToDispose = false;
+	SDL_Quit();
+}
+
+
+
+
+SdlRenderer::~SdlRenderer()
+{
+
+	LOG("Destroying SdlRenderer object...");
+	if(m_needToDispose)
+		this->Dispose();
+
+	
+}
+
 
 bool SdlRenderer::Initialize(const int width,const int height) noexcept
 {
 
-	
+	assert(!m_needToDispose); // assert that the class have no need to dispose
+	m_needToDispose = true; // now the class need to dispose
 	if(SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
 		LOG("Couldn't start the application: " << SDL_GetError());
@@ -27,7 +52,7 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 	m_pitch = width * 4;
 	
 	m_window = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,
-									SDL_WINDOWPOS_CENTERED, width * 4, height * 6, SDL_WINDOW_RESIZABLE);
+		SDL_WINDOWPOS_CENTERED, width * 4, height * 6, SDL_WINDOW_RESIZABLE);
 	
 	if(m_window == nullptr)
 	{
@@ -60,9 +85,7 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 
 
 	SDL_SetRenderDrawColor(m_rend, 0, 0, 0, 255);
-
 	SDL_RenderClear(m_rend);
-
 	SDL_RenderPresent(m_rend);
 		
 	return true;
@@ -104,26 +127,5 @@ bool SdlRenderer::IsWindowClosed() noexcept
 
 
 
-void SdlRenderer::Dispose() noexcept
-{
-	SDL_DestroyTexture(m_texture);
-	SDL_DestroyRenderer(m_rend);
-	SDL_DestroyWindow(m_window);
-	m_texture = nullptr;
-	m_rend = nullptr;
-	m_window = nullptr;
-}
 
-
-
-
-SdlRenderer::~SdlRenderer()
-{
-
-	LOG("Destroying SdlRenderer object...");
-	if( m_rend != nullptr || m_window  != nullptr  || m_texture != nullptr)
-		this->Dispose();
-
-	SDL_Quit();
-}
 
