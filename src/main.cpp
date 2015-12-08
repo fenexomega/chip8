@@ -1,3 +1,4 @@
+#include "utility/log.h"
 #include "Chip8.h"
 
 
@@ -11,7 +12,7 @@ int main(int argc, char **argv)
 		return 0;
 	}
 	
-
+	
 	Chip8 *myChip8 = new(std::nothrow) Chip8();
 	
 	if(myChip8 == nullptr)
@@ -26,8 +27,8 @@ int main(int argc, char **argv)
 		delete myChip8;
 		return 1;
 	}
-	
-	if(!myChip8->loadRom("BRIX"))
+
+	if(!myChip8->loadRom(argv[1]))
 	{
 		myChip8->dispose();
 		delete myChip8;
@@ -43,7 +44,6 @@ int main(int argc, char **argv)
 	
 		if(myChip8->getDrawFlag())
 			myChip8->drawGraphics();
-	
 	}
 	
 	
@@ -55,12 +55,4 @@ int main(int argc, char **argv)
 	
 	
 	return 0;
-}
-
-
-
-
-
-void clean_resources(Chip8 *ptr){
-	delete ptr;
 }

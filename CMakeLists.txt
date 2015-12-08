@@ -7,7 +7,7 @@ cmake_minimum_required(VERSION 2.8)
 
 # CXX_FLAGS
 set(CMAKE_CXX_COMPILER "clang++")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Winline -Wall -Wextra -std=c++0x")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Winline -Wall -Wextra -std=c++14")
 
 #######################################################################################
 #######################################################################################

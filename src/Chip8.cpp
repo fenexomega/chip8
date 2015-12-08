@@ -1,10 +1,13 @@
 #include <cstring>
 #include <cstdio>
 #include <ctime>
-#include <cassert>
 #include <typeinfo>
 
+
 #include "utility/log.h"
+#include "utility/dynamic_assert.h"
+
+
 #include "SdlRenderer.h"
 #include "SdlInput.h"
 #include "Chip8.h"
@@ -83,7 +86,7 @@ bool Chip8::initialize() noexcept
 {
 
 	LOG("Initializing Chip8 Systems...");
-	assert(m_memory == nullptr);
+	dynamic_assert((m_memory == nullptr), "Chip8 initialize called again, before dispose resources...");
 	
 	
 	m_pc     = 0x200;	// Program counter starts at 0x200
@@ -109,7 +112,7 @@ bool Chip8::initialize() noexcept
 	}
 	
 	std::srand(std::time(0));						// seed rand
-	std::memset(m_gfx.get(), 0, m_gfxResolution   * sizeof(uint32_t));	// Clear display
+	std::memset(m_gfx.get(), 0, m_gfxResolution * sizeof(uint32_t));	// Clear display
 	std::memset(m_stack, 0,     STACK_MAX 	    * sizeof(uint16_t));	// Clear stack
 	std::memset(m_V, 0,         V_REGISTERS_MAX * sizeof(uint8_t));		// Clear registers V0-VF
 	std::memset(m_memory, 0,    MEMORY_MAX      * sizeof(uint8_t)); 	// Clear memory
@@ -137,9 +140,16 @@ bool Chip8::initialize() noexcept
 	
 	
 	std::memcpy(m_memory,chip8_fontset, 80 * sizeof(uint8_t)); // copy fontset to memory.
-
-	return (initGraphics() & initInput()) ? true : 
-		(LOGerr("interrupting Chip8."), m_interrupted = true, false);
+	
+	if( ! (initGraphics() & initInput()) )
+	{
+		LOGerr("interrupting Chip8."); 
+		m_interrupted = true; 
+		return false;
+	
+	};
+	
+	return true;
 }
 
 
@@ -177,12 +187,16 @@ bool Chip8::loadRom(const char *romFileName) noexcept
 	return true;
 }
 
-
+inline void Chip8::cleanFlags() noexcept
+{
+	m_drawFlag = false;
+	m_interrupted = false;
+}
 
 void Chip8::reset() noexcept
 {
 	this->cleanFlags();
-	m_pc	 = 0x200;
+	m_pc      = 0x200;
 	m_opcode  = 0;	
 	m_I = 0;			
 	m_sp = 0;
@@ -241,17 +255,12 @@ bool Chip8::setResolution(size_t x, size_t y) noexcept
 	// clean renderer_ and Initialize with new resolution.
 	m_renderer->Dispose();
 	if( !m_renderer->Initialize(x,y) )
-	{
-		LOGerr("Can't initialize Renderer (" << 
-			typeid(*m_renderer).name() << ") in mode " << x << "x" << y << " , interrupting Chip8 instance.");
-		
+	{	
 		m_interrupted = true;
 		return false;
 	}
 
-
-
-	return true;				
+	return true;		
 }
 
 
@@ -551,11 +560,10 @@ void Chip8::executeInstruction() noexcept
 
 			uint8_t Vx = VX, Vy = VY;
 			int height = N;
+			uint8_t *_8bitRow = &m_memory[m_I];
 			
-			
-				for (int i = 0; i < height; ++i)
+				for (int i = 0; i < height; ++i, ++_8bitRow)
 				{
-					uint8_t _8bitRow = m_memory[m_I + i];
 					for (int j = 0; j < 8; ++j)
 					{
 						int px = ((Vx + j) & 63);
@@ -563,7 +571,7 @@ void Chip8::executeInstruction() noexcept
 
 						int pixelPos = (64 * py) + px;
 
-						bool pixel = (_8bitRow & (1 << (7 - j))) != 0;
+						bool pixel = (*_8bitRow & (1 << (7 - j))) != 0;
 
 						m_V[0xF] |= ((m_gfx[pixelPos] > 0) & pixel);
 

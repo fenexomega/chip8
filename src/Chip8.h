@@ -2,12 +2,12 @@
 #define CHIP8_H
 #include <memory>
 #include <SDL2/SDL.h>
+#undef main // for windows builds
+
 
 #include "interfaces/iRenderer.h"
 #include "interfaces/iInput.h"
 #include "resolution_t.h"
-#include "utility/log.h"
-#undef main // for windows builds
 
 
 
@@ -28,7 +28,7 @@ public:
 	inline bool getDrawFlag() const noexcept;
 	inline bool wantToExit() const noexcept;
 	inline void drawGraphics() noexcept;
-	inline void cleanFlags() noexcept;
+	void cleanFlags() noexcept;
 	
 	bool setResolution(size_t x, size_t y) noexcept;
 	void updateCpuState()  noexcept;
@@ -68,11 +68,7 @@ private:
 
 
 
-inline void Chip8::cleanFlags() noexcept
-{
-	m_drawFlag = false;
-	m_interrupted = false;
-}
+
 
 
 
