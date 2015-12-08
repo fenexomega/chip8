@@ -22,12 +22,17 @@ Chip8::Chip8() :
 /* After use Chip8::dispose(), be sure to call, chip8::initSystems() again before you use the object. */
 void Chip8::dispose()
 {
-	m_renderer->Dispose();
+	// reverse deallocation
 	m_input.reset();
+	
+	m_renderer->Dispose();
 	m_renderer.reset();
+	
 	m_gfx.reset();
+	
 	delete[] m_memory;
 	m_memory = nullptr;
+
 }
 
 

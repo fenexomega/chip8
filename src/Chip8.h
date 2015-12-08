@@ -47,11 +47,14 @@ private:
 	bool m_interrupted;
 	size_t m_gfxBytes;
 	resolution_t m_gfxResolution;
-	std::unique_ptr<iRenderer> m_renderer;
-	std::unique_ptr<iInput>	m_input;
-	std::unique_ptr<uint32_t[]> m_gfx;
 	
 	uint8_t	*m_memory;
+	std::unique_ptr<uint32_t[]> m_gfx;
+	std::unique_ptr<iRenderer> m_renderer;
+	std::unique_ptr<iInput>	m_input;
+	
+	
+	
 	uint8_t m_V[V_REGISTERS_MAX];
 	uint8_t m_delayTimer;
 	uint8_t m_soundTimer;
