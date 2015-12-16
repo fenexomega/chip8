@@ -6,22 +6,24 @@
 // Max of keycodes to check. This covers all the ascii table.
 #define NUM_KEYCODES 256
 
-//all 16 keys of TelMac + ESC
+//all 16 keys of TelMac + ESC, RESET, NO_KEY_PRESSED
 SdlInput::SdlInput() noexcept :
-m_currentKeys{ 	{ 0x1, SDL_SCANCODE_KP_7 }, { 0x2, SDL_SCANCODE_KP_8 }, { 0x3, SDL_SCANCODE_KP_9 }, { 0xc, SDL_SCANCODE_KP_MULTIPLY },
-		{ 0x4, SDL_SCANCODE_KP_4 }, { 0x5, SDL_SCANCODE_KP_5 }, { 0x6, SDL_SCANCODE_KP_6 }, { 0xd, SDL_SCANCODE_KP_MINUS },
-		{ 0x7, SDL_SCANCODE_KP_1 }, { 0x8, SDL_SCANCODE_KP_2 }, { 0x9, SDL_SCANCODE_KP_3 }, { 0xe, SDL_SCANCODE_KP_PLUS },
-		{ 0xa, SDL_SCANCODE_KP_0 }, { 0x0, SDL_SCANCODE_KP_COMMA }, { 0xb, SDL_SCANCODE_KP_ENTER }, { 0xf, SDL_SCANCODE_KP_PERIOD },
-		{ ESCAPE_KEY_CODE, SDL_SCANCODE_ESCAPE}, { RETURN_KEY_CODE, SDL_SCANCODE_RETURN } }
+m_keyPairs	{{KEY_0, SDL_SCANCODE_KP_0}, 
+		{KEY_1, SDL_SCANCODE_KP_7}, {KEY_2, SDL_SCANCODE_KP_8}, {KEY_3, SDL_SCANCODE_KP_9},
+		{KEY_4, SDL_SCANCODE_KP_4}, {KEY_5, SDL_SCANCODE_KP_5}, {KEY_6, SDL_SCANCODE_KP_6}, 
+		{KEY_7, SDL_SCANCODE_KP_1}, {KEY_8, SDL_SCANCODE_KP_2}, {KEY_9, SDL_SCANCODE_KP_3}, 
+		{KEY_A, SDL_SCANCODE_KP_DIVIDE}, {KEY_B, SDL_SCANCODE_KP_MULTIPLY}, {KEY_C, SDL_SCANCODE_KP_MINUS},
+		{KEY_D, SDL_SCANCODE_KP_PLUS}, {KEY_E, SDL_SCANCODE_KP_PERIOD}, {KEY_F, SDL_SCANCODE_KP_ENTER},
+		{NO_KEY_PRESSED, NO_KEY_PRESSED}, {RESET, SDL_SCANCODE_RETURN}, {ESCAPE, SDL_SCANCODE_ESCAPE}}
+	
 {
 	LOG("Creating SdlInput object...");
 	this->UpdateKeys();
-	
 }
 
 
 
-SdlInput::~SdlInput() noexcept
+SdlInput::~SdlInput()
 {
 	
 	LOG("Destroying SdlInput object...");
@@ -32,18 +34,21 @@ SdlInput::~SdlInput() noexcept
 
 
 
-bool SdlInput::IsKeyPressed(const int key)  const noexcept
+bool SdlInput::IsKeyPressed(const EmulatorKey key)  const noexcept
 {
-	
-	return m_keys[ m_currentKeys.at(key) ] == SDL_TRUE;
+	if(key > MAX_KEY_OFFSET)
+		return false;
+	else
+		return m_keyboardState[ m_keyPairs[key].second ] == SDL_TRUE;
 }
 
 
-int SdlInput::GetPressedKeyValue() const noexcept
+EmulatorKey SdlInput::GetPressedKeyValue() const noexcept
 {
-	auto itr = std::find_if(m_currentKeys.begin(), m_currentKeys.end(),
-		[&](const std::pair<const int,SDL_Scancode> &keyPair) {return m_keys[keyPair.second] == SDL_TRUE; });
-	return (itr != m_currentKeys.end()) ? itr->first : NO_KEY_PRESSED;
+	auto itr = std::find_if(m_keyPairs.begin(), m_keyPairs.end(),
+		[&](auto &keyPair) {return m_keyboardState[keyPair.second] == SDL_TRUE; });
+		
+	return (itr != m_keyPairs.end()) ? (EmulatorKey)itr->first : NO_KEY_PRESSED;
 }
 
 
@@ -52,7 +57,7 @@ inline void SdlInput::UpdateKeys() noexcept
 {
 
 	SDL_PumpEvents();
-	m_keys = SDL_GetKeyboardState(NULL);
+	m_keyboardState = SDL_GetKeyboardState(NULL);
 
 }
 

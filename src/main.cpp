@@ -8,47 +8,46 @@ int main(int argc, char **argv)
 	
 	if (argc < 0)
 	{
-		std::cout << "No game to load, exiting." << std::endl;
+		LOGerr("No game to load, exiting.");
 		return 0;
 	}
 	
+	Chip8 *chip8Cpu = new Chip8();
 	
-	Chip8 *myChip8 = new(std::nothrow) Chip8();
-	
-	if(myChip8 == nullptr)
+	if(chip8Cpu == nullptr)
 	{
-		LOGerr("can't allocate memory for Chip8: ("<< sizeof(Chip8) << " Bytes), or memory problem.");
+		LOGerr("failed to allocate the chip8 object...");
 		return 1;
 	}
 	
-	if(!myChip8->initialize())
+	if(!chip8Cpu->initialize())
 	{
-		myChip8->dispose();
-		delete myChip8;
+		chip8Cpu->dispose();
+		delete chip8Cpu;
 		return 1;
 	}
 
-	if(!myChip8->loadRom(argv[1]))
+	if(!chip8Cpu->loadRom(argv[1]))
 	{
-		myChip8->dispose();
-		delete myChip8;
+		chip8Cpu->dispose();
+		delete chip8Cpu;
 		return 1;
 	}
 	
 	
-	while(!myChip8->wantToExit())
+	while(!chip8Cpu->wantToExit())
 	{
 	
-		myChip8->updateCpuState();
-		myChip8->executeInstruction();
+		chip8Cpu->updateCpuState();
+		chip8Cpu->executeInstruction();
 	
-		if(myChip8->getDrawFlag())
-			myChip8->drawGraphics();
+		if(chip8Cpu->getDrawFlag())
+			chip8Cpu->drawGraphics();
 	}
 	
 	
-	myChip8->dispose();
-	delete myChip8;
+	chip8Cpu->dispose();
+	delete chip8Cpu;
 	
 	
 	//std::cin.ignore(1); //for LOG read

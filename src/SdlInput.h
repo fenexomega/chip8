@@ -1,27 +1,36 @@
 #ifndef SDLINPUT_H
 #define SDLINPUT_H
-#include <unordered_map>
-#include <SDL2/SDL.h>
+
+#include <vector>
 #include "interfaces/iInput.h"
 
 
-using std::unordered_map;
 
-class SdlInput : public iInput
+class SdlInput final : public iInput
 {
 // iInput interface
 public:
-    inline void UpdateKeys() noexcept;
-    bool IsKeyPressed(const int key)	const noexcept;
-    int GetPressedKeyValue()	const noexcept;
-    SdlInput() noexcept;
-    ~SdlInput() noexcept;
-
+	SdlInput() noexcept;
+	~SdlInput();
+	void UpdateKeys() noexcept;
+	bool IsKeyPressed(const EmulatorKey key) const noexcept;
+	EmulatorKey GetPressedKeyValue() const noexcept;
+	
 private:
-    unordered_map<int,SDL_Scancode> m_currentKeys;
-    const uint8_t* m_keys;
-
-
+	const unsigned char* m_keyboardState;
+	std::vector<std::pair<int, int>> m_keyPairs;
 };
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif // SDLINPUT_H

@@ -15,7 +15,7 @@
 
 
 Chip8::Chip8() : 
-	m_drawFlag (false), m_interrupted (false), m_gfxResolution(64,32), m_memory ( nullptr )
+	m_drawFlag (false), m_interrupted (false), m_gfxResolution(WIDTH,HEIGHT), m_memory ( nullptr )
 	
 {
 	LOG("Creating Chip8 object...");
@@ -27,7 +27,6 @@ void Chip8::dispose()
 {
 	// reverse deallocation
 	m_input.reset();
-	
 	m_renderer->Dispose();
 	m_renderer.reset();
 	
@@ -86,7 +85,8 @@ bool Chip8::initialize() noexcept
 {
 
 	LOG("Initializing Chip8 Systems...");
-	dynamic_assert((m_memory == nullptr), "Chip8 initialize called again, before dispose resources...");
+	if(m_memory != nullptr)
+		this->dispose();
 	
 	
 	m_pc     = 0x200;	// Program counter starts at 0x200
@@ -217,7 +217,7 @@ void Chip8::updateCpuState() noexcept
 	m_input->UpdateKeys();
 	
 	// check if reset button is pressed
-	if(m_input->IsKeyPressed(RETURN_KEY_CODE))
+	if(m_input->IsKeyPressed(RESET))
 		this->reset();
 
 
@@ -266,7 +266,7 @@ bool Chip8::setResolution(size_t x, size_t y) noexcept
 
 uint8_t Chip8::waitKeyPress() noexcept
 {	
-	int key = NO_KEY_PRESSED;
+	EmulatorKey key = NO_KEY_PRESSED;
 	do
 	{
 		m_input->UpdateKeys();
@@ -591,13 +591,13 @@ void Chip8::executeInstruction() noexcept
 			switch (m_opcode & 0x000f)
 			{
 				case 0xE: // EX9E: Skips the next instruction if the key stored in VX is pressed.
-					if(m_input->IsKeyPressed(VX))
+					if(m_input->IsKeyPressed((EmulatorKey)VX))
 						m_pc += 2;
 					break;
 
 
 				case 0x1: //0xEXA1	Skips the next instruction if the key stored in VX isn't pressed.
-					if(!m_input->IsKeyPressed(VX))
+					if(!m_input->IsKeyPressed((EmulatorKey)VX))
 						m_pc += 2;
 					break;
 

@@ -7,7 +7,7 @@ struct SDL_Texture;
 #include "interfaces/iRenderer.h"
 
 
-class SdlRenderer : public iRenderer
+class SdlRenderer final : public iRenderer
 {
 
 public:
@@ -19,11 +19,11 @@ public:
 	
 	void Dispose() noexcept;
 
-	bool IsWindowClosed() noexcept;
+	bool IsWindowClosed() const noexcept;
 
 	~SdlRenderer();
 private:
-	inline bool CheckWindowState() noexcept;
+	inline bool CheckWindowState() const noexcept;
 	SDL_Window *m_window;
 	SDL_Renderer *m_rend;
 	SDL_Texture *m_texture;

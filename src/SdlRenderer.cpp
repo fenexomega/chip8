@@ -3,7 +3,7 @@
 #include "SdlRenderer.h"
 #include "utility/log.h"
 
-constexpr int fps { 1000/ 60 };
+
 
 
 
@@ -20,8 +20,8 @@ void SdlRenderer::Dispose() noexcept
 	SDL_DestroyTexture(m_texture);
 	SDL_DestroyRenderer(m_rend);
 	SDL_DestroyWindow(m_window);
-	m_needToDispose = false;
 	SDL_Quit();
+	m_needToDispose = false;
 }
 
 
@@ -41,8 +41,10 @@ SdlRenderer::~SdlRenderer()
 bool SdlRenderer::Initialize(const int width,const int height) noexcept
 {
 
-	assert(!m_needToDispose); // assert that the class have no need to dispose
-	m_needToDispose = true; // now the class need to dispose
+	
+	if(m_needToDispose)
+		this->Dispose();
+	
 	if(SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
 		LOG("Couldn't start the application: " << SDL_GetError());
@@ -99,7 +101,7 @@ void SdlRenderer::Render(const void *gfx) noexcept
 	SDL_UpdateTexture(m_texture, nullptr, gfx, m_pitch);
 	SDL_RenderCopy(m_rend, m_texture, nullptr, nullptr);
 	SDL_RenderPresent(m_rend);
-	SDL_Delay(fps);
+	SDL_Delay(FPS);
 }
 
 
@@ -108,7 +110,8 @@ void SdlRenderer::Render(const void *gfx) noexcept
 
 
 
-inline bool SdlRenderer::CheckWindowState() noexcept
+inline 
+bool SdlRenderer::CheckWindowState() const noexcept
 {
 	static SDL_Event event;
 	SDL_PollEvent(&event);
@@ -119,7 +122,7 @@ inline bool SdlRenderer::CheckWindowState() noexcept
 
 
 
-bool SdlRenderer::IsWindowClosed() noexcept
+bool SdlRenderer::IsWindowClosed() const noexcept
 {
 	
 	return CheckWindowState();
