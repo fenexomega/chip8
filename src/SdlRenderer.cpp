@@ -101,7 +101,7 @@ void SdlRenderer::Render(const void *gfx) noexcept
 	SDL_UpdateTexture(m_texture, nullptr, gfx, m_pitch);
 	SDL_RenderCopy(m_rend, m_texture, nullptr, nullptr);
 	SDL_RenderPresent(m_rend);
-	SDL_Delay(FPS);
+	//SDL_Delay(FPS);
 }
 
 

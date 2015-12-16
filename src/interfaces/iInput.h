@@ -3,7 +3,7 @@
 
 
 
-enum EmulatorKey
+enum EmulatorKey: unsigned char
 {
 	//Chip8 keypad, which will be emulated in the computer's keypad
 	KEY_0,
