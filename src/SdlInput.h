@@ -18,7 +18,7 @@ public:
 	
 private:
 	const unsigned char* m_keyboardState;
-	std::vector<std::pair<int,int>> m_keyPairs;
+	std::vector<std::pair<uint8_t,int>> m_keyPairs;
 };
 
 

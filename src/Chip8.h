@@ -2,7 +2,7 @@
 #define CHIP8_H
 #include <memory>
 #include <SDL2/SDL.h>
-#undef main // for windows builds
+#undef main
 
 
 #include "interfaces/iRenderer.h"
@@ -14,9 +14,9 @@
 constexpr size_t MEMORY_MAX        = 0xFFF;
 constexpr size_t STACK_MAX         = 16;
 constexpr size_t V_REGISTERS_MAX   = 16;
-constexpr long   ROM_MAX_SIZE { MEMORY_MAX - 0x200 };
+constexpr long   ROM_MAX_SIZE      =  MEMORY_MAX - 0x200;
 
-constexpr unsigned int CHIP8_CLOCK_FREQUENCY = { CLOCKS_PER_SEC / 60 };
+constexpr unsigned int CHIP8_CLOCK_FREQUENCY = CLOCKS_PER_SEC / 60;
 constexpr size_t WIDTH   = 64;
 constexpr size_t HEIGHT  = 32;
 
