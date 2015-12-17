@@ -36,19 +36,16 @@ SdlInput::~SdlInput()
 
 bool SdlInput::IsKeyPressed(const EmulatorKey key)  const noexcept
 {
-	if(key > MAX_KEY_OFFSET)
-		return false;
-	else
-		return m_keyboardState[ m_keyPairs[key].second ] == SDL_TRUE;
+	return m_keyboardState[ m_keyPairs[key].second ] == SDL_TRUE;
 }
 
 
-EmulatorKey SdlInput::GetPressedKeyValue() const noexcept
+uint8_t SdlInput::GetPressedKeyValue() const noexcept
 {
 	auto itr = std::find_if(m_keyPairs.begin(), m_keyPairs.end(),
-		[&](auto &keyPair) {return m_keyboardState[keyPair.second] == SDL_TRUE; });
+		[&](const auto &keyPair) {return m_keyboardState[keyPair.second] == SDL_TRUE; });
 		
-	return (itr != m_keyPairs.end()) ? (EmulatorKey)itr->first : NO_KEY_PRESSED;
+	return (itr != m_keyPairs.end()) ? itr->first : NO_KEY_PRESSED;
 }
 
 

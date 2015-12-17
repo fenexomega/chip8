@@ -107,25 +107,11 @@ void SdlRenderer::Render(const void *gfx) noexcept
 
 
 
-
-
-
-inline 
-bool SdlRenderer::CheckWindowState() const noexcept
+bool SdlRenderer::IsWindowClosed() const noexcept
 {
 	static SDL_Event event;
 	SDL_PollEvent(&event);
 	return (event.type == SDL_QUIT);
-		
-	
-}
-
-
-
-bool SdlRenderer::IsWindowClosed() const noexcept
-{
-	
-	return CheckWindowState();
 }
 
 

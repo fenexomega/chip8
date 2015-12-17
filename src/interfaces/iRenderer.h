@@ -9,6 +9,7 @@ class iRenderer
 
 public:
 	virtual ~iRenderer() {}
+	
 	virtual bool Initialize(const int,const int) noexcept = 0; 
 
 		

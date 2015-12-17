@@ -2,17 +2,18 @@
 #include "Chip8.h"
 
 
+
+
 int main(int argc, char **argv)
 {
 
-	
 	if (argc < 0)
 	{
 		LOGerr("No game to load, exiting.");
 		return 0;
 	}
 	
-	Chip8 *chip8Cpu = new Chip8();
+	Chip8 *chip8Cpu = new(std::nothrow) Chip8();
 	
 	if(chip8Cpu == nullptr)
 	{
@@ -34,9 +35,9 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	
-	
 	while(!chip8Cpu->wantToExit())
 	{
+	
 	
 		chip8Cpu->updateCpuState();
 		chip8Cpu->executeInstruction();
@@ -45,12 +46,8 @@ int main(int argc, char **argv)
 			chip8Cpu->drawGraphics();
 	}
 	
-	
 	chip8Cpu->dispose();
 	delete chip8Cpu;
-	
-	
-	//std::cin.ignore(1); //for LOG read
 	
 	
 	return 0;

@@ -23,7 +23,6 @@ public:
 
 	~SdlRenderer();
 private:
-	inline bool CheckWindowState() const noexcept;
 	SDL_Window *m_window;
 	SDL_Renderer *m_rend;
 	SDL_Texture *m_texture;

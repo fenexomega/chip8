@@ -3,7 +3,7 @@
 
 
 
-enum EmulatorKey: unsigned char
+enum EmulatorKey: uint8_t
 {
 	//Chip8 keypad, which will be emulated in the computer's keypad
 	KEY_0,
@@ -20,6 +20,7 @@ enum EmulatorKey: unsigned char
 	
 	NO_KEY_PRESSED // does not count as a key, but is returned if none of the others are pressed
 };
+
 constexpr int MAX_KEY_OFFSET = 17;
 
 class iInput
@@ -28,7 +29,7 @@ public:
 	virtual ~iInput() {}
 	virtual void UpdateKeys() noexcept = 0;
 	virtual bool IsKeyPressed(const EmulatorKey key) const noexcept = 0;
-	virtual EmulatorKey GetPressedKeyValue() const noexcept = 0;
+	virtual uint8_t GetPressedKeyValue() const noexcept = 0;
 	
 };
 

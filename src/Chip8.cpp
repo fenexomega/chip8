@@ -4,9 +4,6 @@
 
 
 #include "utility/log.h"
-#include "utility/dynamic_assert.h"
-
-
 #include "SdlRenderer.h"
 #include "SdlInput.h"
 #include "Chip8.h"
@@ -94,7 +91,6 @@ bool Chip8::initialize() noexcept
 	m_sp     = 0;		// Reset stack pointer
 	m_soundTimer = 0;	
 	m_delayTimer = 0;
-	
 	m_drawFlag = false;
 	
 	m_memory = new(std::nothrow) uint8_t[MEMORY_MAX];
@@ -138,7 +134,7 @@ bool Chip8::initialize() noexcept
 	};
 	
 	
-	std::memcpy(m_memory,chip8_fontset, 80 * sizeof(uint8_t)); // copy fontset to memory.
+	std::memcpy(m_memory,chip8_fontset, sizeof(uint8_t) * 80); // copy fontset to memory.
 	
 	if( ! (initGraphics() & initInput()) )
 	{
@@ -186,6 +182,7 @@ bool Chip8::loadRom(const char *romFileName) noexcept
 	return true;
 }
 
+
 inline void Chip8::cleanFlags() noexcept
 {
 	m_drawFlag = false;
@@ -214,18 +211,15 @@ void Chip8::updateCpuState() noexcept
 	static auto timerCounter = std::clock();
 	m_input->UpdateKeys();
 	
-	
 	if(m_input->IsKeyPressed(RESET))
 		this->reset();
 		
-	else if(m_input->IsKeyPressed(ESCAPE))
+	if(m_input->IsKeyPressed(ESCAPE) || m_renderer->IsWindowClosed())
 		m_interrupted = true;
-	
-	else if(m_renderer->IsWindowClosed())
-		m_interrupted = true;
+
 	
 	
-	// decrease the timers by 1 every 60th of 1 second
+	// decrease the timers by 1. every 60th of 1 second
 	if ((std::clock() - timerCounter) > CHIP8_CLOCK_FREQUENCY)
 	{
 		if (m_soundTimer > 0)
@@ -270,7 +264,7 @@ bool Chip8::setResolution(size_t x, size_t y) noexcept
 
 uint8_t Chip8::waitKeyPress() noexcept
 {	
-	EmulatorKey key = NO_KEY_PRESSED;
+	uint8_t key = NO_KEY_PRESSED;
 	do
 	{
 		m_input->UpdateKeys();
@@ -301,8 +295,8 @@ void Chip8::executeInstruction() noexcept
 	// X and Y: (4-bit value) register identifier
 	
 	// para maior parte dos casos VX e VY:
-	#define VX m_V [ ( (m_opcode & 0x0f00 ) >> 8)  ]
-	#define VY m_V [ ( (m_opcode & 0x00f0 ) >> 4)  ]
+	#define VX (m_V [ ( (m_opcode & 0x0f00 ) >> 8)  ])
+	#define VY (m_V [ ( (m_opcode & 0x00f0 ) >> 4)  ])
 	#define NNN (m_opcode & 0x0fff)
 	#define NN (m_opcode & 0x00ff)
 	#define N (m_opcode & 0x000f)
@@ -432,21 +426,6 @@ void Chip8::executeInstruction() noexcept
 
 				case 0x4: // 8XY4: Adds VY to VX . VF is set to 1 when theres a carry, and to 0 when there isn't
 				{
-					/* demonstracao :
-
-					auto &VX = V_ [ (opcode_ & 0x0f00)  >> 8];
-					auto &VY = V_ [ (opcode_ & 0x00f0) >> 4];
-
-					unsigned int result = VX + VY;
-
-					if( ( result & 0xffffff00 ) != 0 )
-						V_ [ 0xF ] = true;
-					else
-						V_ [ 0xF ] = false;
-
-					VX = result;
-					*/
-					// otimizado :
 
 					int result = VX + VY; // compute sum
 					m_V [ 0xF ] = ( ( result & 0xff00 ) != 0) ? 1 : 0; // check carry
@@ -583,8 +562,9 @@ void Chip8::executeInstruction() noexcept
 					}
 				}
 
-				m_drawFlag = true;
-				break;
+			m_drawFlag = true;
+			
+			break;
 		
 
 		}
@@ -654,7 +634,7 @@ void Chip8::executeInstruction() noexcept
 
 					m_memory[m_I + 2] = Vx % 10;
 					m_memory[m_I + 1] = (Vx / 10) % 10;
-					m_memory[m_I] = (Vx / 100);
+					m_memory[m_I]     = (Vx / 100);
 
 					break;
 				}

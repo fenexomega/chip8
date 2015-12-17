@@ -14,11 +14,11 @@ public:
 	~SdlInput();
 	void UpdateKeys() noexcept;
 	bool IsKeyPressed(const EmulatorKey key) const noexcept;
-	EmulatorKey GetPressedKeyValue() const noexcept;
+	uint8_t GetPressedKeyValue() const noexcept;
 	
 private:
 	const unsigned char* m_keyboardState;
-	std::vector<std::pair<int, int>> m_keyPairs;
+	std::vector<std::pair<int,int>> m_keyPairs;
 };
 
 
