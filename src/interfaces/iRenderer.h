@@ -8,6 +8,7 @@ class iRenderer
 {
 
 public:
+	virtual ~iRenderer() {}
 	virtual bool Initialize(const int,const int) noexcept = 0; 
 
 		
@@ -20,7 +21,7 @@ public:
 	virtual void Dispose() noexcept = 0;
 
 
-	virtual ~iRenderer() {}
+	
 
 };
 

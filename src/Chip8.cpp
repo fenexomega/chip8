@@ -1,7 +1,6 @@
 #include <cstring>
 #include <cstdio>
 #include <ctime>
-#include <typeinfo>
 
 
 #include "utility/log.h"
@@ -213,16 +212,21 @@ void Chip8::reset() noexcept
 void Chip8::updateCpuState() noexcept
 {
 	static auto timerCounter = std::clock();
-
 	m_input->UpdateKeys();
 	
-	// check if reset button is pressed
+	
 	if(m_input->IsKeyPressed(RESET))
 		this->reset();
-
-
+		
+	else if(m_input->IsKeyPressed(ESCAPE))
+		m_interrupted = true;
+	
+	else if(m_renderer->IsWindowClosed())
+		m_interrupted = true;
+	
+	
 	// decrease the timers by 1 every 60th of 1 second
-	if ((std::clock() - timerCounter) > CLOCKS_PER_SEC / 60)
+	if ((std::clock() - timerCounter) > CHIP8_CLOCK_FREQUENCY)
 	{
 		if (m_soundTimer > 0)
 			--m_soundTimer;

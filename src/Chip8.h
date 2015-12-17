@@ -16,8 +16,10 @@ constexpr size_t STACK_MAX         = 16;
 constexpr size_t V_REGISTERS_MAX   = 16;
 constexpr long   ROM_MAX_SIZE { MEMORY_MAX - 0x200 };
 
+constexpr unsigned int CHIP8_CLOCK_FREQUENCY = { CLOCKS_PER_SEC / 60 };
 constexpr size_t WIDTH   = 64;
 constexpr size_t HEIGHT  = 32;
+
 
 class Chip8
 {
@@ -75,7 +77,7 @@ private:
 
 inline bool Chip8::wantToExit() const noexcept
 {
-	return m_renderer->IsWindowClosed() || m_input->IsKeyPressed(ESCAPE) || m_interrupted;
+	return m_interrupted;
 }
 
 

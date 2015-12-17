@@ -15,21 +15,21 @@ enum EmulatorKey: unsigned char
 	
 	
 	// system keys
-	NO_KEY_PRESSED,
 	RESET,
-	ESCAPE
+	ESCAPE,
+	
+	NO_KEY_PRESSED // does not count as a key, but is returned if none of the others are pressed
 };
-constexpr int MAX_KEY_OFFSET = 18;
+constexpr int MAX_KEY_OFFSET = 17;
 
 class iInput
 {
 public:
+	virtual ~iInput() {}
 	virtual void UpdateKeys() noexcept = 0;
-	//virtual bool IsKeyUp(const int key) const = 0;
-	//virtual bool IsKeyDown(const int key) const = 0;
 	virtual bool IsKeyPressed(const EmulatorKey key) const noexcept = 0;
 	virtual EmulatorKey GetPressedKeyValue() const noexcept = 0;
-	virtual ~iInput() {}
+	
 };
 
 #endif // IINPUT
