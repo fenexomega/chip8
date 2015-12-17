@@ -1,6 +1,5 @@
 #ifndef SDLINPUT_H
 #define SDLINPUT_H
-
 #include <vector>
 #include "interfaces/iInput.h"
 
@@ -12,18 +11,24 @@ class SdlInput final : public iInput
 public:
 	SdlInput() noexcept;
 	~SdlInput();
-	void UpdateKeys() noexcept;
+	bool UpdateKeys() noexcept;
 	bool IsKeyPressed(const EmulatorKey key) const noexcept;
-	uint8_t GetPressedKeyValue() const noexcept;
+	EmulatorKey GetPressedKeyValue() const noexcept;
+	EmulatorKey WaitKeyPress() noexcept;
 	
 private:
 	const unsigned char* m_keyboardState;
-	std::vector<std::pair<uint8_t,int>> m_keyPairs;
+	EmulatorKey m_currentKey;
+	std::vector<std::pair<EmulatorKey,int>> m_keyPairs;
 };
 
 
 
 
+inline EmulatorKey SdlInput::GetPressedKeyValue() const noexcept
+{
+	return m_currentKey;
+}
 
 
 

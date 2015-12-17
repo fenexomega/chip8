@@ -44,7 +44,6 @@ private:
 	bool initGraphics() noexcept;
 	bool initInput() noexcept;
 	void reset() noexcept;
-	uint8_t waitKeyPress() noexcept;
 	
 	bool m_drawFlag;
 	bool m_interrupted;

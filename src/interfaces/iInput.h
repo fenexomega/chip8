@@ -1,6 +1,5 @@
-#ifndef IINPUT
-#define IINPUT
-
+#ifndef IINPUT_H
+#define IINPUT_H
 
 
 enum EmulatorKey: uint8_t
@@ -27,9 +26,11 @@ class iInput
 {
 public:
 	virtual ~iInput() {}
-	virtual void UpdateKeys() noexcept = 0;
+	virtual bool UpdateKeys() noexcept = 0; // return true if there is a key press
+	
 	virtual bool IsKeyPressed(const EmulatorKey key) const noexcept = 0;
-	virtual uint8_t GetPressedKeyValue() const noexcept = 0;
+	virtual EmulatorKey GetPressedKeyValue() const noexcept = 0;
+	virtual EmulatorKey WaitKeyPress() noexcept = 0;
 	
 };
 

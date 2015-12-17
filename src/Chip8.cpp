@@ -209,15 +209,19 @@ void Chip8::reset() noexcept
 void Chip8::updateCpuState() noexcept
 {
 	static auto timerCounter = std::clock();
-	m_input->UpdateKeys();
 	
-	if(m_input->IsKeyPressed(RESET))
-		this->reset();
-		
-	if(m_input->IsKeyPressed(ESCAPE) || m_renderer->IsWindowClosed())
-		m_interrupted = true;
+	if(m_input->UpdateKeys())
+	{
+	
+		if(m_input->IsKeyPressed(EmulatorKey::RESET))
+			this->reset();
+			
+		else if(m_input->IsKeyPressed(EmulatorKey::ESCAPE))
+			m_interrupted = true;
 
-	
+	}
+	else if(m_renderer->IsWindowClosed())
+		m_interrupted = true;
 	
 	// decrease the timers by 1. every 60th of 1 second
 	if ((std::clock() - timerCounter) > CHIP8_CLOCK_FREQUENCY)
@@ -259,23 +263,6 @@ bool Chip8::setResolution(size_t x, size_t y) noexcept
 	}
 
 	return true;		
-}
-
-
-uint8_t Chip8::waitKeyPress() noexcept
-{	
-	uint8_t key = NO_KEY_PRESSED;
-	do
-	{
-		m_input->UpdateKeys();
-		if (this->wantToExit())
-			return 0;
-		key = m_input->GetPressedKeyValue();
-
-	} while(key == NO_KEY_PRESSED);
-	
-	return key;
-	
 }
 
 
@@ -603,7 +590,7 @@ void Chip8::executeInstruction() noexcept
 
 
 				case 0xA: //FX0A	A key press is awaited, and then stored in VX.
-					VX = ( this->waitKeyPress() );
+					VX = ( m_input->WaitKeyPress() );
 					break;
 
 				
