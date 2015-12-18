@@ -95,7 +95,7 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 
 
 
-void SdlRenderer::Render(const void *gfx) noexcept
+void SdlRenderer::Render(const uint32_t *gfx) noexcept
 {
 	
 	SDL_UpdateTexture(m_texture, nullptr, gfx, m_pitch);

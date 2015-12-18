@@ -2,6 +2,8 @@
 #define IINPUT_H
 
 
+constexpr int MAX_KEY_OFFSET = 18;
+
 enum EmulatorKey: uint8_t
 {
 	//Chip8 keypad, which will be emulated in the computer's keypad
@@ -20,19 +22,46 @@ enum EmulatorKey: uint8_t
 	NO_KEY_PRESSED // does not count as a key, but is returned if none of the others are pressed
 };
 
-constexpr int MAX_KEY_OFFSET = 17;
+
 
 class iInput
 {
 public:
 	virtual ~iInput() {}
-	virtual bool UpdateKeys() noexcept = 0; // return true if there is a key press
-	
-	virtual bool IsKeyPressed(const EmulatorKey key) const noexcept = 0;
-	virtual EmulatorKey GetPressedKeyValue() const noexcept = 0;
-	virtual EmulatorKey WaitKeyPress() noexcept = 0;
-	
+
+	inline bool IsKeyPressed(const EmulatorKey key) const noexcept;
+
+	inline EmulatorKey GetPressedKeyValue() const noexcept;
+
+
+
+	virtual bool UpdateKeys() noexcept = 0;                            // return true if there is a key press, store the key in m_currentKey
+
+	virtual EmulatorKey WaitKeyPress() noexcept = 0;                   //Wait for the keypress and return the EmulatorKey
+
+protected:
+	EmulatorKey m_currentKey;
+
 };
+
+
+
+
+
+
+inline
+EmulatorKey iInput::GetPressedKeyValue() const noexcept
+{
+	return m_currentKey;
+}
+
+inline
+bool iInput::IsKeyPressed(const EmulatorKey key)  const noexcept
+{
+	return m_currentKey == key;
+}
+
+
 
 #endif // IINPUT
 

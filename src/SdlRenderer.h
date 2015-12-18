@@ -1,10 +1,12 @@
 #ifndef SDLRENDERER_H
 #define SDLRENDERER_H
+#include "interfaces/iRenderer.h"
+
 
 struct SDL_Window;
 struct SDL_Renderer;
 struct SDL_Texture;
-#include "interfaces/iRenderer.h"
+
 
 
 class SdlRenderer final : public iRenderer
@@ -15,7 +17,7 @@ public:
 
 	bool Initialize(const int width,const int height) noexcept;
 
-	void Render(const void *gfx) noexcept;
+	void Render(const uint32_t *gfx) noexcept;
 	
 	void Dispose() noexcept;
 

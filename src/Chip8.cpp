@@ -167,7 +167,7 @@ bool Chip8::loadRom(const char *romFileName) noexcept
 	std::fseek(romFile, 0, SEEK_SET);
 
 	// check if file size will not overflow emulated memory size
-	if (romFileSize > ROM_MAX_SIZE)
+	if (romFileSize > ROM_SIZE_MAX)
 	{
 		LOGerr("Error, ROM size not compatible, interrupting Chip8 instance.");
 		std::fclose(romFile);
@@ -223,6 +223,7 @@ void Chip8::updateCpuState() noexcept
 	else if(m_renderer->IsWindowClosed())
 		m_interrupted = true;
 	
+
 	// decrease the timers by 1. every 60th of 1 second
 	if ((std::clock() - timerCounter) > CHIP8_CLOCK_FREQUENCY)
 	{

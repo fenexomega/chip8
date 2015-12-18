@@ -2,7 +2,7 @@
 #define IRENDERER_H
 
 
-constexpr unsigned int FPS =  1000/ 60 ;
+constexpr unsigned int FPS =  1000/ 70 ;
 
 class iRenderer
 {
@@ -13,7 +13,7 @@ public:
 	virtual bool Initialize(const int,const int) noexcept = 0; 
 
 		
-	virtual void Render(const void *gfx) noexcept = 0;
+	virtual void Render(const uint32_t *gfx) noexcept = 0;
 
 
 	virtual bool IsWindowClosed() const noexcept = 0;
