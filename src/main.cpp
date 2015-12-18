@@ -8,7 +8,7 @@ int main(int argc, char **argv)
 
 	if (argc < 2)
 	{
-		LOGerr("No game to load, exiting.");
+		LOGerr("No game to load, exiting...");
 		return 0;
 	}
 	

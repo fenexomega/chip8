@@ -1,10 +1,8 @@
 #ifndef CHIP8_H
 #define CHIP8_H
+
+
 #include <memory>
-#include <SDL2/SDL.h>
-#undef main
-
-
 #include "interfaces/iRenderer.h"
 #include "interfaces/iInput.h"
 #include "resolution_t.h"

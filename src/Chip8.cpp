@@ -1,11 +1,13 @@
 #include <cstring>
 #include <cstdio>
 #include <ctime>
-
+#include <memory>
+#include <SDL2/SDL.h>
 
 #include "utility/log.h"
 #include "SdlRenderer.h"
 #include "SdlInput.h"
+
 #include "Chip8.h"
 
 
@@ -291,7 +293,7 @@ void Chip8::executeInstruction() noexcept
 	
 	static auto unkownOpcode = [](unsigned opcode, bool& interrupted)
 	{
-		LOGerr("Unknown Opcode " << std::hex << opcode);
+		LOGerr("Unknown Opcode: " << std::hex << opcode);
 		interrupted = true;
 	};
 	
