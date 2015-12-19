@@ -1,8 +1,6 @@
 #include "utility/log.h"
 #include "Chip8.h"
 
-
-
 int main(int argc, char **argv)
 {
 
@@ -11,6 +9,7 @@ int main(int argc, char **argv)
 		LOGerr("No game to load, exiting...");
 		return 0;
 	}
+
 	
 	Chip8 *chip8Cpu = new(std::nothrow) Chip8();
 	
@@ -34,6 +33,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 	
+
 	while(!chip8Cpu->wantToExit())
 	{
 	
@@ -51,3 +51,4 @@ int main(int argc, char **argv)
 	
 	return 0;
 }
+

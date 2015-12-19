@@ -15,13 +15,17 @@ class SdlRenderer final : public iRenderer
 public:
 	SdlRenderer();
 
-	bool Initialize(const int width,const int height) noexcept;
+	bool Initialize(const int width,const int height, WindowMode mode) noexcept;
 
 	void Render(const uint32_t *gfx) noexcept;
 	
-	void Dispose() noexcept;
-
 	bool IsWindowClosed() const noexcept;
+
+	bool SetWindowPosition(const unsigned x, const unsigned y) noexcept;
+
+	bool SetWindowSize(const unsigned width, const unsigned height) noexcept;
+
+	void Dispose() noexcept;
 
 	~SdlRenderer();
 private:

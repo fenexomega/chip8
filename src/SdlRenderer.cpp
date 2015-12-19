@@ -1,4 +1,4 @@
-#include <cassert>
+#include <limits>
 #include <SDL2/SDL.h>
 #include "SdlRenderer.h"
 #include "utility/log.h"
@@ -38,7 +38,7 @@ SdlRenderer::~SdlRenderer()
 }
 
 
-bool SdlRenderer::Initialize(const int width,const int height) noexcept
+bool SdlRenderer::Initialize(const int width,const int height, WindowMode mode) noexcept
 {
 
 	
@@ -53,9 +53,10 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 	
 	m_pitch = width * 4;
 	
-	m_window = SDL_CreateWindow("Chip8 Emulator",SDL_WINDOWPOS_CENTERED,
-		SDL_WINDOWPOS_CENTERED, width * 4, height * 6, SDL_WINDOW_RESIZABLE);
+	m_window = SDL_CreateWindow("Chip8 Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width * 4, height * 6,
+				    (mode == WindowMode::BORDLESS) ? SDL_WINDOW_BORDERLESS : SDL_WINDOW_RESIZABLE);
 	
+
 	if(m_window == nullptr)
 	{
 		LOG("Couldn't allocate SDL_Window. Error: " << SDL_GetError());
@@ -85,11 +86,11 @@ bool SdlRenderer::Initialize(const int width,const int height) noexcept
 		return false;
 	}
 
-
 	SDL_SetRenderDrawColor(m_rend, 0, 0, 0, 255);
 	SDL_RenderClear(m_rend);
 	SDL_RenderPresent(m_rend);
-		
+
+	m_needToDispose = true;
 	return true;
 }
 
@@ -116,7 +117,30 @@ bool SdlRenderer::IsWindowClosed() const noexcept
 		return false;
 }
 
+bool SdlRenderer::SetWindowPosition(const unsigned x, const unsigned y) noexcept
+{
+	SDL_DisplayMode desktopDisplay;
 
+	if(SDL_GetDesktopDisplayMode(0, &desktopDisplay) != 0){
+		LOGerr("Failed to get desktop display mode: " << SDL_GetError());
+		return false;
+	}
+
+	else if(x > static_cast<unsigned>(desktopDisplay.h) || y > static_cast<unsigned>(desktopDisplay.w))
+		return false;
+
+	SDL_SetWindowPosition(m_window, x, y);
+	return true;
+}
+
+
+
+bool SdlRenderer::SetWindowSize(const unsigned width, const unsigned height) noexcept
+{
+
+	SDL_SetWindowSize(m_window, width, height);
+	return true;
+}
 
 
 

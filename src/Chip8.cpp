@@ -46,7 +46,7 @@ Chip8::~Chip8()
 
 
 
-bool Chip8::initGraphics() noexcept
+bool Chip8::initRenderer(WindowMode mode) noexcept
 {
 	
 	m_renderer.reset(new(std::nothrow) SdlRenderer());
@@ -57,7 +57,7 @@ bool Chip8::initGraphics() noexcept
 		return false;
 	}
 	
-	return m_renderer->Initialize(m_gfxResolution.x, m_gfxResolution.y);
+	return m_renderer->Initialize(m_gfxResolution.x, m_gfxResolution.y, mode);
 }
 
 
@@ -79,7 +79,7 @@ bool Chip8::initInput() noexcept
 
 
 
-bool Chip8::initialize() noexcept
+bool Chip8::initialize(WindowMode mode) noexcept
 {
 
 	LOG("Initializing Chip8 Systems...");
@@ -138,7 +138,7 @@ bool Chip8::initialize() noexcept
 	
 	std::memcpy(m_memory,chip8_fontset, sizeof(uint8_t) * 80); // copy fontset to memory.
 	
-	if( ! (initGraphics() & initInput()) )
+	if( ! (initRenderer(mode) & initInput()) )
 	{
 		LOGerr("interrupting Chip8."); 
 		m_interrupted = true; 
@@ -244,30 +244,15 @@ void Chip8::updateCpuState() noexcept
 
 
 
-bool Chip8::setResolution(size_t x, size_t y) noexcept
+bool Chip8::setWindowPosition(const unsigned x, const unsigned y) noexcept
 {
-	m_gfxResolution.set(x,y);
-	m_gfxBytes =  m_gfxResolution * sizeof(uint32_t);
-	m_gfx.reset(new(std::nothrow) uint32_t[m_gfxResolution]);
-	
-	if(m_gfx == nullptr)
-	{
-		LOGerr("Can't reallocate gfx array. Interrupting Chip8");
-		m_interrupted = true;
-		return false;
-	}
-
-	// clean renderer_ and Initialize with new resolution.
-	m_renderer->Dispose();
-	if( !m_renderer->Initialize(x,y) )
-	{	
-		m_interrupted = true;
-		return false;
-	}
-
-	return true;		
+	return m_renderer->SetWindowPosition(x,y);
 }
 
+bool Chip8::setWindowSize(const unsigned widht, const unsigned height) noexcept
+{
+	return m_renderer->SetWindowSize(widht, height);
+}
 
 
 void Chip8::executeInstruction() noexcept
@@ -322,7 +307,7 @@ void Chip8::executeInstruction() noexcept
 					break;
 				
 				case 0x00FF: // increase resolution to 128x64 ( SuperChip )
-					this->setResolution(128,64);
+					//this->setResolution(128,64);
 					break;
 				
 				

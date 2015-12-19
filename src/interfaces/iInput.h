@@ -33,8 +33,6 @@ public:
 
 	inline EmulatorKey GetPressedKeyValue() const noexcept;
 
-
-
 	virtual bool UpdateKeys() noexcept = 0;                            // return true if there is a key press, store the key in m_currentKey
 
 	virtual EmulatorKey WaitKeyPress() noexcept = 0;                   //Wait for the keypress and return the EmulatorKey

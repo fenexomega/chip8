@@ -45,6 +45,7 @@ bool SdlInput::UpdateKeys() noexcept
 			m_currentKey =  keyPair.first;
 			return true;
 		}
+
 	m_currentKey = NO_KEY_PRESSED;
 	return false;
 }

@@ -23,7 +23,7 @@ class Chip8
 {
 public:
 	Chip8();
-	bool initialize() noexcept;
+	bool initialize(WindowMode mode = WindowMode::RESIZABLE) noexcept;
 	bool loadRom(const char *romFileName) noexcept;
 
 	inline bool getDrawFlag() const noexcept;
@@ -31,7 +31,9 @@ public:
 	inline void drawGraphics() noexcept;
 	void cleanFlags() noexcept;
 	
-	bool setResolution(size_t x, size_t y) noexcept;
+	bool setWindowPosition(const unsigned x, const unsigned y) noexcept;
+	bool setWindowSize(const unsigned widht, const unsigned height) noexcept;
+
 	void updateCpuState()  noexcept;
 	void executeInstruction() noexcept;
 
@@ -39,7 +41,7 @@ public:
 	~Chip8();
 
 private:
-	bool initGraphics() noexcept;
+	bool initRenderer(WindowMode mode) noexcept;
 	bool initInput() noexcept;
 	void reset() noexcept;
 	
