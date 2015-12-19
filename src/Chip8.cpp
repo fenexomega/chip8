@@ -1,19 +1,19 @@
 #include <cstring>
-#include <cstdio>
 #include <ctime>
-#include <memory>
 #include <SDL2/SDL.h>
 
 #include "utility/log.h"
 #include "SdlRenderer.h"
 #include "SdlInput.h"
-
 #include "Chip8.h"
 
 
 
 Chip8::Chip8() : 
-	m_drawFlag (false), m_interrupted (false), m_gfxResolution(WIDTH,HEIGHT), m_memory ( nullptr )
+	m_drawFlag (false),
+	m_interrupted (false),
+	m_gfxResolution(WIDTH,HEIGHT),
+	m_memory ( nullptr )
 	
 {
 	LOG("Creating Chip8 object...");

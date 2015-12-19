@@ -48,7 +48,6 @@ int main(int argc, char **argv)
 	chip8Cpu->dispose();
 	delete chip8Cpu;
 	
-	
 	return 0;
 }
 

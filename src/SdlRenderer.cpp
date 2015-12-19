@@ -1,4 +1,3 @@
-#include <limits>
 #include <SDL2/SDL.h>
 #include "SdlRenderer.h"
 #include "utility/log.h"
@@ -47,7 +46,7 @@ bool SdlRenderer::Initialize(const int width,const int height, WindowMode mode) 
 	
 	if(SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
-		LOG("Couldn't start the application: " << SDL_GetError());
+		LOGerr("Couldn't start the application: " << SDL_GetError());
 		return false;
 	}
 	
@@ -59,7 +58,7 @@ bool SdlRenderer::Initialize(const int width,const int height, WindowMode mode) 
 
 	if(m_window == nullptr)
 	{
-		LOG("Couldn't allocate SDL_Window. Error: " << SDL_GetError());
+		LOGerr("Couldn't allocate SDL_Window. Error: " << SDL_GetError());
 		return false;
 	}
 
@@ -68,7 +67,7 @@ bool SdlRenderer::Initialize(const int width,const int height, WindowMode mode) 
 
 	if(m_rend == nullptr)
 	{
-		LOG("Couldn't allocate SDL_Renderer. Error: " << SDL_GetError());
+		LOGerr("Couldn't allocate SDL_Renderer. Error: " << SDL_GetError());
 		SDL_DestroyWindow(m_window);
 		return false;
 	}
@@ -80,7 +79,7 @@ bool SdlRenderer::Initialize(const int width,const int height, WindowMode mode) 
 	if(m_texture == nullptr)
 	{
 
-		LOG("Couldn't allocate SDL_Texture. Error: " << SDL_GetError());
+		LOGerr("Couldn't allocate SDL_Texture. Error: " << SDL_GetError());
 		SDL_DestroyRenderer(m_rend);
 		SDL_DestroyWindow(m_window);
 		return false;
@@ -117,17 +116,24 @@ bool SdlRenderer::IsWindowClosed() const noexcept
 		return false;
 }
 
+
+
 bool SdlRenderer::SetWindowPosition(const unsigned x, const unsigned y) noexcept
 {
 	SDL_DisplayMode desktopDisplay;
 
-	if(SDL_GetDesktopDisplayMode(0, &desktopDisplay) != 0){
+	if(SDL_GetDesktopDisplayMode(0, &desktopDisplay) != 0)
+	{
 		LOGerr("Failed to get desktop display mode: " << SDL_GetError());
 		return false;
 	}
 
-	else if(x > static_cast<unsigned>(desktopDisplay.h) || y > static_cast<unsigned>(desktopDisplay.w))
+	else if(x > static_cast<unsigned>(desktopDisplay.h)
+			|| y > static_cast<unsigned>(desktopDisplay.w))
+	{
+		LOGerr("SetWindowPosition: position is offscreen");
 		return false;
+	}
 
 	SDL_SetWindowPosition(m_window, x, y);
 	return true;
@@ -135,8 +141,25 @@ bool SdlRenderer::SetWindowPosition(const unsigned x, const unsigned y) noexcept
 
 
 
+
+
 bool SdlRenderer::SetWindowSize(const unsigned width, const unsigned height) noexcept
 {
+	SDL_DisplayMode desktopDisplay;
+
+	if(SDL_GetDesktopDisplayMode(0, &desktopDisplay) != 0)
+	{
+		LOGerr("Failed to get desktop display mode: " << SDL_GetError());
+		return false;
+	}
+
+	else if(width > static_cast<unsigned>(desktopDisplay.w) ||
+			height > static_cast<unsigned>(desktopDisplay.h))
+	{
+		LOGerr("SetWindowSize: size is too large");
+		return false;
+	}
+
 
 	SDL_SetWindowSize(m_window, width, height);
 	return true;

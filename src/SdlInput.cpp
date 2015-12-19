@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <SDL2/SDL.h>
 #include "SdlInput.h"
 #include "utility/log.h"
