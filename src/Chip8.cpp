@@ -25,7 +25,9 @@ void Chip8::dispose()
 {
 	// reverse deallocation
 	m_input.reset();
-	m_renderer->Dispose();
+	if(m_renderer != nullptr)
+		m_renderer->Dispose();
+	
 	m_renderer.reset();
 	
 	m_gfx.reset();
@@ -38,9 +40,11 @@ void Chip8::dispose()
 
 Chip8::~Chip8()
 {
-	LOG("Destroying Chip8 object...");
+	
 	if(m_memory != nullptr)
 		this->dispose(); // for deallocating in reverse order
+
+	LOG("Destroying Chip8 object...");
 }
 
 

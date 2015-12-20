@@ -1,6 +1,8 @@
 #ifndef LOG_H
 #define LOG_H
 
+#define __CHIP8_GUI__
+
 
 #include <iostream>
 #define LOG(x) std::cout << x << std::endl
