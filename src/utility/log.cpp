@@ -1,4 +1,4 @@
 #include "log.h"
-#ifdef __CHIP8_GUI__
+#ifdef QT_GUI_LIB
 std::stringstream global_errorStream;
 #endif

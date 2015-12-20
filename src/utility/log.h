@@ -1,7 +1,7 @@
 #ifndef LOG_H
 #define LOG_H
 
-#define __CHIP8_GUI__
+
 
 
 #include <iostream>
@@ -9,7 +9,7 @@
 
 
 
-#ifndef __CHIP8_GUI__
+#ifndef QT_GUI_LIB
 #define LOGerr(x) std::cerr << x << std::endl
 
 
