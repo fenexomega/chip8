@@ -15,12 +15,12 @@
 
 #else
 #include <sstream>
-extern std::stringstream global_errorStream;
+static std::stringstream global_errorStream;
 
 #define LOGerr(x) global_errorStream << x << std::endl
 
-inline
-std::string GetEmulatorErrorMsg()
+static inline
+std::string GetLogErrorMsg()
 {
 	std::string error = global_errorStream.str();
 	global_errorStream.str(std::string());		// clear global_errorStream

@@ -21,7 +21,6 @@ CONFIG(release, debug|release){
 SOURCES += main.cpp\
         mainwindow.cpp \
     chip8emulator.cpp \
-    ../src/utility/log.cpp \
     ../src/Chip8.cpp \
     ../src/SdlInput.cpp \
     ../src/SdlRenderer.cpp

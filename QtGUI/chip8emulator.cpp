@@ -74,7 +74,7 @@ void exitHandler(QMainWindow &mainWin)
 static
 void errorHandler(QMainWindow &mainWin)
 {
-	QString possibleErrorMsg = GetEmulatorErrorMsg().c_str(); // check if there was an error
+	QString possibleErrorMsg = GetLogErrorMsg().c_str(); // check if there was an error
 
 	if(!possibleErrorMsg.isEmpty())
 		QMetaObject::invokeMethod(&mainWin, "printErrorMessage",

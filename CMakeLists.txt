@@ -15,7 +15,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Wall -Wextra -Winline  -std=c++14")
 # BUILD TYPES
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
 
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
