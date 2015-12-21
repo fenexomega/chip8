@@ -199,8 +199,8 @@ void Chip8::reset() noexcept
 {
 	this->cleanFlags();
 	m_pc      = 0x200;
-	m_opcode  = 0;	
-	m_I = 0;			
+	m_opcode  = 0;
+	m_I = 0;
 	m_sp = 0;
 	m_soundTimer = 0;
 	m_delayTimer = 0;
@@ -219,15 +219,21 @@ void Chip8::updateCpuState() noexcept
 	if(m_input->UpdateKeys())
 	{
 	
-		if(m_input->IsKeyPressed(EmulatorKey::RESET))
+		if(m_input->IsKeyPressed(EmulatorKey::RESET)){
 			this->reset();
+			return;
+		}
 			
-		else if(m_input->IsKeyPressed(EmulatorKey::ESCAPE))
+		else if(m_input->IsKeyPressed(EmulatorKey::ESCAPE)){
 			m_interrupted = true;
+			return;
+		}
 
 	}
-	else if(m_renderer->IsWindowClosed())
+	else if(m_renderer->IsWindowClosed()){
 		m_interrupted = true;
+		return;
+	}
 	
 
 	// decrease the timers by 1. every 60th of 1 second

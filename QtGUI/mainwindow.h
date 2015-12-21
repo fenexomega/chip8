@@ -31,9 +31,9 @@ private:
 	Ui::MainWindow *ui;
 	std::atomic<bool> m_interruptEmulator;
 	Chip8Emulator m_emulator;
-	static constexpr char* defaultBackgroundImage = "./bkg";
-	static constexpr unsigned defaultWindowWidth  = 512;
-	static constexpr unsigned defaultWindowHeight = 256;
+	static constexpr const char* defaultBackgroundImage = "./bkg";
+	static constexpr unsigned defaultWindowWidth        = 512;
+	static constexpr unsigned defaultWindowHeight       = 256;
 
 };
 

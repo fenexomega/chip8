@@ -12,7 +12,7 @@ class Chip8Emulator final : public QThread
 
 public:
 	Chip8Emulator(QMainWindow &win, std::atomic<bool> &interrupt);
-	void run();
+	void run() override;
 	inline void setRomFile(QString fileName);
 
 

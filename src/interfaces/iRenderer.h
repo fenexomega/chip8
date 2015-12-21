@@ -15,7 +15,7 @@ class iRenderer
 {
 
 public:
-	virtual ~iRenderer() {}
+	virtual ~iRenderer() = default;
 	
 	virtual bool Initialize(const int w, const int h, WindowMode mode) noexcept = 0;
 

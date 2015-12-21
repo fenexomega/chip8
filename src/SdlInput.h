@@ -11,8 +11,8 @@ class SdlInput final : public iInput
 public:
 	SdlInput() noexcept;
 	~SdlInput();
-	bool UpdateKeys() noexcept;
-	EmulatorKey WaitKeyPress() noexcept;
+	bool UpdateKeys() noexcept override;
+	EmulatorKey WaitKeyPress() noexcept override;
 	
 private:
 	const unsigned char* m_keyboardState;

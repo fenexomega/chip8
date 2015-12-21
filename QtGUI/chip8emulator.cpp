@@ -21,28 +21,31 @@ void Chip8Emulator::run()
 	QMetaObject::invokeMethod(&m_mainWin, "setVisible",
 				  Qt::QueuedConnection, Q_ARG(bool,false)); // set mainWin invisible
 
-	auto m_chip8 = std::make_unique<Chip8>();
+	auto uniqueChip8 = std::make_unique<Chip8>();
+	
+	// get raw ptr
+	Chip8 *rawChip8 = uniqueChip8.get();                   
 
-	if(!m_chip8->initialize() || !m_chip8->loadRom(m_currentRom.toStdString().c_str()))
+	if(!rawChip8->initialize() || !rawChip8->loadRom(m_currentRom.toStdString().c_str()))
 		return exitHandler(m_mainWin);
 
 
-	else if(! m_chip8->setWindowSize(defaultWidth,defaultHeight) ||
-			! m_chip8->setWindowPosition(m_mainWin.pos().x(), m_mainWin.pos().y()))
+	else if(! rawChip8->setWindowSize(defaultWidth,defaultHeight) ||
+			! rawChip8->setWindowPosition(m_mainWin.pos().x(), m_mainWin.pos().y()))
 	{
 		errorHandler(m_mainWin);
 	}
 
 
 
-	Chip8 *rawChip = m_chip8.get(); // get raw ptr to use in main loop
 
-	while(!m_interrupt && !m_chip8->wantToExit())
+
+	while(! m_interrupt  && ! rawChip8->wantToExit())
 	{
-		rawChip->updateCpuState();
-		rawChip->executeInstruction();
-		if(rawChip->getDrawFlag())
-			rawChip->drawGraphics();
+		rawChip8->updateCpuState();
+		rawChip8->executeInstruction();
+		if(rawChip8->getDrawFlag())
+			rawChip8->drawGraphics();
 	}
 
 	return exitHandler(m_mainWin);

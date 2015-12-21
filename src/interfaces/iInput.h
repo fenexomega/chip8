@@ -27,7 +27,7 @@ enum EmulatorKey: uint8_t
 class iInput
 {
 public:
-	virtual ~iInput() {}
+	virtual ~iInput() = default;
 
 	inline bool IsKeyPressed(const EmulatorKey key) const noexcept;
 
