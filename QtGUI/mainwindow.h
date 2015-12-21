@@ -9,20 +9,21 @@ namespace Ui {
 class MainWindow;
 }
 
-constexpr const char* defaultBackgroundImage = "./bkg";
 
 
-class MainWindow : public QMainWindow
+
+
+class MainWindow final : public QMainWindow
 {
 	Q_OBJECT
 
 public:
-	explicit MainWindow(QWidget *parent = 0);
+	explicit MainWindow(QWidget *parent = nullptr);
 	~MainWindow();
 
 
 private slots:
-	void printErrorMessage(const QString errorMsg);
+	void printErrorMessage(const QString errorMsg) const;
 	void loadRom();
 
 
@@ -30,6 +31,9 @@ private:
 	Ui::MainWindow *ui;
 	std::atomic<bool> m_interruptEmulator;
 	Chip8Emulator m_emulator;
+	static constexpr char* defaultBackgroundImage = "./bkg";
+	static constexpr unsigned defaultWindowWidth  = 512;
+	static constexpr unsigned defaultWindowHeight = 256;
 
 };
 

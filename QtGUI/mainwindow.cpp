@@ -9,8 +9,11 @@ MainWindow::MainWindow(QWidget *parent) :
 	m_interruptEmulator(false),
 	m_emulator(*this, m_interruptEmulator)
 {
+
 	ui->setupUi(this);
-	this->setFixedSize(this->size());
+	this->setFixedSize(defaultWindowWidth, defaultWindowHeight);
+	this->setWindowTitle("Chip8-Emulator");
+
 
 	QPixmap bkgnd(defaultBackgroundImage);
 	bkgnd = bkgnd.scaled(this->size(), Qt::IgnoreAspectRatio);
@@ -20,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	this->setPalette(palette);
 }
+
+
 
 MainWindow::~MainWindow()
 {
@@ -35,7 +40,7 @@ MainWindow::~MainWindow()
 
 
 
-void MainWindow::printErrorMessage(const QString errorMsg)
+void MainWindow::printErrorMessage(const QString errorMsg) const
 {
 	QMessageBox messageBox;
 	messageBox.critical(nullptr,"Error", errorMsg);

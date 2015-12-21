@@ -13,7 +13,10 @@ TEMPLATE = app
 
 LIBS += -lSDL2
 
-QMAKE_CXXFLAGS += -std=c++14
+QMAKE_CXXFLAGS += -std=c++14 -Wall -Wextra
+CONFIG(release, debug|release){
+    QMAKE_CXXFLAGS += -O3 -march=native -Winline
+}
 
 SOURCES += main.cpp\
         mainwindow.cpp \
