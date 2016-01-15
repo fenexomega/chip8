@@ -1,11 +1,11 @@
 #include <cstring>
-#include <ctime>
 #include <SDL2/SDL.h>
 
 #include "utility/log.h"
 #include "SdlRenderer.h"
 #include "SdlInput.h"
 #include "Chip8.h"
+
 
 
 
@@ -112,7 +112,7 @@ bool Chip8::initialize(WindowMode mode) noexcept
 		return false;
 	}
 	
-	std::srand(std::time(0));						// seed rand
+	std::srand(static_cast<unsigned int>(std::time(0))); // seed rand
 	std::memset(m_gfx.get(), 0, m_gfxResolution * sizeof(uint32_t));	// Clear display
 	std::memset(m_stack, 0,     STACK_MAX 	    * sizeof(uint16_t));	// Clear stack
 	std::memset(m_V, 0,         V_REGISTERS_MAX * sizeof(uint8_t));		// Clear registers V0-VF
@@ -219,18 +219,19 @@ void Chip8::updateCpuState() noexcept
 	if(m_input->UpdateKeys())
 	{
 	
-		if(m_input->IsKeyPressed(EmulatorKey::RESET)){
+		if(m_input->IsKeyPressed(EmulatorKey::RESET)) {
 			this->reset();
 			return;
 		}
 			
-		else if(m_input->IsKeyPressed(EmulatorKey::ESCAPE)){
+		else if(m_input->IsKeyPressed(EmulatorKey::ESCAPE)) {
 			m_interrupted = true;
 			return;
 		}
 
 	}
-	else if(m_renderer->IsWindowClosed()){
+
+	else if(m_renderer->IsWindowClosed()) {
 		m_interrupted = true;
 		return;
 	}
@@ -588,7 +589,7 @@ void Chip8::executeInstruction() noexcept
 
 
 				case 0xA: //FX0A	A key press is awaited, and then stored in VX.
-					VX = ( m_input->WaitKeyPress() );
+					VX = static_cast<uint8_t>(m_input->WaitKeyPress());
 					break;
 
 				

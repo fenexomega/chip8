@@ -1,7 +1,6 @@
 #ifndef CHIP8_H
 #define CHIP8_H
-
-
+#include <ctime>
 #include <memory>
 #include "interfaces/iRenderer.h"
 #include "interfaces/iInput.h"
@@ -9,34 +8,32 @@
 
 
 
-constexpr size_t MEMORY_MAX        = 0xFFF;
-constexpr size_t STACK_MAX         = 16;
-constexpr size_t V_REGISTERS_MAX   = 16;
-constexpr long   ROM_SIZE_MAX      =  MEMORY_MAX - 0x200;
-
-constexpr unsigned int CHIP8_CLOCK_FREQUENCY = CLOCKS_PER_SEC / 60;
-constexpr size_t WIDTH   = 64;
-constexpr size_t HEIGHT  = 32;
-
-
 class Chip8
 {
+	constexpr static size_t MEMORY_MAX = 0xFFF;
+	constexpr static size_t STACK_MAX = 16;
+	constexpr static size_t V_REGISTERS_MAX = 16;
+	constexpr static long ROM_SIZE_MAX = MEMORY_MAX - 0x200;
+	constexpr static long CHIP8_CLOCK_FREQUENCY = CLOCKS_PER_SEC / 60;
+	constexpr static size_t WIDTH = 64;
+	constexpr static size_t HEIGHT = 32;
+
 public:
 	Chip8();
+	Chip8(const Chip8&) = delete;
+	Chip8& operator=(const Chip8&) = delete;
+
 	bool initialize(WindowMode mode = WindowMode::RESIZABLE) noexcept;
 	bool loadRom(const char *romFileName) noexcept;
-
-	inline bool getDrawFlag() const noexcept;
-	inline bool wantToExit() const noexcept;
-	inline void drawGraphics() noexcept;
+	void drawGraphics() noexcept;
+	void updateCpuState()  noexcept;
+	void executeInstruction() noexcept;
 	void cleanFlags() noexcept;
-	
 	bool setWindowPosition(const unsigned x, const unsigned y) noexcept;
 	bool setWindowSize(const unsigned widht, const unsigned height) noexcept;
 
-	void updateCpuState()  noexcept;
-	void executeInstruction() noexcept;
-
+	bool getDrawFlag() const noexcept;
+	bool wantToExit()  const noexcept;
 	void dispose();
 	~Chip8();
 
@@ -66,10 +63,6 @@ private:
 	uint16_t m_stack[STACK_MAX];
 	uint16_t m_sp;
 };
-
-
-
-
 
 
 

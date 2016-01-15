@@ -3,13 +3,16 @@
 #include <vector>
 #include "interfaces/iInput.h"
 
-using KeyPairs = std::pair<EmulatorKey,int>;
 
 
 class SdlInput final : public iInput
 {
+	using SDLKey = int;
+	using KeyPairs = std::pair<EmulatorKey, SDLKey>;
 public:
 	SdlInput() noexcept;
+	SdlInput(const SdlInput&) = delete;
+	SdlInput& operator=(const SdlInput&) = delete;
 	~SdlInput();
 	bool UpdateKeys() noexcept override;
 	EmulatorKey WaitKeyPress() noexcept override;
