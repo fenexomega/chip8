@@ -8,7 +8,10 @@
 
 
 SdlRenderer::SdlRenderer() 
-	:	m_window (nullptr), m_rend (nullptr), m_texture (nullptr), m_needToDispose(false)
+	:	m_window (nullptr), 
+	m_rend (nullptr), 
+	m_texture (nullptr), 
+	m_needToDispose(false)
 {
 	LOG("Creating SdlRenderer object...");
 }
@@ -37,15 +40,14 @@ SdlRenderer::~SdlRenderer()
 }
 
 
-bool SdlRenderer::Initialize(const int width,const int height, WindowMode mode) noexcept
+bool SdlRenderer::Initialize(const int width,const int height, WindowMode mode)
 {
 
 	
 	if(m_needToDispose)
 		this->Dispose();
 	
-	if(SDL_Init(SDL_INIT_VIDEO) != 0)
-	{
+	if(SDL_Init(SDL_INIT_VIDEO) != 0) {
 		LOGerr("Couldn't start the application: " << SDL_GetError());
 		return false;
 	}
@@ -56,8 +58,7 @@ bool SdlRenderer::Initialize(const int width,const int height, WindowMode mode) 
 				    (mode == WindowMode::BORDLESS) ? SDL_WINDOW_BORDERLESS : SDL_WINDOW_RESIZABLE);
 	
 
-	if(m_window == nullptr)
-	{
+	if(m_window == nullptr) {
 		LOGerr("Couldn't allocate SDL_Window. Error: " << SDL_GetError());
 		return false;
 	}
@@ -78,7 +79,6 @@ bool SdlRenderer::Initialize(const int width,const int height, WindowMode mode) 
 
 	if(m_texture == nullptr)
 	{
-
 		LOGerr("Couldn't allocate SDL_Texture. Error: " << SDL_GetError());
 		SDL_DestroyRenderer(m_rend);
 		SDL_DestroyWindow(m_window);
@@ -95,7 +95,7 @@ bool SdlRenderer::Initialize(const int width,const int height, WindowMode mode) 
 
 
 
-void SdlRenderer::Render(const uint32_t *gfx) noexcept
+void SdlRenderer::Render(const uint32_t *gfx)
 {
 	
 	SDL_UpdateTexture(m_texture, nullptr, gfx, m_pitch);
@@ -107,7 +107,7 @@ void SdlRenderer::Render(const uint32_t *gfx) noexcept
 
 
 
-bool SdlRenderer::IsWindowClosed() const noexcept
+bool SdlRenderer::IsWindowClosed() const
 {
 	static SDL_Event event;
 	if(SDL_PollEvent(&event))
@@ -118,7 +118,7 @@ bool SdlRenderer::IsWindowClosed() const noexcept
 
 
 
-bool SdlRenderer::SetWindowPosition(const unsigned x, const unsigned y) noexcept
+bool SdlRenderer::SetWindowPosition(const unsigned x, const unsigned y)
 {
 	SDL_DisplayMode desktopDisplay;
 
@@ -143,7 +143,7 @@ bool SdlRenderer::SetWindowPosition(const unsigned x, const unsigned y) noexcept
 
 
 
-bool SdlRenderer::SetWindowSize(const unsigned width, const unsigned height) noexcept
+bool SdlRenderer::SetWindowSize(const unsigned width, const unsigned height)
 {
 	SDL_DisplayMode desktopDisplay;
 

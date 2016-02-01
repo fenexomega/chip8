@@ -26,11 +26,11 @@ class iInput
 public:
 	virtual ~iInput() = default;
 
-	bool IsKeyPressed(const EmulatorKey key) const noexcept;
-	auto GetPressedKeyValue() const noexcept;
+	bool IsKeyPressed(const EmulatorKey key) const;
+	auto GetPressedKeyValue() const;
 
-	virtual bool UpdateKeys() noexcept = 0;          // return true if there is a key press, store the key in m_currentKey
-	virtual EmulatorKey WaitKeyPress() noexcept = 0; // Wait for the keypress and return the EmulatorKey
+	virtual bool UpdateKeys() = 0;          // return true if there is a key press, store the key in m_currentKey
+	virtual EmulatorKey WaitKeyPress() = 0; // Wait for the keypress and return the EmulatorKey
 
 protected:
 	EmulatorKey m_currentKey;
@@ -39,15 +39,11 @@ protected:
 };
 
 
-
-
-inline auto iInput::GetPressedKeyValue() const noexcept
-{
+inline auto iInput::GetPressedKeyValue() const {
 	return static_cast<std::underlying_type_t<EmulatorKey>>(m_currentKey);
 }
 
-inline bool iInput::IsKeyPressed(const EmulatorKey key)  const noexcept
-{
+inline bool iInput::IsKeyPressed(const EmulatorKey key)  const {
 	return m_currentKey == key;
 }
 

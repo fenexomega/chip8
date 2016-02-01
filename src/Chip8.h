@@ -22,32 +22,36 @@ public:
 	Chip8();
 	Chip8(const Chip8&) = delete;
 	Chip8& operator=(const Chip8&) = delete;
-
-	bool initialize(WindowMode mode = WindowMode::RESIZABLE) noexcept;
-	bool loadRom(const char *romFileName) noexcept;
-	void drawGraphics() noexcept;
-	void updateCpuState()  noexcept;
-	void executeInstruction() noexcept;
-	void cleanFlags() noexcept;
-	bool setWindowPosition(const unsigned x, const unsigned y) noexcept;
-	bool setWindowSize(const unsigned widht, const unsigned height) noexcept;
-
-	bool getDrawFlag() const noexcept;
-	bool wantToExit()  const noexcept;
-	void dispose();
 	~Chip8();
 
-private:
-	bool initRenderer(WindowMode mode) noexcept;
-	bool initInput() noexcept;
-	void reset() noexcept;
+
+	bool initialize(WindowMode mode = WindowMode::RESIZABLE);
+	bool loadRom(const char* romFileName);
+	void drawGraphics();
+	void updateCpuState();
+	void executeInstruction();
+	void cleanFlags();
+	void setWindowPosition(const unsigned x, const unsigned y);
+	void setWindowSize(const unsigned widht, const unsigned height);
+
+	bool getDrawFlag() const;
+	bool wantToExit()  const;
+	void dispose() noexcept;
 	
+
+private:
+	bool initRenderer(WindowMode mode);
+	bool initInput();
+	void reset();
+	
+
+private:
 	bool m_drawFlag;
 	bool m_interrupted;
 	size_t m_gfxBytes;
 	resolution_t m_gfxResolution;
 	
-	uint8_t	*m_memory;
+	uint8_t* m_memory;
 	std::unique_ptr<uint32_t[]> m_gfx;
 	std::unique_ptr<iRenderer> m_renderer;
 	std::unique_ptr<iInput>	m_input;
@@ -67,24 +71,17 @@ private:
 
 
 
-inline bool Chip8::wantToExit() const noexcept
-{
+inline bool Chip8::wantToExit() const  {
 	return m_interrupted;
 }
 
 
-inline bool Chip8::getDrawFlag() const noexcept
-{
+inline bool Chip8::getDrawFlag() const {
 	return m_drawFlag;
 }
 
 
 
-inline void Chip8::drawGraphics() noexcept
-{
-	m_renderer->Render(m_gfx.get());
-	m_drawFlag = false;
-}
 
 
 

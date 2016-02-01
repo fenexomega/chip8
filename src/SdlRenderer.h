@@ -15,15 +15,15 @@ class SdlRenderer final : public iRenderer
 public:
 	SdlRenderer();
 
-	bool Initialize(const int width,const int height, WindowMode mode) noexcept override; 
+	bool Initialize(const int width,const int height, WindowMode mode) override; 
 
-	void Render(const uint32_t *gfx) noexcept override;
+	void Render(const uint32_t *gfx) override;
 	
-	bool IsWindowClosed() const noexcept override;
+	bool IsWindowClosed() const override;
 
-	bool SetWindowPosition(const unsigned x, const unsigned y) noexcept override;
+	bool SetWindowPosition(const unsigned x, const unsigned y) override;
 
-	bool SetWindowSize(const unsigned width, const unsigned height) noexcept override;
+	bool SetWindowSize(const unsigned width, const unsigned height) override;
 
 	void Dispose() noexcept override;
 

@@ -19,7 +19,7 @@ static std::stringstream global_errorStream;
 
 #define LOGerr(x) global_errorStream << x << std::endl
 
-static inline
+static
 std::string GetLogErrorMsg()
 {
 	std::string error = global_errorStream.str();

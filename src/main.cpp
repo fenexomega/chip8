@@ -25,13 +25,11 @@ int main(int argc, char **argv)
 
 	while(!chip8Cpu->wantToExit())
 	{
-
 		chip8Cpu->updateCpuState();
 		chip8Cpu->executeInstruction();
 
 		if(chip8Cpu->getDrawFlag())
 			chip8Cpu->drawGraphics();
-		
 	}
 
 
