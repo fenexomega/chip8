@@ -3,8 +3,7 @@
 #include "utility/log.h"
 
 
-SdlInput::SdlInput() noexcept :
-
+SdlInput::SdlInput() :
 	m_keyboardState(SDL_GetKeyboardState(NULL)),
 	m_keyPairs
 	{
@@ -20,8 +19,6 @@ SdlInput::SdlInput() noexcept :
 	this->UpdateKeys();
 }
 
-
-
 SdlInput::~SdlInput()
 {
 	LOG("Destroying SdlInput object...");
@@ -30,7 +27,7 @@ SdlInput::~SdlInput()
 
 
 
-bool SdlInput::UpdateKeys() noexcept
+bool SdlInput::UpdateKeys()
 {
 	SDL_PumpEvents();
 	for(const auto &keyPair : m_keyPairs)
@@ -46,7 +43,7 @@ bool SdlInput::UpdateKeys() noexcept
 
 
 
-EmulatorKey SdlInput::WaitKeyPress() noexcept
+EmulatorKey SdlInput::WaitKeyPress()
 {
 	while(true)
 	{

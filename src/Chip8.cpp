@@ -20,21 +20,15 @@ Chip8::Chip8() :
 	
 }
 
-/* After use Chip8::dispose(), be sure to call, chip8::initSystems() again before you use the object. */
-void Chip8::dispose()
+void Chip8::dispose() noexcept
 {
 	// reverse deallocation
 	m_input.reset();
 	if(m_renderer != nullptr)
 		m_renderer->Dispose();
 	
-	m_renderer.reset();
-	
-	m_gfx.reset();
-	
 	delete[] m_memory;
 	m_memory = nullptr;
-
 }
 
 
@@ -50,7 +44,8 @@ Chip8::~Chip8()
 
 
 
-bool Chip8::initRenderer(WindowMode mode) noexcept
+
+bool Chip8::initRenderer(WindowMode mode)
 {
 	
 	m_renderer.reset(new(std::nothrow) SdlRenderer());
@@ -66,7 +61,7 @@ bool Chip8::initRenderer(WindowMode mode) noexcept
 
 
 
-bool Chip8::initInput() noexcept
+bool Chip8::initInput()
 {
 	
 	m_input.reset(new(std::nothrow) SdlInput());
@@ -81,9 +76,13 @@ bool Chip8::initInput() noexcept
 	return true;
 }
 
+void Chip8::cleanFlags() {
+	m_drawFlag = false;
+	m_interrupted = false;
+}
 
 
-bool Chip8::initialize(WindowMode mode) noexcept
+bool Chip8::initialize(WindowMode mode)
 {
 
 	LOG("Initializing Chip8 Systems...");
@@ -108,15 +107,16 @@ bool Chip8::initialize(WindowMode mode) noexcept
 	if((m_memory == nullptr) || (m_gfx == nullptr))
 	{
 		LOGerr("Cannot allocate memory for GFX or emulated Memory, interrupting Chip8 instance.");
+		this->dispose();
 		m_interrupted = true;
 		return false;
 	}
 	
-	std::srand(static_cast<unsigned int>(std::time(0))); // seed rand
-	std::memset(m_gfx.get(), 0, m_gfxResolution * sizeof(uint32_t));	// Clear display
-	std::memset(m_stack, 0,     STACK_MAX 	    * sizeof(uint16_t));	// Clear stack
-	std::memset(m_V, 0,         V_REGISTERS_MAX * sizeof(uint8_t));		// Clear registers V0-VF
-	std::memset(m_memory, 0,    MEMORY_MAX      * sizeof(uint8_t)); 	// Clear memory
+	std::srand(static_cast<unsigned int>(std::time(0)));             // seed rand
+	std::memset(m_gfx.get(), 0, m_gfxResolution * sizeof(uint32_t)); // Clear display
+	std::memset(m_stack, 0, STACK_MAX * sizeof(uint16_t));           // Clear stack
+	std::memset(m_V, 0, V_REGISTERS_MAX * sizeof(uint8_t));          // Clear registers V0-VF
+	std::memset(m_memory, 0, MEMORY_MAX * sizeof(uint8_t));          // Clear memory
 
 	// Load fontset
 	uint8_t chip8_fontset[80] 
@@ -144,6 +144,7 @@ bool Chip8::initialize(WindowMode mode) noexcept
 	
 	if( ! (initRenderer(mode) & initInput()) )
 	{
+		this->dispose();
 		LOGerr("interrupting Chip8."); 
 		m_interrupted = true; 
 		return false;
@@ -155,7 +156,7 @@ bool Chip8::initialize(WindowMode mode) noexcept
 
 
 
-bool Chip8::loadRom(const char *romFileName) noexcept
+bool Chip8::loadRom(const char *romFileName)
 {
 	LOG("Loading " << romFileName);
 	std::FILE *romFile = std::fopen(romFileName,"rb");
@@ -189,13 +190,9 @@ bool Chip8::loadRom(const char *romFileName) noexcept
 }
 
 
-inline void Chip8::cleanFlags() noexcept
-{
-	m_drawFlag = false;
-	m_interrupted = false;
-}
 
-void Chip8::reset() noexcept
+
+void Chip8::reset()
 {
 	this->cleanFlags();
 	m_pc      = 0x200;
@@ -205,14 +202,14 @@ void Chip8::reset() noexcept
 	m_soundTimer = 0;
 	m_delayTimer = 0;
 	std::memset(m_gfx.get(), 0, m_gfxBytes);
-	std::memset(m_stack,0, STACK_MAX        * sizeof(uint16_t));
-	std::memset(m_V, 0,    V_REGISTERS_MAX  * sizeof(uint8_t));
+	std::memset(m_stack,0, STACK_MAX * sizeof(uint16_t));
+	std::memset(m_V, 0, V_REGISTERS_MAX  * sizeof(uint8_t));
 
 }
 
 
 
-void Chip8::updateCpuState() noexcept
+void Chip8::updateCpuState()
 {
 	static auto timerCounter = std::clock();
 	
@@ -252,25 +249,23 @@ void Chip8::updateCpuState() noexcept
 }
 
 
-
-
-
-bool Chip8::setWindowPosition(const unsigned x, const unsigned y) noexcept
-{
-	return m_renderer->SetWindowPosition(x,y);
-}
-
-bool Chip8::setWindowSize(const unsigned widht, const unsigned height) noexcept
-{
-	return m_renderer->SetWindowSize(widht, height);
+void Chip8::drawGraphics() {
+	m_renderer->Render(m_gfx.get());
+	m_drawFlag = false;
 }
 
 
-void Chip8::executeInstruction() noexcept
-{
+void Chip8::setWindowPosition(const unsigned x, const unsigned y) {
+	m_renderer->SetWindowPosition(x,y);
+}
 
-	
-	
+void Chip8::setWindowSize(const unsigned widht, const unsigned height) {
+	m_renderer->SetWindowSize(widht, height);
+}
+
+
+void Chip8::executeInstruction()
+{
 	m_opcode = ( ( m_memory[ m_pc ] << 8 ) | m_memory [ m_pc + 1 ] );
 	
 	m_pc += 2;
@@ -314,11 +309,11 @@ void Chip8::executeInstruction() noexcept
 					break;
 
 				case 0x00FC: // scroll screen 4 pixels left  ( SuperChip )
-					LOG("Scrolling Left");					
+					LOG("Scrolling Left");
 					break;
 				
 				case 0x00FF: // increase resolution to 128x64 ( SuperChip )
-					//this->setResolution(128,64);
+					m_renderer->SetWindowSize(128 * 4, 64 * 4);
 					break;
 				
 				

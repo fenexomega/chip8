@@ -1,21 +1,21 @@
 #ifndef SDLINPUT_H
 #define SDLINPUT_H
 #include <vector>
+#include <SDL2/SDL_keyboard.h>
 #include "interfaces/iInput.h"
-
 
 
 class SdlInput final : public iInput
 {
-	using SDLKey = int;
-	using KeyPairs = std::pair<EmulatorKey, SDLKey>;
+	using KeyPairs = std::pair<EmulatorKey, SDL_Scancode>;
 public:
-	SdlInput() noexcept;
+	SdlInput();
 	SdlInput(const SdlInput&) = delete;
 	SdlInput& operator=(const SdlInput&) = delete;
 	~SdlInput();
-	bool UpdateKeys() noexcept override;
-	EmulatorKey WaitKeyPress() noexcept override;
+
+	bool UpdateKeys() override;
+	EmulatorKey WaitKeyPress() override;
 	
 private:
 	const unsigned char* m_keyboardState;
