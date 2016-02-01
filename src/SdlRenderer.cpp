@@ -7,10 +7,11 @@
 
 
 
-SdlRenderer::SdlRenderer() 
-	:	m_window (nullptr), 
+SdlRenderer::SdlRenderer() :
+	m_window (nullptr), 
 	m_rend (nullptr), 
-	m_texture (nullptr), 
+	m_texture (nullptr),
+	m_event (nullptr),
 	m_needToDispose(false)
 {
 	LOG("Creating SdlRenderer object...");
@@ -22,7 +23,6 @@ void SdlRenderer::Dispose() noexcept
 	SDL_DestroyTexture(m_texture);
 	SDL_DestroyRenderer(m_rend);
 	SDL_DestroyWindow(m_window);
-	SDL_Quit();
 	m_needToDispose = false;
 }
 
@@ -31,24 +31,30 @@ void SdlRenderer::Dispose() noexcept
 
 SdlRenderer::~SdlRenderer()
 {
-
 	LOG("Destroying SdlRenderer object...");
 	if(m_needToDispose)
 		this->Dispose();
-
 	
+	SDL_Quit();	
 }
 
 
-bool SdlRenderer::Initialize(const int width,const int height, WindowMode mode)
+bool SdlRenderer::Initialize(const int width, const int height, WindowMode mode)
 {
 
 	
 	if(m_needToDispose)
 		this->Dispose();
 	
-	if(SDL_Init(SDL_INIT_VIDEO) != 0) {
+	if( SDL_Init(SDL_INIT_VIDEO) != SDL_FALSE ) {
 		LOGerr("Couldn't start the application: " << SDL_GetError());
+		return false;
+	}
+
+	m_event = new(std::nothrow) SDL_Event;
+
+	if(m_event == nullptr) {
+		LOGerr("Couldn't allocate memory. SdlRenderer::Initialize");
 		return false;
 	}
 	
@@ -63,7 +69,7 @@ bool SdlRenderer::Initialize(const int width,const int height, WindowMode mode)
 		return false;
 	}
 
-	m_rend = SDL_CreateRenderer(m_window,-1, SDL_RENDERER_ACCELERATED);
+	m_rend = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED);
 
 
 	if(m_rend == nullptr)
@@ -89,6 +95,7 @@ bool SdlRenderer::Initialize(const int width,const int height, WindowMode mode)
 	SDL_RenderClear(m_rend);
 	SDL_RenderPresent(m_rend);
 
+	
 	m_needToDispose = true;
 	return true;
 }
@@ -97,7 +104,6 @@ bool SdlRenderer::Initialize(const int width,const int height, WindowMode mode)
 
 void SdlRenderer::Render(const uint32_t *gfx)
 {
-	
 	SDL_UpdateTexture(m_texture, nullptr, gfx, m_pitch);
 	SDL_RenderCopy(m_rend, m_texture, nullptr, nullptr);
 	SDL_RenderPresent(m_rend);
@@ -109,9 +115,8 @@ void SdlRenderer::Render(const uint32_t *gfx)
 
 bool SdlRenderer::IsWindowClosed() const
 {
-	static SDL_Event event;
-	if(SDL_PollEvent(&event))
-		return (event.type == SDL_QUIT);
+	if(SDL_PollEvent(m_event))
+		return (m_event->type == SDL_QUIT);
 	else
 		return false;
 }
@@ -122,15 +127,15 @@ bool SdlRenderer::SetWindowPosition(const unsigned x, const unsigned y)
 {
 	SDL_DisplayMode desktopDisplay;
 
-	if(SDL_GetDesktopDisplayMode(0, &desktopDisplay) != 0)
-	{
+	if ( SDL_GetDesktopDisplayMode(0, &desktopDisplay) != 0 ) {
 		LOGerr("Failed to get desktop display mode: " << SDL_GetError());
 		return false;
 	}
 
-	else if(x > static_cast<unsigned>(desktopDisplay.h)
-			|| y > static_cast<unsigned>(desktopDisplay.w))
+	else if( x > static_cast<unsigned>(desktopDisplay.h) 
+		|| y > static_cast<unsigned>(desktopDisplay.w)) 
 	{
+		
 		LOGerr("SetWindowPosition: position is offscreen");
 		return false;
 	}
@@ -146,22 +151,21 @@ bool SdlRenderer::SetWindowPosition(const unsigned x, const unsigned y)
 bool SdlRenderer::SetWindowSize(const unsigned width, const unsigned height)
 {
 	SDL_DisplayMode desktopDisplay;
-
-	if(SDL_GetDesktopDisplayMode(0, &desktopDisplay) != 0)
-	{
+	if ( SDL_GetDesktopDisplayMode(0, &desktopDisplay) != 0 ) {		
 		LOGerr("Failed to get desktop display mode: " << SDL_GetError());
 		return false;
 	}
 
-	else if(width > static_cast<unsigned>(desktopDisplay.w) ||
+	else if( width > static_cast<unsigned>(desktopDisplay.w) ||
 			height > static_cast<unsigned>(desktopDisplay.h))
 	{
 		LOGerr("SetWindowSize: size is too large");
 		return false;
 	}
 
-
+	
 	SDL_SetWindowSize(m_window, width, height);
+	m_pitch = width * 4;
 	return true;
 }
 

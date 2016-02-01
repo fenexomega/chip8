@@ -142,7 +142,7 @@ bool Chip8::initialize(WindowMode mode)
 	
 	std::memcpy(m_memory,chip8_fontset, sizeof(uint8_t) * 80); // copy fontset to memory.
 	
-	if( ! (initRenderer(mode) & initInput()) )
+	if( !initRenderer(mode) || !initInput())
 	{
 		this->dispose();
 		LOGerr("interrupting Chip8."); 

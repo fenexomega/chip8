@@ -6,7 +6,7 @@
 struct SDL_Window;
 struct SDL_Renderer;
 struct SDL_Texture;
-
+union SDL_Event;
 
 
 class SdlRenderer final : public iRenderer
@@ -29,9 +29,10 @@ public:
 
 	~SdlRenderer();
 private:
-	SDL_Window *m_window;
-	SDL_Renderer *m_rend;
-	SDL_Texture *m_texture;
+	SDL_Window* m_window;
+	SDL_Renderer* m_rend;
+	SDL_Texture* m_texture;
+	SDL_Event* m_event;
 	bool m_needToDispose;
 	int m_pitch;
 	
