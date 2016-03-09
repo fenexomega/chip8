@@ -1,7 +1,9 @@
 #ifndef IINPUT_H
 #define IINPUT_H
+#include <functional>
 
 // system constants
+#define MAX_KEYS 18
 enum class EmulatorKey : uint8_t
 {
 	//Chip8 keypad, which will be emulated in the computer's keypad
@@ -16,37 +18,30 @@ enum class EmulatorKey : uint8_t
 	// system keys
 	RESET,
 	ESCAPE,
-
-	NO_KEY_PRESSED, // does not count as a key, but is returned if none of the others are pressed
-	MAX_KEY_OFFSET = 17 // do not count as a key.
+	
+	// does not count as a key, but is returned if none of the others are pressed
+	NO_KEY_PRESSED 
 };
+
+
 
 class iInput
 {
 public:
+		using WaitKeyPressPred = const std::function<bool()>;
+public:
+
 	virtual ~iInput() = default;
+	virtual bool IsKeyPressed(const EmulatorKey key) const = 0;
+	virtual uint8_t GetPressedKeyValue() const = 0;
 
-	bool IsKeyPressed(const EmulatorKey key) const;
-	auto GetPressedKeyValue() const;
+	// return true if there is a key press, store the key in m_currentKey
+	virtual bool UpdateKeys() = 0;   
 
-	virtual bool UpdateKeys() = 0;          // return true if there is a key press, store the key in m_currentKey
-	virtual EmulatorKey WaitKeyPress() = 0; // Wait for the keypress and return the EmulatorKey
-
-protected:
-	EmulatorKey m_currentKey;
-
+	// loop until there is a key press or until predicate return false
+	virtual EmulatorKey WaitKeyPress(WaitKeyPressPred predicate) = 0;
 
 };
-
-
-inline auto iInput::GetPressedKeyValue() const {
-	return static_cast<std::underlying_type_t<EmulatorKey>>(m_currentKey);
-}
-
-inline bool iInput::IsKeyPressed(const EmulatorKey key)  const {
-	return m_currentKey == key;
-}
-
 
 
 #endif // IINPUT

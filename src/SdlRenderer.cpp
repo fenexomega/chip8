@@ -3,10 +3,6 @@
 #include "utility/log.h"
 
 
-
-
-
-
 SdlRenderer::SdlRenderer() :
 	m_window (nullptr), 
 	m_rend (nullptr), 
@@ -23,10 +19,9 @@ void SdlRenderer::Dispose() noexcept
 	SDL_DestroyTexture(m_texture);
 	SDL_DestroyRenderer(m_rend);
 	SDL_DestroyWindow(m_window);
+	free(m_event);
 	m_needToDispose = false;
 }
-
-
 
 
 SdlRenderer::~SdlRenderer()
@@ -60,9 +55,11 @@ bool SdlRenderer::Initialize(const int width, const int height, WindowMode mode)
 	
 	m_pitch = width * 4;
 	
+	
 	m_window = SDL_CreateWindow("Chip8 Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width * 4, height * 6,
 				    (mode == WindowMode::BORDLESS) ? SDL_WINDOW_BORDERLESS : SDL_WINDOW_RESIZABLE);
 	
+	m_windowMode = mode;
 
 	if(m_window == nullptr) {
 		LOGerr("Couldn't allocate SDL_Window. Error: " << SDL_GetError());
@@ -101,6 +98,15 @@ bool SdlRenderer::Initialize(const int width, const int height, WindowMode mode)
 }
 
 
+void SdlRenderer::UpdateEvents()
+{
+	SDL_PollEvent(m_event);
+	if (m_event->type == SDL_WINDOWEVENT
+		&& m_event->window.event == SDL_WINDOWEVENT_RESIZED
+		|| m_event->window.event == SDL_WINDOWEVENT_RESTORED)
+		SDL_RenderPresent(m_rend);
+}
+
 
 void SdlRenderer::Render(const uint32_t *gfx)
 {
@@ -111,16 +117,16 @@ void SdlRenderer::Render(const uint32_t *gfx)
 }
 
 
-
-
 bool SdlRenderer::IsWindowClosed() const
 {
-	if(SDL_PollEvent(m_event))
-		return (m_event->type == SDL_QUIT);
-	else
-		return false;
+	return m_event->type == SDL_QUIT;
 }
 
+
+WindowMode SdlRenderer::GetMode() const 
+{
+	return m_windowMode;
+}
 
 
 bool SdlRenderer::SetWindowPosition(const unsigned x, const unsigned y)

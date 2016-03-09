@@ -14,11 +14,15 @@ public:
 	SdlInput& operator=(const SdlInput&) = delete;
 	~SdlInput();
 
+	bool IsKeyPressed(const EmulatorKey key) const override;
+	uint8_t GetPressedKeyValue() const override;
 	bool UpdateKeys() override;
-	EmulatorKey WaitKeyPress() override;
+	EmulatorKey WaitKeyPress(WaitKeyPressPred pred) override;
+
 	
 private:
 	const unsigned char* m_keyboardState;
+	EmulatorKey m_currentKey;
 	std::vector<KeyPairs> m_keyPairs;
 };
 

@@ -26,7 +26,6 @@ SdlInput::~SdlInput()
 
 
 
-
 bool SdlInput::UpdateKeys()
 {
 	SDL_PumpEvents();
@@ -41,20 +40,35 @@ bool SdlInput::UpdateKeys()
 }
 
 
-
-
-EmulatorKey SdlInput::WaitKeyPress()
+bool SdlInput::IsKeyPressed(const EmulatorKey key) const
 {
-	while(true)
+	return m_currentKey == key;
+}
+
+
+uint8_t SdlInput::GetPressedKeyValue() const
+{
+	return static_cast<uint8_t>(m_currentKey);
+}
+
+
+
+EmulatorKey SdlInput::WaitKeyPress(WaitKeyPressPred pred)
+{
+	while (true)
 	{
+		if (pred != nullptr) {
+			if (!pred())
+				return EmulatorKey::NO_KEY_PRESSED;
+		}
+
 		SDL_PumpEvents();
-		for(auto &keyPair : m_keyPairs)
-			if(m_keyboardState[ keyPair.second ] == SDL_TRUE)
+		for (auto &keyPair : m_keyPairs)
+			if (m_keyboardState[keyPair.second] == SDL_TRUE)
 				return keyPair.first;
 	};
 
 }
-
 
 
 

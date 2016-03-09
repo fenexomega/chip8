@@ -24,8 +24,11 @@ void Chip8::dispose() noexcept
 {
 	// reverse deallocation
 	m_input.reset();
+
 	if(m_renderer != nullptr)
 		m_renderer->Dispose();
+
+	m_renderer.reset();
 	
 	delete[] m_memory;
 	m_memory = nullptr;
@@ -119,7 +122,7 @@ bool Chip8::initialize(WindowMode mode)
 	std::memset(m_memory, 0, MEMORY_MAX * sizeof(uint8_t));          // Clear memory
 
 	// Load fontset
-	uint8_t chip8_fontset[80] 
+	static uint8_t chip8_fontset[80] 
 	{
 		0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
 		0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -209,9 +212,11 @@ void Chip8::reset()
 
 
 
-void Chip8::updateCpuState()
+void Chip8::updateSystemState()
 {
-	static auto timerCounter = std::clock();
+	static auto timer = std::clock();
+
+	m_renderer->UpdateEvents();
 	
 	if(m_input->UpdateKeys())
 	{
@@ -228,21 +233,21 @@ void Chip8::updateCpuState()
 
 	}
 
-	else if(m_renderer->IsWindowClosed()) {
+	else if (m_renderer->IsWindowClosed()) {
 		m_interrupted = true;
 		return;
 	}
-	
+
 
 	// decrease the timers by 1. every 60th of 1 second
-	if ((std::clock() - timerCounter) > CHIP8_CLOCK_FREQUENCY)
+	if ((std::clock() - timer) > CHIP8_CLOCK_FREQUENCY)
 	{
 		if (m_soundTimer > 0)
 			--m_soundTimer;
 		if (m_delayTimer > 0)
 			--m_delayTimer;
 
-		timerCounter = std::clock();
+		timer = std::clock();
 	}
 
 
@@ -584,7 +589,13 @@ void Chip8::executeInstruction()
 
 
 				case 0xA: //FX0A	A key press is awaited, and then stored in VX.
-					VX = static_cast<uint8_t>(m_input->WaitKeyPress());
+				{
+					VX = static_cast<uint8_t>(m_input->WaitKeyPress([&]()
+					{
+						updateSystemState();
+						return !wantToExit(); 
+					}));
+				}
 					break;
 
 				

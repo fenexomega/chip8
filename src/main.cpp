@@ -12,7 +12,6 @@ int main(int argc, char **argv)
 	}
 	
 	auto uniqueChip8Cpu = std::make_unique<Chip8>();
-
 	Chip8 *chip8Cpu = uniqueChip8Cpu.get();
 
 
@@ -25,13 +24,12 @@ int main(int argc, char **argv)
 
 	while(!chip8Cpu->wantToExit())
 	{
-		chip8Cpu->updateCpuState();
 		chip8Cpu->executeInstruction();
-
 		if(chip8Cpu->getDrawFlag())
 			chip8Cpu->drawGraphics();
-	}
 
+		chip8Cpu->updateSystemState();
+	}
 
 	return 0;
 }
