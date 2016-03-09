@@ -589,13 +589,12 @@ void Chip8::executeInstruction()
 
 
 				case 0xA: //FX0A	A key press is awaited, and then stored in VX.
-				{
 					VX = static_cast<uint8_t>(m_input->WaitKeyPress([&]()
 					{
 						updateSystemState();
 						return !wantToExit(); 
 					}));
-				}
+					
 					break;
 
 				
