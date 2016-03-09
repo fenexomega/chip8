@@ -28,7 +28,7 @@ public:
 	bool initialize(WindowMode mode = WindowMode::RESIZABLE);
 	bool loadRom(const char* romFileName);
 	void drawGraphics();
-	void updateCpuState();
+	void updateSystemState();
 	void executeInstruction();
 	void cleanFlags();
 	void setWindowPosition(const unsigned x, const unsigned y);
