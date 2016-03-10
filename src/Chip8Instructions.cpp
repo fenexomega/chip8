@@ -318,13 +318,13 @@ void Chip8Instructions::op_EXxx(Chip8 *const chip)
 {
 	switch (chip->m_opcode & 0x000f)
 	{
-		case 0xE: // EX9E: Skips the next instruction if the key stored in VX is pressed.
+		case 0xE: // EX9E  Skips the next instruction if the key stored in VX is pressed.
 			if (chip->m_input->IsKeyPressed((EmulatorKey)VX))
 				chip->m_pc += 2;
 			break;
 
 
-		case 0x1: //0xEXA1	Skips the next instruction if the key stored in VX isn't pressed.
+		case 0x1: // 0xEXA1  Skips the next instruction if the key stored in VX isn't pressed.
 			if (!chip->m_input->IsKeyPressed((EmulatorKey)VX))
 				chip->m_pc += 2;
 			break;
@@ -341,12 +341,12 @@ void Chip8Instructions::op_FXxx(Chip8 *const chip)
 {
 	switch (chip->m_opcode & 0x000f)
 	{
-		case 0x7: // FX07	Sets VX to the value of the delay timer.
+		case 0x7: // FX07   Sets VX to the value of the delay timer.
 			VX = chip->m_delayTimer;
 			break;
 
 
-		case 0xA: //FX0A	A key press is awaited, and then stored in VX.
+		case 0xA: // FX0A   A key press is awaited, and then stored in VX.
 			VX = static_cast<uint8_t>(chip->m_input->WaitKeyPress(chip, [](void* _this)
 			{
 				((Chip8*)_this)->updateSystemState();
@@ -357,30 +357,29 @@ void Chip8Instructions::op_FXxx(Chip8 *const chip)
 
 
 
-		case 0x8: // FX18	Sets the sound timer to VX.
+		case 0x8: // FX18   Sets the sound timer to VX.
 			chip->m_soundTimer = VX;
 			break;
 
 
 
-		case 0xE://	FX1E	Adds VX to I.
+		case 0xE: // FX1E   Adds VX to I.
 			chip->m_I = ((chip->m_I + VX) & 0xFFFF);
 			break;
 
-		case 0x9: // FX29   Sets I to the location of the sprite for the character in VX. 
-					// Characters 0-F (in hexadecimal) are represented by a 4x5 font.
+		case 0x9: // FX29  Sets I to the location of the sprite for the character in VX. 
+			// Characters 0-F (in hexadecimal) are represented by a 4x5 font.
 			chip->m_I = (VX)* 5;
-
 			break;
 
 
-		case 0x3: //FX33	Stores the Binary - coded decimal representation of VX, 
-		{		 //with the most significant of three digits at the address in I, 
-					//the middle digit at I plus 1, and the least significant digit at I plus 2. 
-					//(In other words, take the decimal representation of VX, place the hundreds digit in memory at location in I, 
-					//the tens digit at location I + 1, and the ones digit at location I + 2.)
+		case 0x3: // FX33   Stores the Binary - coded decimal representation of VX, 
+		{
+			// with the most significant of three digits at the address in I, 
+			// the middle digit at I plus 1, and the least significant digit at I plus 2. 
+			// (In other words, take the decimal representation of VX, place the hundreds digit in memory at location in I, 
+			// the tens digit at location I + 1, and the ones digit at location I + 2.)
 			uint8_t Vx = VX;
-
 			chip->m_memory[chip->m_I + 2] = Vx % 10;
 			chip->m_memory[chip->m_I + 1] = (Vx / 10) % 10;
 			chip->m_memory[chip->m_I] = (Vx / 100);
@@ -389,36 +388,33 @@ void Chip8Instructions::op_FXxx(Chip8 *const chip)
 		}
 
 		case 0x0: // FX30
-		{
 			LOG("FX30");
 			chip->m_I = VX;
 			break;
-		}
 
-
-
+		
 		case 0x5: // BEGIN OF FX*5
-		{
+		{	
 			switch (chip->m_opcode & 0x00ff)
 			{
-				case 0x15: // FX15	Sets the delay timer to VX.
+				case 0x15: // FX15  Sets the delay timer to VX.
 					chip->m_delayTimer = VX;
 					break;
 
-				case 0x55: //FX55	Stores V0 to VX in memory starting at address I
+				case 0x55: //FX55  Stores V0 to VX in memory starting at address I
 					std::memcpy(chip->m_memory + chip->m_I, chip->m_V, ((chip->m_opcode & 0x0f00) >> 8) + 1);
 					break;
 
-				case 0x65: //FX65	Fills V0 to VX with values from memory starting at address I.
+				case 0x65: //FX65  Fills V0 to VX with values from memory starting at address I.
 					std::memcpy(chip->m_V, chip->m_memory + chip->m_I, ((chip->m_opcode & 0x0f00) >> 8) + 1);
 					break;
 
-				default:
-					UnknownOpcode(chip);
+				default: UnknownOpcode(chip);
+					break;
 			}
 
-			break; // END OF FX*5
 		}
+		break; // END OF FX*5
 
 		default: UnknownOpcode(chip); break;
 	}
