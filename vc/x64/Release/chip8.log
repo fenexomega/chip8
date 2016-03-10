@@ -1,0 +1,9 @@
+﻿  Chip8.cpp
+  Chip8Instructions.cpp
+  Generating code
+  3 of 241 functions ( 1.2%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    3 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  chip8.vcxproj -> C:\cygwin64\home\Rafael\Git\github\chip8\vc\x64\Release\chip8.exe
+  chip8.vcxproj -> C:\cygwin64\home\Rafael\Git\github\chip8\vc\x64\Release\chip8.pdb (Full PDB)
