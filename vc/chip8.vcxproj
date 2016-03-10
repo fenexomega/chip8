@@ -21,18 +21,20 @@
   <ItemGroup>
     <ClCompile Include="..\src\Chip8.cpp" />
     <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="..\src\SdlInput.cpp" />
-    <ClCompile Include="..\src\SdlRenderer.cpp" />
+    <ClCompile Include="..\src\sdl\SdlEvents.cpp" />
+    <ClCompile Include="..\src\sdl\SdlInput.cpp" />
+    <ClCompile Include="..\src\sdl\SdlRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Chip8.h" />
     <ClInclude Include="..\src\interfaces\iInput.h" />
     <ClInclude Include="..\src\interfaces\iRenderer.h" />
     <ClInclude Include="..\src\resolution_t.h" />
-    <ClInclude Include="..\src\SdlInput.h" />
-    <ClInclude Include="..\src\SdlRenderer.h" />
+    <ClInclude Include="..\src\sdl\SdlInput.h" />
+    <ClInclude Include="..\src\sdl\SdlRenderer.h" />
     <ClInclude Include="..\src\utility\dynamic_assert.h" />
     <ClInclude Include="..\src\utility\log.h" />
+    <ClInclude Include="..\src\utility\undearlyingtype.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{CCD355EC-2286-41AE-BF0A-37F274B63315}</ProjectGuid>
@@ -87,12 +89,20 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\dev\SDL2\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>C:\Users\Rafael\Documents\WINDOWS_CPP_LIBS\SDL2\SDL2-2.0.3\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\Users\Rafael\Documents\WINDOWS_CPP_LIBS\SDL2\SDL2-2.0.3\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

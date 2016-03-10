@@ -28,18 +28,18 @@ enum class EmulatorKey : uint8_t
 class iInput
 {
 public:
-		using WaitKeyPressPred = const std::function<bool()>;
+		using WaitKeyPressPred = bool(*)(void*);
 public:
 
 	virtual ~iInput() = default;
 	virtual bool IsKeyPressed(const EmulatorKey key) const = 0;
-	virtual uint8_t GetPressedKeyValue() const = 0;
+	virtual EmulatorKey GetPressedKey() const = 0;
 
 	// return true if there is a key press, store the key in m_currentKey
 	virtual bool UpdateKeys() = 0;   
 
 	// loop until there is a key press or until predicate return false
-	virtual EmulatorKey WaitKeyPress(WaitKeyPressPred predicate) = 0;
+	virtual EmulatorKey WaitKeyPress(void* predArg, WaitKeyPressPred pred) = 0;
 
 };
 
