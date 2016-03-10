@@ -31,11 +31,14 @@ public:
 	void updateSystemState();
 	void executeInstruction();
 	void cleanFlags();
+	
 	void setWindowPosition(const unsigned x, const unsigned y);
 	void setWindowSize(const unsigned widht, const unsigned height);
 
+	bool checkResetFlag();
+	bool getResetFlag() const;
 	bool getDrawFlag() const;
-	bool wantToExit()  const;
+	bool wantToExit() const;
 	void dispose() noexcept;
 	
 
@@ -47,7 +50,8 @@ private:
 
 private:
 	bool m_drawFlag;
-	bool m_interrupted;
+	bool m_exitFlag;
+	bool m_resetFlag;
 	size_t m_gfxBytes;
 	resolution_t m_gfxResolution;
 	
@@ -72,13 +76,31 @@ private:
 
 
 inline bool Chip8::wantToExit() const  {
-	return m_interrupted;
+	return m_exitFlag;
 }
+
 
 
 inline bool Chip8::getDrawFlag() const {
 	return m_drawFlag;
 }
+
+inline bool Chip8::getResetFlag() const {
+	return m_resetFlag;
+}
+
+
+inline bool Chip8::checkResetFlag()
+{
+	if (m_resetFlag) {
+		m_resetFlag = false;
+		return true;
+	}
+	return false;
+}
+
+
+
 
 
 

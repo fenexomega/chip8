@@ -2,8 +2,8 @@
 #include <SDL2/SDL.h>
 
 #include "utility/log.h"
-#include "SdlRenderer.h"
-#include "SdlInput.h"
+#include "sdl/SdlRenderer.h"
+#include "sdl/SdlInput.h"
 #include "Chip8.h"
 
 
@@ -11,7 +11,8 @@
 
 Chip8::Chip8() : 
 	m_drawFlag (false),
-	m_interrupted (false),
+	m_exitFlag (false),
+	m_resetFlag (false),
 	m_gfxResolution(WIDTH,HEIGHT),
 	m_memory ( nullptr )
 	
@@ -79,10 +80,14 @@ bool Chip8::initInput()
 	return true;
 }
 
-void Chip8::cleanFlags() {
+void Chip8::cleanFlags() 
+{
 	m_drawFlag = false;
-	m_interrupted = false;
+	m_exitFlag = false;
+	m_resetFlag = false;
 }
+
+
 
 
 bool Chip8::initialize(WindowMode mode)
@@ -111,7 +116,7 @@ bool Chip8::initialize(WindowMode mode)
 	{
 		LOGerr("Cannot allocate memory for GFX or emulated Memory, interrupting Chip8 instance.");
 		this->dispose();
-		m_interrupted = true;
+		m_exitFlag = true;
 		return false;
 	}
 	
@@ -149,7 +154,7 @@ bool Chip8::initialize(WindowMode mode)
 	{
 		this->dispose();
 		LOGerr("interrupting Chip8."); 
-		m_interrupted = true; 
+		m_exitFlag = true; 
 		return false;
 	
 	};
@@ -167,7 +172,7 @@ bool Chip8::loadRom(const char *romFileName)
 	if (romFile == nullptr)
 	{
 		LOGerr("Error at opening ROM file, interrupting Chip8 instance.");
-		m_interrupted = true;
+		m_exitFlag = true;
 		return false;
 	}
 
@@ -181,7 +186,7 @@ bool Chip8::loadRom(const char *romFileName)
 	{
 		LOGerr("Error, ROM size not compatible, interrupting Chip8 instance.");
 		std::fclose(romFile);
-		m_interrupted = true;
+		m_exitFlag = true;
 		return false;
 	}
 
@@ -207,6 +212,7 @@ void Chip8::reset()
 	std::memset(m_gfx.get(), 0, m_gfxBytes);
 	std::memset(m_stack,0, STACK_MAX * sizeof(uint16_t));
 	std::memset(m_V, 0, V_REGISTERS_MAX  * sizeof(uint8_t));
+	m_resetFlag = true;
 
 }
 
@@ -227,14 +233,14 @@ void Chip8::updateSystemState()
 		}
 			
 		else if(m_input->IsKeyPressed(EmulatorKey::ESCAPE)) {
-			m_interrupted = true;
+			m_exitFlag = true;
 			return;
 		}
 
 	}
 
 	else if (m_renderer->IsWindowClosed()) {
-		m_interrupted = true;
+		m_exitFlag = true;
 		return;
 	}
 
@@ -335,7 +341,7 @@ void Chip8::executeInstruction()
 					break;
 
 				default:
-					unkownOpcode(m_opcode, m_interrupted);
+					unkownOpcode(m_opcode, m_exitFlag);
 
 			}
 
@@ -464,7 +470,7 @@ void Chip8::executeInstruction()
 					break;
 
 				default:
-					unkownOpcode(m_opcode, m_interrupted);
+					unkownOpcode(m_opcode, m_exitFlag);
 
 
 			}
@@ -572,7 +578,7 @@ void Chip8::executeInstruction()
 					break;
 
 				default:
-					unkownOpcode(m_opcode, m_interrupted);
+					unkownOpcode(m_opcode, m_exitFlag);
 			}			
 			
 			break; // END OF Exxx
@@ -589,12 +595,12 @@ void Chip8::executeInstruction()
 
 
 				case 0xA: //FX0A	A key press is awaited, and then stored in VX.
-					VX = static_cast<uint8_t>(m_input->WaitKeyPress([&]()
-					{
-						updateSystemState();
-						return !wantToExit(); 
+					VX = static_cast<uint8_t>(m_input->WaitKeyPress(this, [](void* chip)
+					{	
+						((Chip8*)chip)->updateSystemState();
+						return !((Chip8*)chip)->wantToExit() 
+							|| !((Chip8*)chip)->checkResetFlag();
 					}));
-					
 					break;
 
 				
@@ -660,7 +666,7 @@ void Chip8::executeInstruction()
 							break;
 						default:
 							LOG("Unknow opcode " << std::hex << (unsigned) m_opcode);
-							m_interrupted = true;
+							m_exitFlag = true;
 
 					}
 
@@ -669,7 +675,7 @@ void Chip8::executeInstruction()
 				}
 
 				default:
-					unkownOpcode(m_opcode, m_interrupted);
+					unkownOpcode(m_opcode, m_exitFlag);
 				
 				
 			}
@@ -678,7 +684,7 @@ void Chip8::executeInstruction()
 			break; // END OF Fxxx
 		}
 		default:
-			unkownOpcode(m_opcode, m_interrupted);
+			unkownOpcode(m_opcode, m_exitFlag);
 		
 		#undef VX
 		#undef VY
