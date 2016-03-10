@@ -42,6 +42,9 @@
     <ClCompile Include="..\src\sdl\SdlEvents.cpp">
       <Filter>Source Files\sdl</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Chip8Instructions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\resolution_t.h">
@@ -70,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="..\src\utility\undearlyingtype.h">
       <Filter>Header Files\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Chip8Instructions.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

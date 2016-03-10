@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Chip8.cpp" />
+    <ClCompile Include="..\src\Chip8Instructions.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\sdl\SdlEvents.cpp" />
     <ClCompile Include="..\src\sdl\SdlInput.cpp" />
@@ -27,6 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Chip8.h" />
+    <ClInclude Include="..\src\Chip8Instructions.h" />
     <ClInclude Include="..\src\interfaces\iInput.h" />
     <ClInclude Include="..\src\interfaces\iRenderer.h" />
     <ClInclude Include="..\src\resolution_t.h" />

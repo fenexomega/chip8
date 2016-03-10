@@ -29,7 +29,7 @@ SdlRenderer::~SdlRenderer()
 	if(m_needToDispose)
 		this->Dispose();
 	
-	SDL_Quit();	
+	SDL_Quit();
 }
 
 
