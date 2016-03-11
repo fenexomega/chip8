@@ -1,6 +1,6 @@
 #include <memory>
 #include "utility/log.h"
-#include "Chip8/Chip8.h"
+#include "chip8/Chip8.h"
 #include "sdl/SdlRenderer.h"
 #include "sdl/SdlInput.h"
 
