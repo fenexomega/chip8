@@ -279,9 +279,22 @@ void Chip8::setWindowSize(const unsigned widht, const unsigned height) {
 
 void Chip8::executeInstruction()
 {
-	m_opcode = ((m_memory[m_pc] << 8) | m_memory[m_pc + 1]);
-	m_pc += 2;
-	Chip8Instructions::s_instrPtr[(m_opcode & 0xF000) >> 12](this);
+	static Timer instructionTimer(1_sec / 256);
+	static Timer drawTimer ( 1_sec / 60 );
+	
+	if(instructionTimer.Finished())
+	{
+		m_opcode = ((m_memory[m_pc] << 8) | m_memory[m_pc + 1]);
+		m_pc += 2;
+		Chip8Instructions::s_instrPtr[(m_opcode & 0xF000) >> 12](this);	
+		instructionTimer.Start();
+	}
+	
+	if(drawTimer.Finished())
+	{
+		m_drawFlag = true;
+		drawTimer.Start();
+	}
 }
 
 

@@ -95,8 +95,7 @@ void SdlRenderer::UpdateEvents()
 {
 	UpdateSdlEvents();
 	if (g_sdlEvent.type == SDL_WINDOWEVENT
-		&& (g_sdlEvent.window.event == SDL_WINDOWEVENT_RESIZED
-		|| g_sdlEvent.window.event == SDL_WINDOWEVENT_RESTORED))
+		&& g_sdlEvent.window.event == SDL_WINDOWEVENT_RESIZED)
 		SDL_RenderPresent(m_rend);
 }
 

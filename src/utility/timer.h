@@ -20,7 +20,7 @@ private:
 };
 
 
-Timer::Timer(const unsigned long target) noexcept 
+inline Timer::Timer(const unsigned long target) noexcept 
 	: m_clk(std::clock()), 
 	m_target(target)
 {
