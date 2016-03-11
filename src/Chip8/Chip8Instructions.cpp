@@ -2,8 +2,8 @@
 #include <cstring>
 #include "Chip8Instructions.h"
 #include "Chip8.h"
-#include "utility/log.h"
-#include "utility/timer.h"
+#include "../utility/log.h"
+#include "../utility/timer.h"
 
 Chip8Instructions::InstrTable Chip8Instructions::s_instrTbl = nullptr;
 bool Chip8Instructions::Initialize()
@@ -356,7 +356,7 @@ void Chip8Instructions::op_FXxx(Chip8 *const chip)
 
 
 		case 0xA: // FX0A   A key press is awaited, and then stored in VX.
-			VX = static_cast<uint8_t>(chip->m_input->WaitKeyPress(chip, Chip8::waitKeyPressPred));
+			VX = static_cast<uint8_t>(chip->m_input->WaitKeyPress());
 			break;
 
 		case 0x8: // FX18   Sets the sound timer to VX.

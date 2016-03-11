@@ -1,7 +1,8 @@
 #include <memory>
 #include "utility/log.h"
-#include "Chip8.h"
-
+#include "Chip8/Chip8.h"
+#include "sdl/SdlRenderer.h"
+#include "sdl/SdlInput.h"
 
 int main(int argc, char **argv)
 {
@@ -19,8 +20,7 @@ int main(int argc, char **argv)
 
 	Chip8 *chip8Cpu = uniqueChip8Cpu.get();
 
-
-	if(!chip8Cpu->initialize())
+	if(!chip8Cpu->initialize(new(std::nothrow) SdlRenderer(), new(std::nothrow) SdlInput()))
 		return 1;
 
 	else if(!chip8Cpu->loadRom(argv[1]))
@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 	}
 
 	/*  debug */
-	std::atexit([]() {std::cin.ignore(); });
+	//std::atexit([]() {std::cin.ignore(); });
 	return 0;
 }
 

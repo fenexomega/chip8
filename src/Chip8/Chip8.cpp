@@ -1,13 +1,13 @@
 #include <cstring>
-#include <thread>
 #include <chrono>
 #include <SDL2/SDL.h>
-#include "utility/log.h"
-#include "utility/timer.h"
-#include "sdl/SdlRenderer.h"
-#include "sdl/SdlInput.h"
+
 #include "Chip8.h"
 #include "Chip8Instructions.h"
+#include "../utility/log.h"
+#include "../utility/timer.h"
+#include "../sdl/SdlRenderer.h"
+#include "../sdl/SdlInput.h"
 
 static Timer precisionCheck(1_sec);
 static unsigned int instructions = 0;
@@ -27,24 +27,18 @@ void Chip8::dispose() noexcept
 {
 	// reverse deallocation
 	Chip8Instructions::Dispose();
-
 	m_input.reset();
-
-	if(m_renderer != nullptr)
-		m_renderer->Dispose();
-
 	m_renderer.reset();
-	
+
 	delete[] m_memory;
 	m_memory = nullptr;
 }
 
 
 Chip8::~Chip8()
-{
-	
+{	
 	if(m_memory != nullptr)
-		this->dispose(); // for deallocating in reverse order
+		this->dispose();
 
 	LOG("Destroying Chip8 object...");
 }
@@ -53,32 +47,25 @@ Chip8::~Chip8()
 
 
 
-bool Chip8::initRenderer(WindowMode mode)
+bool Chip8::initRenderer()
 {
-	m_renderer.reset(new(std::nothrow) SdlRenderer());
-	if(! m_renderer)
-	{
-		LOGerr("Couldn't allocate SdlRenderer.");
+	if(! m_renderer) {
+		LOGerr("NULL iRenderer.");
 		return false;
 	}	
-	return m_renderer->Initialize(m_gfxResolution.x, m_gfxResolution.y, mode);
+	return m_renderer->Initialize(m_gfxResolution.x, m_gfxResolution.y);
 }
 
 
 
 bool Chip8::initInput()
-{
-	
-	m_input.reset(new(std::nothrow) SdlInput());
-
-	
-	if(! m_input)
-	{
-		LOGerr("Couldn't allocate SdlInput.");
+{	
+	if(! m_input) {
+		LOGerr("NULL iInput.");
 		return false;
 	}
 	
-	return true;
+	return m_input->Initialize();
 }
 
 void Chip8::cleanFlags() 
@@ -89,7 +76,7 @@ void Chip8::cleanFlags()
 
 
 
-bool Chip8::initialize(WindowMode mode)
+bool Chip8::initialize(iRenderer* rend, iInput* input)
 {
 
 	LOG("Initializing Chip8 Systems...");
@@ -147,7 +134,10 @@ bool Chip8::initialize(WindowMode mode)
 	
 	std::memcpy(m_memory,chip8_fontset, sizeof(uint8_t) * 80); // copy fontset to memory.
 	
-	if( !initRenderer(mode) || !initInput() || !Chip8Instructions::Initialize())
+	m_renderer.reset(rend);
+	m_input.reset(input);
+	
+	if( !initRenderer() || !initInput() || !Chip8Instructions::Initialize())
 	{
 		this->dispose();
 		LOGerr("interrupting Chip8."); 
@@ -157,6 +147,7 @@ bool Chip8::initialize(WindowMode mode)
 	};
 
 	m_renderer->SetBuffer(m_gfx.get());
+	m_input->SetWaitKeyPressCallback(waitKeyPressCallback, this);
 	m_timers.instrTimer.SetTargetTime(1_sec / 512);
 	m_timers.drawTimer.SetTargetTime(1_sec / 60);
 	
@@ -230,16 +221,20 @@ void Chip8::setFramesPerSec(unsigned short frames)
 
 void Chip8::updateSystemState()
 {
-	m_renderer->UpdateEvents();
-	
-	if(m_input->UpdateKeys())
+	if(m_renderer->UpdateEvents())
 	{
+		if(m_renderer->IsWinClosed()) {
+			m_exitFlag = true;
+		}
+	}
 	
+	else if(m_input->UpdateKeys())
+	{
 		if(m_input->IsKeyPressed(EmulatorKey::RESET)) {
 			this->reset();
 			return;
 		}
-			
+
 		else if(m_input->IsKeyPressed(EmulatorKey::ESCAPE)) {
 			m_exitFlag = true;
 			return;
@@ -247,14 +242,9 @@ void Chip8::updateSystemState()
 
 	}
 
-	else if (m_renderer->IsWindowClosed()) {
-		m_exitFlag = true;
-		return;
-	}
-
-
 	/* decrease the timers by 1. every 60th of 1 second */
 	static Timer delayAndSoundTimer(60_hz);
+
 	if (delayAndSoundTimer.Finished())
 	{
 		if (m_soundTimer > 0)
@@ -286,7 +276,7 @@ void Chip8::drawGraphics()
 {
 	if (m_timers.drawTimer.Finished())
 	{
-		m_renderer->RenderLastBuffer();
+		m_renderer->RenderBuffer();
 		m_timers.drawTimer.Start();
 		++fps;
 	}
@@ -309,7 +299,7 @@ void Chip8::executeInstruction()
 
 /* update systems while waiting for key*/
 #define _this ((Chip8*)chip)
-bool Chip8::waitKeyPressPred(void *const chip)
+bool Chip8::waitKeyPressCallback(void *const chip)
 {
 	_this->updateSystemState();
 	_this->drawGraphics();

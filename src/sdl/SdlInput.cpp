@@ -19,7 +19,6 @@ SdlInput::SdlInput() :
 	}
 {
 	LOG("Creating SdlInput object...");
-	this->UpdateKeys();
 }
 
 SdlInput::~SdlInput()
@@ -29,6 +28,20 @@ SdlInput::~SdlInput()
 
 
 
+
+bool SdlInput::Initialize()
+{
+	return true;	
+}
+
+
+
+void SdlInput::Dispose() noexcept
+{
+	// ...
+}
+
+
 bool SdlInput::UpdateKeys()
 {
 	UpdateSdlEvents();
@@ -36,6 +49,13 @@ bool SdlInput::UpdateKeys()
 		|| g_sdlEvent.type == SDL_KEYUP;
 	
 }
+
+
+void SdlInput::SetKey(const EmulatorKey key, int value)
+{
+	m_keyPairs[toUType(key)].second = static_cast<SDL_Scancode>(value);
+}
+
 
 
 bool SdlInput::IsKeyPressed(const EmulatorKey key) const
@@ -57,11 +77,11 @@ EmulatorKey SdlInput::GetPressedKey() const
 
 
 
-EmulatorKey SdlInput::WaitKeyPress(void* predArg, WaitKeyPressPred pred)
+EmulatorKey SdlInput::WaitKeyPress()
 {
-	if (pred != nullptr)
+	if (m_waitClbk != nullptr)
 	{
-		while (pred(predArg))
+		while (m_waitClbk(m_waitClbkArg))
 		{
 			for (auto &keyPair : m_keyPairs)
 				if (m_keyboardState[keyPair.second] == SDL_TRUE)
@@ -73,6 +93,18 @@ EmulatorKey SdlInput::WaitKeyPress(void* predArg, WaitKeyPressPred pred)
 }
 
 
+void SdlInput::SetWaitKeyPressCallback(WaitKeyPressCallback callback, void* arg) {
+	m_waitClbk = callback;
+	m_waitClbkArg = arg;
+}
 
 
+void SdlInput::SetResetCallback(ResetCallback resetClbk, void* arg) {
+	m_resetClbk = resetClbk;
+	m_resetClbkArg = arg;
+}
 
+void SdlInput::SetEscapeCallback(EscapeCallback escapeClbk, void* arg) {
+	m_escapeClbk = escapeClbk;
+	m_escapeClbkArg = arg;
+}

@@ -10,7 +10,11 @@ SdlRenderer::SdlRenderer() :
 	m_rend (nullptr), 
 	m_texture (nullptr),
 	m_buffer(nullptr),
-	m_needToDispose(false)
+	m_needToDispose(false),
+	m_closeClbk(nullptr),
+	m_resizeClbk(nullptr),
+	m_closeClbkArg(nullptr),
+	m_resizeClbkArg(nullptr)
 {
 	LOG("Creating SdlRenderer object...");
 }
@@ -35,7 +39,7 @@ SdlRenderer::~SdlRenderer()
 }
 
 
-bool SdlRenderer::Initialize(const int width, const int height, WindowMode mode)
+bool SdlRenderer::Initialize(const int width, const int height)
 {
 
 	
@@ -51,11 +55,10 @@ bool SdlRenderer::Initialize(const int width, const int height, WindowMode mode)
 	m_pitch = width * 4;
 	
 	
-	m_window = SDL_CreateWindow("Chip8 Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width * 4, height * 6,
-				    (mode == WindowMode::BORDLESS) ? SDL_WINDOW_BORDERLESS : SDL_WINDOW_RESIZABLE);
+	m_window = SDL_CreateWindow("Chip8 Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width * 4, height * 6, SDL_WINDOW_RESIZABLE);
 	
-	m_windowMode = mode;
-
+	m_windowMode = WindowMode::RESIZABLE;
+	
 	if(m_window == nullptr) {
 		LOGerr("Couldn't allocate SDL_Window. Error: " << SDL_GetError());
 		return false;
@@ -93,9 +96,25 @@ bool SdlRenderer::Initialize(const int width, const int height, WindowMode mode)
 }
 
 
-void SdlRenderer::UpdateEvents()
+bool SdlRenderer::UpdateEvents()
 {
 	UpdateSdlEvents();
+	if(!m_closeClbk && !m_resizeClbk)
+		return g_sdlEvent.type == SDL_WINDOWEVENT;
+
+	else if(g_sdlEvent.type == SDL_WINDOWEVENT)
+	{
+		if(g_sdlEvent.window.event == SDL_WINDOWEVENT_RESIZED)
+			m_resizeClbk(m_resizeClbkArg);
+		else if(g_sdlEvent.window.event == SDL_WINDOWEVENT_RESTORED)
+			m_resizeClbk(m_resizeClbkArg);
+		else if(g_sdlEvent.window.event == SDL_WINDOWEVENT_CLOSE)
+			m_closeClbk(m_closeClbkArg);
+
+		return true;
+	}
+
+	return false;
 }
 
 void SdlRenderer::SetBuffer(const uint32_t* gfx)
@@ -112,7 +131,7 @@ void SdlRenderer::Render(const uint32_t* gfx)
 }
 
 
-void SdlRenderer::RenderLastBuffer() const
+void SdlRenderer::RenderBuffer()
 {
 	SDL_UpdateTexture(m_texture, nullptr, m_buffer, m_pitch);
 	SDL_RenderCopy(m_rend, m_texture, nullptr, nullptr);
@@ -120,9 +139,9 @@ void SdlRenderer::RenderLastBuffer() const
 }
 
 
-bool SdlRenderer::IsWindowClosed() const
+bool SdlRenderer::IsWinClosed() const
 {
-	return g_sdlEvent.type == SDL_QUIT;
+	return g_sdlEvent.window.event == SDL_WINDOWEVENT_CLOSE;
 }
 
 
@@ -132,7 +151,7 @@ WindowMode SdlRenderer::GetMode() const
 }
 
 
-bool SdlRenderer::SetWindowPosition(const unsigned x, const unsigned y)
+bool SdlRenderer::SetWinPosition(const unsigned x, const unsigned y)
 {
 	SDL_DisplayMode desktopDisplay;
 
@@ -157,7 +176,7 @@ bool SdlRenderer::SetWindowPosition(const unsigned x, const unsigned y)
 
 
 
-bool SdlRenderer::SetWindowSize(const unsigned width, const unsigned height)
+bool SdlRenderer::SetWinSize(const unsigned width, const unsigned height)
 {
 	SDL_DisplayMode desktopDisplay;
 	if ( SDL_GetDesktopDisplayMode(0, &desktopDisplay) != 0 ) {		
@@ -180,3 +199,15 @@ bool SdlRenderer::SetWindowSize(const unsigned width, const unsigned height)
 
 
 
+
+void SdlRenderer::SetWinCloseCallback(WinCloseCallback callback, void* arg)
+{
+	m_closeClbk = callback;
+	m_closeClbkArg = arg;
+}
+
+void SdlRenderer::SetWinResizeCallback(WinResizeCallback callback, void* arg)
+{
+	m_resizeClbk = callback;
+	m_resizeClbkArg = arg;
+}

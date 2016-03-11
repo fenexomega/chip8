@@ -2,10 +2,10 @@
 #define CHIP8_H
 #include <ctime>
 #include <memory>
-#include "interfaces/iRenderer.h"
-#include "interfaces/iInput.h"
-#include "resolution_t.h"
-#include "utility/timer.h"
+#include "../interfaces/iRenderer.h"
+#include "../interfaces/iInput.h"
+#include "../utility/resolution_t.h"
+#include "../utility/timer.h"
 
 
 class Chip8
@@ -23,7 +23,7 @@ public:
 	Chip8& operator=(const Chip8&) = delete;
 	~Chip8();
 
-	bool initialize(WindowMode mode = WindowMode::RESIZABLE);
+	bool initialize(iRenderer* rend, iInput* input);
 	void dispose() noexcept;
 
 	bool getDrawFlag() const;
@@ -43,9 +43,9 @@ public:
 	void setInstrPerSec(unsigned short instrs);
 	void setFramesPerSec(unsigned short frames);
 private:
-	bool initRenderer(WindowMode mode);
+	bool initRenderer();
 	bool initInput();
-	static bool waitKeyPressPred(void *const);
+	static bool waitKeyPressCallback(void* const);
 
 private:
 	bool m_drawFlag;
