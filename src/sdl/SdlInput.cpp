@@ -3,7 +3,8 @@
 #include "../utility/log.h"
 #include "../utility/undearlyingtype.h"
 
-
+extern SDL_Event g_sdlEvent;
+extern void UpdateSdlEvents();
 
 SdlInput::SdlInput() :
 	m_keyboardState(SDL_GetKeyboardState(NULL)),
@@ -31,7 +32,8 @@ SdlInput::~SdlInput()
 bool SdlInput::UpdateKeys()
 {
 	UpdateSdlEvents();
-	return g_sdlEvent.type == SDL_KEYDOWN;
+	return g_sdlEvent.type == SDL_KEYDOWN 
+		|| g_sdlEvent.type == SDL_KEYUP;
 	
 }
 

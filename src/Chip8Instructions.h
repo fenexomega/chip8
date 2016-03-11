@@ -1,19 +1,20 @@
 #ifndef CHIP8_INSTRUCTIONS_H
 #define CHIP8_INSTRUCTIONS_H
-#include "utility/timer.h"
+
 
 class Chip8;
 class Chip8Instructions
 {
 	friend class Chip8;
-	using FunctionPtr = void(*)(Chip8*const);
-	using InstructionPtr = void(**)(Chip8*const);
+	using InstrPtr = void(*)(Chip8*const);
+	using InstrTable = void(**)(Chip8*const);
 	
 	
-	static InstructionPtr s_instrPtr;
+	static InstrTable s_instrTbl;
 	static bool Initialize();
 	static void Dispose() noexcept;
 	static void UnknownOpcode(Chip8 *const);
+
 
 	static void op_0xxx(Chip8 *const); // 3 instructions for 0xxx
 	static void op_1NNN(Chip8 *const); // jumps to address NNN
@@ -31,7 +32,6 @@ class Chip8Instructions
 	static void op_DXYN(Chip8 *const); // DRAW Instruction .....
 	static void op_EXxx(Chip8 *const); // 2 instruction EX9E, EXA1
 	static void op_FXxx(Chip8 *const); // 9 instructions.
-	
 };
 
 

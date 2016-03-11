@@ -9,13 +9,13 @@
 #include "Chip8.h"
 #include "Chip8Instructions.h"
 
-
-
+static Timer precisionCheck(1_sec);
+static unsigned int instructions = 0;
+static unsigned int fps = 0;
 
 Chip8::Chip8() : 
 	m_drawFlag (false),
 	m_exitFlag (false),
-	m_resetFlag (false),
 	m_gfxResolution(WIDTH,HEIGHT),
 	m_memory ( nullptr )
 	
@@ -55,15 +55,12 @@ Chip8::~Chip8()
 
 bool Chip8::initRenderer(WindowMode mode)
 {
-	
 	m_renderer.reset(new(std::nothrow) SdlRenderer());
-	
 	if(! m_renderer)
 	{
 		LOGerr("Couldn't allocate SdlRenderer.");
 		return false;
-	}
-	
+	}	
 	return m_renderer->Initialize(m_gfxResolution.x, m_gfxResolution.y, mode);
 }
 
@@ -88,7 +85,6 @@ void Chip8::cleanFlags()
 {
 	m_drawFlag = false;
 	m_exitFlag = false;
-	m_resetFlag = false;
 }
 
 
@@ -100,7 +96,6 @@ bool Chip8::initialize(WindowMode mode)
 	if(m_memory != nullptr)
 		this->dispose();
 	
-	
 	m_pc     = 0x200;	// Program counter starts at 0x200
 	m_opcode = 0;		// Reset current opcode
 	m_I      = 0;		// Reset index register
@@ -110,7 +105,7 @@ bool Chip8::initialize(WindowMode mode)
 	m_drawFlag = false;
 	
 	m_memory = new(std::nothrow) uint8_t[MEMORY_MAX];
-	m_gfx.reset( new(std::nothrow) uint32_t[m_gfxResolution]);
+	m_gfx.reset(new(std::nothrow) uint32_t[m_gfxResolution]);
 	m_gfxBytes = (m_gfxResolution * sizeof(uint32_t));
 	
 
@@ -160,6 +155,10 @@ bool Chip8::initialize(WindowMode mode)
 		return false;
 	
 	};
+
+	m_renderer->SetBuffer(m_gfx.get());
+	m_timers.instrTimer.SetTargetTime(1_sec / 512);
+	m_timers.drawTimer.SetTargetTime(1_sec / 60);
 	
 	return true;
 }
@@ -214,16 +213,23 @@ void Chip8::reset()
 	std::memset(m_gfx.get(), 0, m_gfxBytes);
 	std::memset(m_stack,0, STACK_MAX * sizeof(uint16_t));
 	std::memset(m_V, 0, V_REGISTERS_MAX  * sizeof(uint8_t));
-	m_resetFlag = true;
 
+}
+
+void Chip8::setInstrPerSec(unsigned short instrs)
+{
+	m_timers.instrTimer.SetTargetTime(1_sec / instrs);
+}
+
+void Chip8::setFramesPerSec(unsigned short frames)
+{
+	m_timers.drawTimer.SetTargetTime(1_sec / frames);
 }
 
 
 
 void Chip8::updateSystemState()
 {
-	static Timer delayAndSoundTimer( 1_sec / 60 );
-
 	m_renderer->UpdateEvents();
 	
 	if(m_input->UpdateKeys())
@@ -247,7 +253,8 @@ void Chip8::updateSystemState()
 	}
 
 
-	// decrease the timers by 1. every 60th of 1 second
+	/* decrease the timers by 1. every 60th of 1 second */
+	static Timer delayAndSoundTimer(60_hz);
 	if (delayAndSoundTimer.Finished())
 	{
 		if (m_soundTimer > 0)
@@ -259,57 +266,57 @@ void Chip8::updateSystemState()
 	}
 
 
+	/* testing timers precisions */
+	if (precisionCheck.Finished())
+	{
+		CLS();
+		printf("INSTRUCTIONS PER SECOND: %i\n", instructions);
+		printf("FRAMES PER SECOND: %i\n", fps);
+		instructions = 0;
+		fps = 0;
+		precisionCheck.Start();
+
+	}
+
+
 }
 
 
-void Chip8::drawGraphics() {
-	m_renderer->Render(m_gfx.get());
-	m_drawFlag = false;
+void Chip8::drawGraphics() 
+{
+	if (m_timers.drawTimer.Finished())
+	{
+		m_renderer->RenderLastBuffer();
+		m_timers.drawTimer.Start();
+		++fps;
+	}
 }
 
-
-void Chip8::setWindowPosition(const unsigned x, const unsigned y) {
-	m_renderer->SetWindowPosition(x,y);
-}
-
-void Chip8::setWindowSize(const unsigned widht, const unsigned height) {
-	m_renderer->SetWindowSize(widht, height);
-}
 
 
 void Chip8::executeInstruction()
 {
-	/* testing timers precisions */
-	static Timer instructionTimer( 1_sec / 666 );
-	static Timer drawTimer (1_sec / 60 );
-	static Timer insPerSec (1_sec);
-	static unsigned int ins = 0;
-	
-	if(instructionTimer.Finished())
+	if(m_timers.instrTimer.Finished())
 	{
-		++ins;
+		++instructions;
 		m_opcode = ((m_memory[m_pc] << 8) | m_memory[m_pc + 1]);
 		m_pc += 2;
-		Chip8Instructions::s_instrPtr[(m_opcode & 0xF000) >> 12](this);	
-		instructionTimer.Start();
-	}
-	
-	if(drawTimer.Finished())
-	{
-		m_drawFlag = true;
-		drawTimer.Start();
-	}
-
-	if(insPerSec.Finished())
-	{
-		CLS();
-		printf("INSTRUCTIONS PER SECOND: %i\n", ins);
-		ins = 0;
-		insPerSec.Start();
-		
+		Chip8Instructions::s_instrTbl[(m_opcode & 0xF000) >> 12](this);	
+		m_timers.instrTimer.Start();
 	}
 }
 
+
+/* update systems while waiting for key*/
+#define _this ((Chip8*)chip)
+bool Chip8::waitKeyPressPred(void *const chip)
+{
+	_this->updateSystemState();
+	_this->drawGraphics();
+	// check if it is reseted or wanna exit
+	return !( (_this->m_opcode == 0) || _this->wantToExit());
+}
+#undef _this
 
 
 

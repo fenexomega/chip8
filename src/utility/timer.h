@@ -16,6 +16,10 @@ constexpr std::chrono::microseconds operator""_micro(unsigned long long x) {
 	return std::chrono::microseconds(x); 
 }
 
+constexpr std::chrono::microseconds operator""_hz(unsigned long long x) {
+	return std::chrono::microseconds(1_sec) / x;
+}
+
 
 class Timer
 {

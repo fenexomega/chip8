@@ -3,39 +3,43 @@
 #include "Chip8Instructions.h"
 #include "Chip8.h"
 #include "utility/log.h"
+#include "utility/timer.h"
 
-Chip8Instructions::InstructionPtr Chip8Instructions::s_instrPtr = nullptr;
+Chip8Instructions::InstrTable Chip8Instructions::s_instrTbl = nullptr;
 bool Chip8Instructions::Initialize()
 {
-	s_instrPtr = (InstructionPtr) std::malloc(sizeof(FunctionPtr) * 0x10);
-	if (s_instrPtr == nullptr) {
+	LOG("Initializing Instruction Table...");
+
+	s_instrTbl = (InstrTable) std::malloc(sizeof(InstrPtr) * 0x10);
+	if (s_instrTbl == nullptr) {
 		LOGerr("Cannot allocate memory for the Instruction Table");
 		return false;
 	}
 
-	s_instrPtr[0] = op_0xxx;
-	s_instrPtr[1] = op_1NNN;
-	s_instrPtr[2] = op_2NNN;
-	s_instrPtr[3] = op_3XNN;
-	s_instrPtr[4] = op_4XNN;
-	s_instrPtr[5] = op_5XY0;
-	s_instrPtr[6] = op_6XNN;
-	s_instrPtr[7] = op_7XNN;
-	s_instrPtr[8] = op_8XYx;
-	s_instrPtr[9] = op_9XY0;
-	s_instrPtr[10] = op_ANNN;
-	s_instrPtr[11] = op_BNNN;
-	s_instrPtr[12] = op_CXNN;
-	s_instrPtr[13] = op_DXYN;
-	s_instrPtr[14] = op_EXxx;
-	s_instrPtr[15] = op_FXxx;
+	s_instrTbl[0] = op_0xxx;
+	s_instrTbl[1] = op_1NNN;
+	s_instrTbl[2] = op_2NNN;
+	s_instrTbl[3] = op_3XNN;
+	s_instrTbl[4] = op_4XNN;
+	s_instrTbl[5] = op_5XY0;
+	s_instrTbl[6] = op_6XNN;
+	s_instrTbl[7] = op_7XNN;
+	s_instrTbl[8] = op_8XYx;
+	s_instrTbl[9] = op_9XY0;
+	s_instrTbl[10] = op_ANNN;
+	s_instrTbl[11] = op_BNNN;
+	s_instrTbl[12] = op_CXNN;
+	s_instrTbl[13] = op_DXYN;
+	s_instrTbl[14] = op_EXxx;
+	s_instrTbl[15] = op_FXxx;
 
 	return true;
 }
 
 void Chip8Instructions::Dispose() noexcept
 {
-	free(s_instrPtr);
+	free(s_instrTbl);
+	LOG("Destroying Instruction Table...");
 }
 
 
@@ -352,15 +356,8 @@ void Chip8Instructions::op_FXxx(Chip8 *const chip)
 
 
 		case 0xA: // FX0A   A key press is awaited, and then stored in VX.
-			VX = static_cast<uint8_t>(chip->m_input->WaitKeyPress(chip, [](void* _this)
-			{
-				((Chip8*)_this)->updateSystemState();
-				return !((Chip8*)_this)->wantToExit()
-					|| !((Chip8*)_this)->checkResetFlag();
-			}));
+			VX = static_cast<uint8_t>(chip->m_input->WaitKeyPress(chip, Chip8::waitKeyPressPred));
 			break;
-
-
 
 		case 0x8: // FX18   Sets the sound timer to VX.
 			chip->m_soundTimer = VX;

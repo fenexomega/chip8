@@ -2,12 +2,14 @@
 #include "SdlRenderer.h"
 #include "../utility/log.h"
 
-
+extern SDL_Event g_sdlEvent;
+extern void UpdateSdlEvents();
 
 SdlRenderer::SdlRenderer() :
 	m_window (nullptr), 
 	m_rend (nullptr), 
 	m_texture (nullptr),
+	m_buffer(nullptr),
 	m_needToDispose(false)
 {
 	LOG("Creating SdlRenderer object...");
@@ -94,18 +96,25 @@ bool SdlRenderer::Initialize(const int width, const int height, WindowMode mode)
 void SdlRenderer::UpdateEvents()
 {
 	UpdateSdlEvents();
-	if (g_sdlEvent.type == SDL_WINDOWEVENT
-		&& g_sdlEvent.window.event == SDL_WINDOWEVENT_RESIZED) {
-		SDL_RenderCopy(m_rend, m_texture, NULL, NULL);	
-		SDL_RenderPresent(m_rend);
+}
 
-	}
+void SdlRenderer::SetBuffer(const uint32_t* gfx)
+{
+	m_buffer = gfx;
 }
 
 
-void SdlRenderer::Render(const uint32_t *gfx)
+void SdlRenderer::Render(const uint32_t* gfx)
 {
 	SDL_UpdateTexture(m_texture, nullptr, gfx, m_pitch);
+	SDL_RenderCopy(m_rend, m_texture, nullptr, nullptr);
+	SDL_RenderPresent(m_rend);
+}
+
+
+void SdlRenderer::RenderLastBuffer() const
+{
+	SDL_UpdateTexture(m_texture, nullptr, m_buffer, m_pitch);
 	SDL_RenderCopy(m_rend, m_texture, nullptr, nullptr);
 	SDL_RenderPresent(m_rend);
 }

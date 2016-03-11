@@ -4,8 +4,6 @@
 #include <SDL2/SDL_keyboard.h>
 #include "../interfaces/iInput.h"
 
-extern SDL_Event g_sdlEvent;
-extern void UpdateSdlEvents();
 
 class SdlInput final : public iInput
 {
