@@ -36,6 +36,7 @@
     <ClInclude Include="..\src\sdl\SdlRenderer.h" />
     <ClInclude Include="..\src\utility\dynamic_assert.h" />
     <ClInclude Include="..\src\utility\log.h" />
+    <ClInclude Include="..\src\utility\timer.h" />
     <ClInclude Include="..\src\utility\undearlyingtype.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

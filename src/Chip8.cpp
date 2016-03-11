@@ -1,7 +1,9 @@
 #include <cstring>
+#include <thread>
+#include <chrono>
 #include <SDL2/SDL.h>
-
 #include "utility/log.h"
+#include "utility/timer.h"
 #include "sdl/SdlRenderer.h"
 #include "sdl/SdlInput.h"
 #include "Chip8.h"
@@ -88,7 +90,6 @@ void Chip8::cleanFlags()
 	m_exitFlag = false;
 	m_resetFlag = false;
 }
-
 
 
 
@@ -221,7 +222,7 @@ void Chip8::reset()
 
 void Chip8::updateSystemState()
 {
-	static auto timer = std::clock();
+	static Timer delayAndSoundTimer( 1_sec / 60 );
 
 	m_renderer->UpdateEvents();
 	
@@ -247,14 +248,14 @@ void Chip8::updateSystemState()
 
 
 	// decrease the timers by 1. every 60th of 1 second
-	if ((std::clock() - timer) > CHIP8_CLOCK_FREQUENCY)
+	if (delayAndSoundTimer.Finished())
 	{
 		if (m_soundTimer > 0)
 			--m_soundTimer;
 		if (m_delayTimer > 0)
 			--m_delayTimer;
 
-		timer = std::clock();
+		delayAndSoundTimer.Start();
 	}
 
 
@@ -278,9 +279,35 @@ void Chip8::setWindowSize(const unsigned widht, const unsigned height) {
 
 void Chip8::executeInstruction()
 {
-	m_opcode = ((m_memory[m_pc] << 8) | m_memory[m_pc + 1]);
-	m_pc += 2;
-	Chip8Instructions::s_instrPtr[(m_opcode & 0xF000) >> 12](this);
+	/* testing timers precisions */
+	static Timer instructionTimer( 1_sec / 666 );
+	static Timer drawTimer (1_sec / 60 );
+	static Timer insPerSec (1_sec);
+	static unsigned int ins = 0;
+	
+	if(instructionTimer.Finished())
+	{
+		++ins;
+		m_opcode = ((m_memory[m_pc] << 8) | m_memory[m_pc + 1]);
+		m_pc += 2;
+		Chip8Instructions::s_instrPtr[(m_opcode & 0xF000) >> 12](this);	
+		instructionTimer.Start();
+	}
+	
+	if(drawTimer.Finished())
+	{
+		m_drawFlag = true;
+		drawTimer.Start();
+	}
+
+	if(insPerSec.Finished())
+	{
+		CLS();
+		printf("INSTRUCTIONS PER SECOND: %i\n", ins);
+		ins = 0;
+		insPerSec.Start();
+		
+	}
 }
 
 

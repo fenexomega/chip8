@@ -1,9 +1,8 @@
 #ifndef CHIP8_INSTRUCTIONS_H
 #define CHIP8_INSTRUCTIONS_H
-
+#include "utility/timer.h"
 
 class Chip8;
-
 class Chip8Instructions
 {
 	friend class Chip8;

@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <cstring>
 #include "Chip8Instructions.h"
 #include "Chip8.h"
 #include "utility/log.h"
@@ -38,6 +39,7 @@ void Chip8Instructions::Dispose() noexcept
 }
 
 
+// 3 instructions in 0xxx
 inline void Chip8Instructions::UnknownOpcode(Chip8 *const chip)
 {
 	LOGerr("Unknown Opcode: " << std::hex << chip->m_opcode);
@@ -50,8 +52,6 @@ inline void Chip8Instructions::UnknownOpcode(Chip8 *const chip)
 // NN: 8 bit constant
 // N: 4 bit constant
 // X and Y: (4-bit value) register identifier
-
-// para maior parte dos casos VX e VY:
 #define VX  (chip->m_V [ ( (chip->m_opcode & 0x0f00 ) >> 8)  ])
 #define VY  (chip->m_V [ ( (chip->m_opcode & 0x00f0 ) >> 4)  ])
 #define NNN (chip->m_opcode & 0x0fff)
@@ -71,8 +71,11 @@ void Chip8Instructions::op_0xxx(Chip8* const chip)
 			break;
 
 		case 0x00EE: // return from a subroutine ( unwind stack )
-			if (chip->m_sp > 0)
-				chip->m_pc = chip->m_stack[--chip->m_sp];
+			chip->m_pc = chip->m_stack[--chip->m_sp];
+			if(chip->m_sp > 16) {
+				LOGerr("Stack Underflow");
+				chip->m_exitFlag = true;
+			}
 			break;
 
 		default:
@@ -95,14 +98,15 @@ void Chip8Instructions::op_1NNN(Chip8 *const chip)
 // 2NNN: Calls subroutine at address NNN
 void Chip8Instructions::op_2NNN(Chip8 *const chip)
 {
+	chip->m_stack[chip->m_sp++] = chip->m_pc;
+	chip->m_pc = NNN;
+
 	if (chip->m_sp >= 16) {
 		LOGerr("Stack Overflow!");
 		chip->m_exitFlag = true;
-		return;
 	}
 	
-	chip->m_stack[chip->m_sp++] = chip->m_pc;
-	chip->m_pc = NNN;
+
 }
 
 
@@ -153,6 +157,10 @@ void Chip8Instructions::op_8XYx(Chip8 *const chip)
 {
 	switch (chip->m_opcode & 0x000f)
 	{
+		
+		default: UnknownOpcode(chip); break;
+
+
 		case 0x0: // 8XY0: store the value of register VY in register VX
 			VX = VY;
 			break;
@@ -212,9 +220,6 @@ void Chip8Instructions::op_8XYx(Chip8 *const chip)
 			chip->m_V[0xF] = ((VX & 0x80) >> 7);  // check the most significant bit
 			VX = ((VX << 1) & 0xFF);
 			break;
-
-		default:
-			UnknownOpcode(chip);
 	}
 
 
@@ -282,6 +287,7 @@ void Chip8Instructions::op_DXYN(Chip8 *const chip)
 	If the current value is different from the value in the memory, the bit value will be 1.
 	If both values match, the bit value will be 0.
 	*/
+
 	chip->m_V[0xF] = 0;
 
 	uint8_t Vx = VX, Vy = VY;
@@ -304,8 +310,6 @@ void Chip8Instructions::op_DXYN(Chip8 *const chip)
 			chip->m_gfx[pixelPos] ^= (pixel) ? ~0 : 0;
 		}
 	}
-
-	chip->m_drawFlag = true;
 }
 
 
@@ -318,6 +322,8 @@ void Chip8Instructions::op_EXxx(Chip8 *const chip)
 {
 	switch (chip->m_opcode & 0x000f)
 	{
+		default: UnknownOpcode(chip); break;
+
 		case 0xE: // EX9E  Skips the next instruction if the key stored in VX is pressed.
 			if (chip->m_input->IsKeyPressed((EmulatorKey)VX))
 				chip->m_pc += 2;
@@ -328,9 +334,6 @@ void Chip8Instructions::op_EXxx(Chip8 *const chip)
 			if (!chip->m_input->IsKeyPressed((EmulatorKey)VX))
 				chip->m_pc += 2;
 			break;
-
-		default:
-			UnknownOpcode(chip);
 	}
 }
 
@@ -341,6 +344,8 @@ void Chip8Instructions::op_FXxx(Chip8 *const chip)
 {
 	switch (chip->m_opcode & 0x000f)
 	{
+		default: UnknownOpcode(chip); break;
+
 		case 0x7: // FX07   Sets VX to the value of the delay timer.
 			VX = chip->m_delayTimer;
 			break;
@@ -369,7 +374,7 @@ void Chip8Instructions::op_FXxx(Chip8 *const chip)
 
 		case 0x9: // FX29  Sets I to the location of the sprite for the character in VX. 
 			// Characters 0-F (in hexadecimal) are represented by a 4x5 font.
-			chip->m_I = (VX)* 5;
+			chip->m_I = VX * 5;
 			break;
 
 
@@ -388,7 +393,6 @@ void Chip8Instructions::op_FXxx(Chip8 *const chip)
 		}
 
 		case 0x0: // FX30
-			LOG("FX30");
 			chip->m_I = VX;
 			break;
 
@@ -397,6 +401,8 @@ void Chip8Instructions::op_FXxx(Chip8 *const chip)
 		{	
 			switch (chip->m_opcode & 0x00ff)
 			{
+				default: UnknownOpcode(chip); break;
+
 				case 0x15: // FX15  Sets the delay timer to VX.
 					chip->m_delayTimer = VX;
 					break;
@@ -409,14 +415,11 @@ void Chip8Instructions::op_FXxx(Chip8 *const chip)
 					std::memcpy(chip->m_V, chip->m_memory + chip->m_I, ((chip->m_opcode & 0x0f00) >> 8) + 1);
 					break;
 
-				default: UnknownOpcode(chip);
-					break;
+			
 			}
-
-		}
-		break; // END OF FX*5
-
-		default: UnknownOpcode(chip); break;
+			
+			break; // END OF FX*5
+		}	
 	}
 
 }
