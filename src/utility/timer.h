@@ -1,45 +1,55 @@
 #ifndef TIMER_H
 #define TIMER_H
-#include <ctime>
+#include <chrono>
 
+constexpr std::chrono::microseconds operator""_sec(unsigned long long x) { 
+	using namespace std::chrono;  
+	return duration_cast<microseconds>(seconds(x)); 
+}
 
-constexpr unsigned long long int operator""_sec(unsigned long long int x) { return x * CLOCKS_PER_SEC; }
+constexpr std::chrono::microseconds operator""_milli(unsigned long long x) {
+	using namespace std::chrono;
+	return duration_cast<microseconds>(milliseconds(x));
+}
+
+constexpr std::chrono::microseconds operator""_micro(unsigned long long x) { 
+	return std::chrono::microseconds(x); 
+}
 
 
 class Timer
 {
 public:
 	Timer() noexcept = default;
-	Timer(const unsigned long target) noexcept;
-	void SetTargetTime(const unsigned long target);
+	Timer(std::chrono::microseconds target) noexcept;
+	void SetTargetTime(std::chrono::microseconds target);
 	bool Finished() const;
 	void Start();
 private:
-	std::clock_t m_clk;
-	std::clock_t m_target;
+	std::chrono::steady_clock::time_point m_clk = std::chrono::steady_clock::now();
+	std::chrono::microseconds m_target;
 };
 
 
-inline Timer::Timer(const unsigned long target) noexcept 
-	: m_clk(std::clock()), 
-	m_target(target)
+inline Timer::Timer(std::chrono::microseconds target) noexcept
+	: m_target(target)
 {
 	
 }
 
-inline void Timer::SetTargetTime(const unsigned long target)
+inline void Timer::SetTargetTime(std::chrono::microseconds target)
 {
 	m_target = target;
 }
 
 inline bool Timer::Finished() const
 {
-	return (( std::clock() - m_clk ) > m_target );
+	return (( std::chrono::steady_clock::now() - m_clk ) > m_target );
 }
 
 inline void Timer::Start()
 {
-	m_clk = std::clock();
+	m_clk = std::chrono::steady_clock::now();
 }
 
 

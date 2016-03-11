@@ -280,7 +280,7 @@ void Chip8::setWindowSize(const unsigned widht, const unsigned height) {
 void Chip8::executeInstruction()
 {
 	/* testing timers precisions */
-	static Timer instructionTimer( 1_sec / 600 );
+	static Timer instructionTimer( 1_sec / 666 );
 	static Timer drawTimer (1_sec / 60 );
 	static Timer insPerSec (1_sec);
 	static unsigned int ins = 0;

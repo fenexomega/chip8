@@ -77,5 +77,8 @@
     <ClInclude Include="..\src\Chip8Instructions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\utility\timer.h">
+      <Filter>Header Files\utility</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

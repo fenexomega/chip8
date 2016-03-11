@@ -374,7 +374,7 @@ void Chip8Instructions::op_FXxx(Chip8 *const chip)
 
 		case 0x9: // FX29  Sets I to the location of the sprite for the character in VX. 
 			// Characters 0-F (in hexadecimal) are represented by a 4x5 font.
-			chip->m_I = (VX)* 5;
+			chip->m_I = VX * 5;
 			break;
 
 
