@@ -80,7 +80,6 @@ inline bool Chip8::wantToExit() const  {
 }
 
 
-
 inline bool Chip8::getDrawFlag() const {
 	return m_drawFlag;
 }
@@ -98,10 +97,6 @@ inline bool Chip8::checkResetFlag()
 	}
 	return false;
 }
-
-
-
-
 
 
 

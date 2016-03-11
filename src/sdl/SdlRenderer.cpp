@@ -95,8 +95,8 @@ void SdlRenderer::UpdateEvents()
 {
 	UpdateSdlEvents();
 	if (g_sdlEvent.type == SDL_WINDOWEVENT
-		&& g_sdlEvent.window.event == SDL_WINDOWEVENT_RESIZED
-		|| g_sdlEvent.window.event == SDL_WINDOWEVENT_RESTORED)
+		&& (g_sdlEvent.window.event == SDL_WINDOWEVENT_RESIZED
+		|| g_sdlEvent.window.event == SDL_WINDOWEVENT_RESTORED))
 		SDL_RenderPresent(m_rend);
 }
 
@@ -106,7 +106,6 @@ void SdlRenderer::Render(const uint32_t *gfx)
 	SDL_UpdateTexture(m_texture, nullptr, gfx, m_pitch);
 	SDL_RenderCopy(m_rend, m_texture, nullptr, nullptr);
 	SDL_RenderPresent(m_rend);
-	SDL_Delay(FPS);
 }
 
 

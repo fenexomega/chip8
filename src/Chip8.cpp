@@ -1,7 +1,9 @@
 #include <cstring>
+#include <thread>
+#include <chrono>
 #include <SDL2/SDL.h>
-
 #include "utility/log.h"
+#include "utility/timer.h"
 #include "sdl/SdlRenderer.h"
 #include "sdl/SdlInput.h"
 #include "Chip8.h"
@@ -88,7 +90,6 @@ void Chip8::cleanFlags()
 	m_exitFlag = false;
 	m_resetFlag = false;
 }
-
 
 
 
@@ -221,7 +222,7 @@ void Chip8::reset()
 
 void Chip8::updateSystemState()
 {
-	static auto timer = std::clock();
+	static Timer delayAndSoundTimer( 1_sec / 60 );
 
 	m_renderer->UpdateEvents();
 	
@@ -247,14 +248,14 @@ void Chip8::updateSystemState()
 
 
 	// decrease the timers by 1. every 60th of 1 second
-	if ((std::clock() - timer) > CHIP8_CLOCK_FREQUENCY)
+	if (delayAndSoundTimer.Finished())
 	{
 		if (m_soundTimer > 0)
 			--m_soundTimer;
 		if (m_delayTimer > 0)
 			--m_delayTimer;
 
-		timer = std::clock();
+		delayAndSoundTimer.Start();
 	}
 
 

@@ -2,7 +2,7 @@
 #define IRENDERER_H
 
 
-constexpr unsigned int FPS =  1000 / 120;
+constexpr unsigned int FPS =  1000 / 60;
 enum class WindowMode
 {
 	RESIZABLE,

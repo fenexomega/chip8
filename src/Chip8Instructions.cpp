@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <cstring>
 #include "Chip8Instructions.h"
 #include "Chip8.h"
 #include "utility/log.h"
