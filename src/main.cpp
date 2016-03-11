@@ -11,7 +11,7 @@ int main(int argc, char **argv)
 		return 0;
 	}
 	
-	auto uniqueChip8Cpu = std::make_unique<Chip8>();
+	auto uniqueChip8Cpu = std::unique_ptr<Chip8>(new Chip8());
 	Chip8 *chip8Cpu = uniqueChip8Cpu.get();
 
 

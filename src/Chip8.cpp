@@ -279,11 +279,15 @@ void Chip8::setWindowSize(const unsigned widht, const unsigned height) {
 
 void Chip8::executeInstruction()
 {
-	static Timer instructionTimer(1_sec / 256);
-	static Timer drawTimer ( 1_sec / 60 );
+	/* testing timers precisions */
+	static Timer instructionTimer( 1_sec / 600 );
+	static Timer drawTimer (1_sec / 60 );
+	static Timer insPerSec (1_sec);
+	static unsigned int ins = 0;
 	
 	if(instructionTimer.Finished())
 	{
+		++ins;
 		m_opcode = ((m_memory[m_pc] << 8) | m_memory[m_pc + 1]);
 		m_pc += 2;
 		Chip8Instructions::s_instrPtr[(m_opcode & 0xF000) >> 12](this);	
@@ -294,6 +298,15 @@ void Chip8::executeInstruction()
 	{
 		m_drawFlag = true;
 		drawTimer.Start();
+	}
+
+	if(insPerSec.Finished())
+	{
+		CLS();
+		printf("INSTRUCTIONS PER SECOND: %i\n", ins);
+		ins = 0;
+		insPerSec.Start();
+		
 	}
 }
 

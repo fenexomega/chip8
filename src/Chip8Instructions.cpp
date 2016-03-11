@@ -393,7 +393,6 @@ void Chip8Instructions::op_FXxx(Chip8 *const chip)
 		}
 
 		case 0x0: // FX30
-			LOG("FX30");
 			chip->m_I = VX;
 			break;
 

@@ -40,7 +40,6 @@ public:
 
 	// loop until there is a key press or until predicate return false
 	virtual EmulatorKey WaitKeyPress(void* predArg, WaitKeyPressPred pred) = 0;
-
 };
 
 
