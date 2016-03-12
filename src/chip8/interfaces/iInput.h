@@ -50,9 +50,9 @@ public:
 	// set a new value to an emulator key
 	virtual void SetKey(EmulatorKey key, int value) = 0;
 
-	virtual void SetWaitKeyPressCallback(WaitKeyPressCallback callback, void* arg = nullptr) = 0;
-	virtual void SetResetCallback(ResetCallback resetClbk, void* arg = nullptr) = 0;
-	virtual void SetEscapeCallback(EscapeCallback escapeClbk, void* arg = nullptr) = 0;
+	virtual void SetWaitKeyPressCallback(void* arg, WaitKeyPressCallback callback) = 0;
+	virtual void SetResetCallback(void* arg, ResetCallback callback) = 0;
+	virtual void SetEscapeCallback(void* arg, EscapeCallback callback) = 0;
 };
 
 

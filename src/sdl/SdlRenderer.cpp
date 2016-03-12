@@ -203,16 +203,14 @@ bool SdlRenderer::SetWinSize(const unsigned width, const unsigned height)
 }
 
 
-
-
-void SdlRenderer::SetWinCloseCallback(WinCloseCallback callback, void* arg)
+void SdlRenderer::SetWinCloseCallback(void* arg, WinCloseCallback callback)
 {
-	m_closeClbk = callback;
 	m_closeClbkArg = arg;
+	m_closeClbk = callback;
 }
 
-void SdlRenderer::SetWinResizeCallback(WinResizeCallback callback, void* arg)
+void SdlRenderer::SetWinResizeCallback(void* arg, WinResizeCallback callback)
 {
-	m_resizeClbk = callback;
 	m_resizeClbkArg = arg;
+	m_resizeClbk = callback;
 }

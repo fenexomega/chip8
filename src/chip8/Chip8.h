@@ -27,35 +27,41 @@ public:
 
 	bool initialize(iRenderer* rend, iInput* input);
 	void dispose() noexcept;
+	Timer::Duration getNextFlagTime() const;
+	void haltForFlags();
 
-	bool getDrawFlag() const;
-	bool wantToExit() const;
-	std::unique_ptr<iRenderer>& getRenderer();
-	std::unique_ptr<iInput>& getInput();
-
-	bool loadRom(const char* romFileName);
 	void updateSystemState();
 	void executeInstruction();
+	bool loadRom(const char* romFileName);
 	void drawGraphics();
 	void cleanFlags();
 	void reset();
 
+	
+	std::unique_ptr<iRenderer>& getRenderer();
+	std::unique_ptr<iInput>& getInput();
 	void setRenderer(iRenderer* rend);
 	void setInput(iInput* rend);
 	void setInstrPerSec(unsigned short instrs);
 	void setFramesPerSec(unsigned short frames);
 
+
+	inline bool getDrawFlag() const;
+	inline bool getInstrFlag() const;
+	inline bool wantToExit() const;
+
 private:
 	bool initRenderer();
 	bool initInput();
-	void updateRender();
+	void updateRenderer();
 	void updateInput();
 	void updateTimers();
-	static bool waitKeyPressCallback(void* const);
+	void updateFlags();
+	static bool waitKeyPressCallback(void*);
 
 private:
 	bool m_drawFlag;
-	bool m_resetFlag;
+	bool m_instrFlag;
 	bool m_exitFlag;
 	size_t m_gfxBytes;
 	resolution_t m_gfxResolution;
@@ -76,8 +82,8 @@ private:
 
 
 	struct {
-		Timer frame;
 		Timer instr;
+		Timer frame;
 	}m_clocks;
 };
 
@@ -86,30 +92,15 @@ inline bool Chip8::wantToExit() const  {
 	return m_exitFlag;
 }
 
-
 inline bool Chip8::getDrawFlag() const {
 	return m_drawFlag;
 }
 
-
-inline std::unique_ptr<iRenderer>& Chip8::getRenderer() {
-	return m_renderer;
+inline bool Chip8::getInstrFlag() const {
+	return m_instrFlag;
 }
 
 
-inline std::unique_ptr<iInput>& Chip8::getInput() {
-	return m_input;
-}
-
-
-inline void Chip8::setRenderer(iRenderer* rend) {
-	m_renderer.reset(rend);
-}
-
-
-inline void Chip8::setInput(iInput* rend) {
-	m_input.reset(rend);
-}
 
 
 

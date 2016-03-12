@@ -32,8 +32,8 @@ public:
 	virtual bool SetWinPosition(const unsigned x, const unsigned y) = 0;
 	virtual bool SetWinSize(const unsigned width, const unsigned height) = 0;
 	
-	virtual void SetWinCloseCallback(WinCloseCallback callback, void* arg = nullptr) = 0;
-	virtual void SetWinResizeCallback(WinResizeCallback callback, void* arg = nullptr) = 0;
+	virtual void SetWinCloseCallback(void* arg, WinCloseCallback callback) = 0;
+	virtual void SetWinResizeCallback(void* arg, WinResizeCallback callback) = 0;
 };
 
 

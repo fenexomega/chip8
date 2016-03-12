@@ -26,8 +26,8 @@ public:
 	bool SetWinPosition(const unsigned x, const unsigned y) override;
 	bool SetWinSize(const unsigned width, const unsigned height) override;
 
-	virtual void SetWinCloseCallback(WinCloseCallback callback, void* arg) override;
-	virtual void SetWinResizeCallback(WinResizeCallback callback, void* arg) override;
+	virtual void SetWinCloseCallback(void* arg, WinCloseCallback callback) override;
+	virtual void SetWinResizeCallback(void* arg, WinResizeCallback callback) override;
 private:
 	SDL_Window* m_window;
 	SDL_Renderer* m_rend;

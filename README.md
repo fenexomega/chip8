@@ -14,3 +14,5 @@ A Cross Plataform Chip-8 Emulator with C++11 and SDL2
 3. finish dissassembler
 
 4. Start implementing SuperChip and MegaChip modes.
+
+5. split Chip8 class into a small struct for real chip8  related members and an Chip8 Manager API
