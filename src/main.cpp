@@ -4,8 +4,11 @@
 #include "sdl/SdlRenderer.h"
 #include "sdl/SdlInput.h"
 
+
+
 int main(int argc, char **argv)
 {
+	
 	if (argc < 2) {
 		LOGerr("No game to load, exiting...");
 		return 0;
@@ -27,15 +30,24 @@ int main(int argc, char **argv)
 		return 1;
 
 
-	while(!chip8Cpu->wantToExit())
+	chip8Cpu->setInstrPerSec(358); /* 358hz */
+	
+	while (!chip8Cpu->wantToExit())
 	{
+		
+		chip8Cpu->haltForFlags();
+
 		chip8Cpu->updateSystemState();
-		chip8Cpu->executeInstruction();
-		chip8Cpu->drawGraphics();
+
+		if (chip8Cpu->getInstrFlag())
+			chip8Cpu->executeInstruction();
+
+		if (chip8Cpu->getDrawFlag())
+			chip8Cpu->drawGraphics();
 	}
 
 	/*  debug */
-	//std::atexit([]() {std::cin.ignore(); });
+	std::atexit([]() {std::cin.ignore(); });
 	return 0;
 }
 

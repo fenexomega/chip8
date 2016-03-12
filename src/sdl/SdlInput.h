@@ -1,13 +1,12 @@
 #ifndef SDLINPUT_H
 #define SDLINPUT_H
 #include <vector>
-#include <SDL2/SDL_keyboard.h>
-#include "../interfaces/iInput.h"
+#include "../chip8/interfaces/iInput.h"
 
 
 class SdlInput final : public iInput
 {
-	using KeyPairs = std::pair<EmulatorKey, SDL_Scancode>;
+	using KeyPair = std::pair<EmulatorKey, int>;
 public:
 	SdlInput();
 	SdlInput(const SdlInput&) = delete;
@@ -23,13 +22,13 @@ public:
 	bool UpdateKeys() override;
 	EmulatorKey WaitKeyPress() override;
 
-	void SetWaitKeyPressCallback(WaitKeyPressCallback callback, void* arg) override;
-	void SetResetCallback(ResetCallback resetClbk, void* arg) override;
-	void SetEscapeCallback(EscapeCallback escapeClbk, void* arg) override;
+	void SetWaitKeyPressCallback(void* arg, WaitKeyPressCallback callback) override;
+	void SetResetCallback(void* arg, ResetCallback callback) override;
+	void SetEscapeCallback(void* arg, EscapeCallback callback) override;
 	
 private:
 	const unsigned char* m_keyboardState;
-	std::vector<KeyPairs> m_keyPairs;
+	std::vector<KeyPair> m_keyPairs;
 	WaitKeyPressCallback m_waitClbk;
 	ResetCallback m_resetClbk;
 	EscapeCallback m_escapeClbk;

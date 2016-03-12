@@ -6,8 +6,12 @@
 extern SDL_Event g_sdlEvent;
 extern void UpdateSdlEvents();
 
-SdlInput::SdlInput() :
-	m_keyboardState(SDL_GetKeyboardState(NULL)),
+SdlInput::SdlInput() 
+	: m_keyboardState(nullptr),
+	m_resetClbk(nullptr),
+	m_escapeClbk(nullptr),
+	m_resetClbkArg(nullptr),
+	m_escapeClbkArg(nullptr),
 	m_keyPairs
 	{
 		{ EmulatorKey::KEY_0, SDL_SCANCODE_KP_0}, { EmulatorKey::KEY_1, SDL_SCANCODE_KP_7}, { EmulatorKey::KEY_2, SDL_SCANCODE_KP_8}, 
@@ -23,6 +27,9 @@ SdlInput::SdlInput() :
 
 SdlInput::~SdlInput()
 {
+	if (m_keyboardState)
+		this->Dispose();
+
 	LOG("Destroying SdlInput object...");
 }
 
@@ -31,6 +38,13 @@ SdlInput::~SdlInput()
 
 bool SdlInput::Initialize()
 {
+	m_keyboardState = SDL_GetKeyboardState(NULL);
+
+	if (!m_keyboardState) {
+		LOGerr("Cannot get Keyboard State");
+		return false;
+	}
+
 	return true;	
 }
 
@@ -38,7 +52,11 @@ bool SdlInput::Initialize()
 
 void SdlInput::Dispose() noexcept
 {
-	// ...
+	m_keyboardState = nullptr;
+	m_resetClbk = nullptr;
+	m_escapeClbk = nullptr;
+	m_resetClbkArg = nullptr;
+	m_escapeClbkArg = nullptr;	
 }
 
 
@@ -83,9 +101,15 @@ EmulatorKey SdlInput::WaitKeyPress()
 	{
 		while (m_waitClbk(m_waitClbkArg))
 		{
-			for (auto &keyPair : m_keyPairs)
-				if (m_keyboardState[keyPair.second] == SDL_TRUE)
-					return keyPair.first;
+			if (UpdateKeys())
+			{
+				/*check for RESET & ESCAPE keys first */
+				for (auto itr = m_keyPairs.crbegin(); itr != m_keyPairs.crend(); ++itr) 
+				{
+					if (m_keyboardState[itr->second] == SDL_TRUE)
+						return itr->first;
+				}
+			}
 		};
 	}
 
@@ -93,18 +117,19 @@ EmulatorKey SdlInput::WaitKeyPress()
 }
 
 
-void SdlInput::SetWaitKeyPressCallback(WaitKeyPressCallback callback, void* arg) {
-	m_waitClbk = callback;
+void SdlInput::SetWaitKeyPressCallback(void* arg, WaitKeyPressCallback callback) {
 	m_waitClbkArg = arg;
+	m_waitClbk = callback;
 }
 
 
-void SdlInput::SetResetCallback(ResetCallback resetClbk, void* arg) {
-	m_resetClbk = resetClbk;
+void SdlInput::SetResetCallback(void* arg, ResetCallback callback) {
 	m_resetClbkArg = arg;
+	m_resetClbk = callback;
+	
 }
 
-void SdlInput::SetEscapeCallback(EscapeCallback escapeClbk, void* arg) {
-	m_escapeClbk = escapeClbk;
-	m_escapeClbkArg = arg;
+void SdlInput::SetEscapeCallback(void* arg, EscapeCallback callback) {
+	m_resetClbkArg = arg;
+	m_escapeClbk = callback;
 }
