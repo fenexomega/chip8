@@ -2,8 +2,8 @@
 #define CHIP8_H
 #include <ctime>
 #include <memory>
-#include "../interfaces/iRenderer.h"
-#include "../interfaces/iInput.h"
+#include "interfaces/iRenderer.h"
+#include "interfaces/iInput.h"
 #include "../utility/resolution_t.h"
 #include "../utility/timer.h"
 
@@ -48,6 +48,9 @@ public:
 private:
 	bool initRenderer();
 	bool initInput();
+	void updateRender();
+	void updateInput();
+	void updateTimers();
 	static bool waitKeyPressCallback(void* const);
 
 private:
@@ -73,9 +76,9 @@ private:
 
 
 	struct {
-		Timer drawTimer;
-		Timer instrTimer;
-	}m_timers;
+		Timer frame;
+		Timer instr;
+	}m_clocks;
 };
 
 

@@ -65,6 +65,8 @@ bool Chip8::initInput()
 	return m_input->Initialize();
 }
 
+
+
 void Chip8::cleanFlags() 
 {
 	m_drawFlag = false;
@@ -145,8 +147,8 @@ bool Chip8::initialize(iRenderer* rend, iInput* input)
 
 	m_renderer->SetBuffer(m_gfx.get());
 	m_input->SetWaitKeyPressCallback(waitKeyPressCallback, this);
-	m_timers.instrTimer.SetTargetTime(1_sec / 512);
-	m_timers.drawTimer.SetTargetTime(1_sec / 60);
+	m_clocks.instr.SetTargetTime(1_sec / 512);
+	m_clocks.frame.SetTargetTime(1_sec / 60);
 	
 	return true;
 }
@@ -206,39 +208,44 @@ void Chip8::reset()
 
 void Chip8::setInstrPerSec(unsigned short instrs)
 {
-	m_timers.instrTimer.SetTargetTime(1_sec / instrs);
+	m_clocks.instr.SetTargetTime(1_sec / instrs);
 }
 
 void Chip8::setFramesPerSec(unsigned short frames)
 {
-	m_timers.drawTimer.SetTargetTime(1_sec / frames);
+	m_clocks.frame.SetTargetTime(1_sec / frames);
 }
 
 
-
-void Chip8::updateSystemState()
+void Chip8::updateRender()
 {
-	if(m_renderer->UpdateEvents())
+	if (m_renderer->UpdateEvents())
 	{
-		if(m_renderer->IsWinClosed()) {
+		if (m_renderer->IsWinClosed()) {
 			m_exitFlag = true;
 		}
 	}
-	
-	else if(m_input->UpdateKeys())
+}
+
+void Chip8::updateInput()
+{
+	if (m_input->UpdateKeys())
 	{
-		if(m_input->IsKeyPressed(EmulatorKey::RESET)) {
+		if (m_input->IsKeyPressed(EmulatorKey::RESET)) {
 			this->reset();
 			return;
 		}
 
-		else if(m_input->IsKeyPressed(EmulatorKey::ESCAPE)) {
+		else if (m_input->IsKeyPressed(EmulatorKey::ESCAPE)) {
 			m_exitFlag = true;
 			return;
 		}
-
 	}
 
+}
+
+void Chip8::updateTimers()
+{
 	/* decrease the timers by 1. every 60th of 1 second */
 	static Timer delayAndSoundTimer(60_hz);
 
@@ -251,6 +258,14 @@ void Chip8::updateSystemState()
 
 		delayAndSoundTimer.Start();
 	}
+}
+
+
+void Chip8::updateSystemState()
+{
+	updateRender();
+	updateInput();
+	updateTimers();
 
 
 	/* testing timers precisions */
@@ -271,10 +286,10 @@ void Chip8::updateSystemState()
 
 void Chip8::drawGraphics() 
 {
-	if (m_timers.drawTimer.Finished())
+	if (m_clocks.frame.Finished())
 	{
 		m_renderer->RenderBuffer();
-		m_timers.drawTimer.Start();
+		m_clocks.frame.Start();
 		++fps;
 	}
 }
@@ -283,13 +298,13 @@ void Chip8::drawGraphics()
 
 void Chip8::executeInstruction()
 {
-	if(m_timers.instrTimer.Finished())
+	if(m_clocks.instr.Finished())
 	{
 		++instructions;
 		m_opcode = ((m_memory[m_pc] << 8) | m_memory[m_pc + 1]);
 		m_pc += 2;
 		Chip8Instructions::s_instrTbl[(m_opcode & 0xF000) >> 12](this);	
-		m_timers.instrTimer.Start();
+		m_clocks.instr.Start();
 	}
 }
 
@@ -298,10 +313,11 @@ void Chip8::executeInstruction()
 #define _this ((Chip8*)chip)
 bool Chip8::waitKeyPressCallback(void *const chip)
 {
-	_this->updateSystemState();
+	_this->updateRender();
+	_this->updateInput();
 	_this->drawGraphics();
 	// check if it is reseted or wanna exit
-	return !( (_this->m_opcode == 0) || _this->wantToExit());
+	return !(_this->wantToExit());
 }
 #undef _this
 

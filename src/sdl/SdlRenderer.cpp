@@ -5,16 +5,16 @@
 extern SDL_Event g_sdlEvent;
 extern void UpdateSdlEvents();
 
-SdlRenderer::SdlRenderer() :
-	m_window (nullptr), 
+SdlRenderer::SdlRenderer() 
+	: m_window (nullptr), 
 	m_rend (nullptr), 
 	m_texture (nullptr),
 	m_buffer(nullptr),
-	m_needToDispose(false),
 	m_closeClbk(nullptr),
 	m_resizeClbk(nullptr),
 	m_closeClbkArg(nullptr),
-	m_resizeClbkArg(nullptr)
+	m_resizeClbkArg(nullptr),
+	m_needToDispose(false)
 {
 	LOG("Creating SdlRenderer object...");
 }
@@ -25,6 +25,14 @@ void SdlRenderer::Dispose() noexcept
 	SDL_DestroyTexture(m_texture);
 	SDL_DestroyRenderer(m_rend);
 	SDL_DestroyWindow(m_window);
+	m_window = nullptr;
+	m_rend = nullptr;
+	m_texture = nullptr;
+	m_buffer = nullptr;
+	m_closeClbk = nullptr;
+	m_resizeClbk = nullptr;
+	m_closeClbkArg = nullptr;
+	m_resizeClbkArg = nullptr;
 	m_needToDispose = false;
 }
 
@@ -99,17 +107,14 @@ bool SdlRenderer::Initialize(const int width, const int height)
 bool SdlRenderer::UpdateEvents()
 {
 	UpdateSdlEvents();
-	if(!m_closeClbk && !m_resizeClbk)
-		return g_sdlEvent.type == SDL_WINDOWEVENT;
-
-	else if(g_sdlEvent.type == SDL_WINDOWEVENT)
+	if(g_sdlEvent.type == SDL_WINDOWEVENT)
 	{
-		if(g_sdlEvent.window.event == SDL_WINDOWEVENT_RESIZED)
-			m_resizeClbk(m_resizeClbkArg);
-		else if(g_sdlEvent.window.event == SDL_WINDOWEVENT_RESTORED)
-			m_resizeClbk(m_resizeClbkArg);
-		else if(g_sdlEvent.window.event == SDL_WINDOWEVENT_CLOSE)
-			m_closeClbk(m_closeClbkArg);
+		switch (g_sdlEvent.window.event)
+		{
+			case SDL_WINDOWEVENT_RESIZED: /* fall */
+			case SDL_WINDOWEVENT_RESTORED: if(m_resizeClbk) m_resizeClbk(m_resizeClbkArg);  break;
+			case SDL_WINDOWEVENT_CLOSE: if(m_closeClbk) m_closeClbk(m_closeClbkArg); break;
+		}
 
 		return true;
 	}

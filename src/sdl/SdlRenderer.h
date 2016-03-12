@@ -1,6 +1,6 @@
 #ifndef SDLRENDERER_H
 #define SDLRENDERER_H
-#include "../interfaces/iRenderer.h"
+#include "../chip8/interfaces/iRenderer.h"
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -33,13 +33,14 @@ private:
 	SDL_Renderer* m_rend;
 	SDL_Texture* m_texture;
 	const uint32_t* m_buffer;
-	bool m_needToDispose;
 	int m_pitch;
 	WindowMode m_windowMode;
+	bool m_needToDispose;
 	WinCloseCallback m_closeClbk;
 	WinResizeCallback m_resizeClbk;
 	void* m_closeClbkArg;
 	void* m_resizeClbkArg;
+	
 
 
 };
