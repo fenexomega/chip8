@@ -104,7 +104,7 @@ inline void Timer::Halt(Timer::Nano nano)
 
 #ifdef __linux__
 	static timespec _sleep{ 0, 0 };
-		_sleep.tv_nsec = nano.count();
+		_sleep.tv_nsec = (nano - 65000_nano).count();
 		nanosleep(&_sleep, NULL);
 
 #elif _WIN32

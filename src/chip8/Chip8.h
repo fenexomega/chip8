@@ -1,12 +1,10 @@
 #ifndef CHIP8_H
 #define CHIP8_H
-#include <ctime>
-#include <memory>
-#include "interfaces/iRenderer.h"
-#include "interfaces/iInput.h"
 #include "../utility/resolution_t.h"
 #include "../utility/timer.h"
 
+class iRenderer;
+class iInput;
 
 class Chip8
 {
@@ -28,7 +26,7 @@ public:
 	bool initialize(iRenderer* rend, iInput* input);
 	void dispose() noexcept;
 	Timer::Duration getNextFlagTime() const;
-	void haltForFlags();
+	void haltForNextFlag() const;
 
 	void updateSystemState();
 	void executeInstruction();
@@ -38,8 +36,8 @@ public:
 	void reset();
 
 	
-	std::unique_ptr<iRenderer>& getRenderer();
-	std::unique_ptr<iInput>& getInput();
+	iRenderer* getRenderer();
+	iInput* getInput();
 	void setRenderer(iRenderer* rend);
 	void setInput(iInput* rend);
 	void setInstrPerSec(unsigned short instrs);
@@ -67,9 +65,9 @@ private:
 	resolution_t m_gfxResolution;
 	
 	uint8_t* m_memory;
-	std::unique_ptr<uint32_t[]> m_gfx;
-	std::unique_ptr<iRenderer> m_renderer;
-	std::unique_ptr<iInput>	m_input;
+	uint32_t* m_gfx;
+	iRenderer* m_renderer;
+	iInput*	m_input;
 	
 	uint8_t m_V[V_REGISTERS_MAX];
 	uint8_t m_delayTimer;

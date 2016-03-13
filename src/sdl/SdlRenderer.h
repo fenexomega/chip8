@@ -35,7 +35,6 @@ private:
 	const uint32_t* m_buffer;
 	int m_pitch;
 	WindowMode m_windowMode;
-	bool m_needToDispose;
 	WinCloseCallback m_closeClbk;
 	WinResizeCallback m_resizeClbk;
 	void* m_closeClbkArg;

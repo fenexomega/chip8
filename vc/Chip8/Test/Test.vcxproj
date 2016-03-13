@@ -80,7 +80,7 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(Solution)$(Plataform)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\cygwin64\home\Rafael\Git\github\chip8\vc\Chip8\Debug</AdditionalLibraryDirectories>
       <AdditionalDependencies>Chip8.lib;SDL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
