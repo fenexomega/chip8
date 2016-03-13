@@ -31,6 +31,7 @@ int main(int argc, char **argv)
 
 
 	chip8Cpu->setInstrPerSec(358); /* 358hz */
+	chip8Cpu->setFramesPerSec(60);
 	
 	while (!chip8Cpu->wantToExit())
 	{
@@ -46,7 +47,7 @@ int main(int argc, char **argv)
 	}
 
 	/*  debug */
-	//std::atexit([]() {std::cin.ignore(); });
+	// std::atexit([]() {std::cin.ignore(); });
 	return 0;
 }
 

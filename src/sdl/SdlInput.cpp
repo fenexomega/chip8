@@ -20,7 +20,7 @@ SdlInput::SdlInput()
 	m_resetClbk(nullptr),
 	m_escapeClbk(nullptr),
 	m_resetClbkArg(nullptr),
-	m_escapeClbkArg(nullptr),
+	m_escapeClbkArg(nullptr)
 {
 	LOG("Creating SdlInput object...");
 }

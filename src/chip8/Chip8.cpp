@@ -1,8 +1,11 @@
+#include <ctime>
 #include <cstring>
 #include <chrono>
 
 #include "Chip8.h"
 #include "Chip8Instructions.h"
+#include "interfaces/iRenderer.h"
+#include "interfaces/iInput.h"
 #include "../utility/log.h"
 #include "../utility/timer.h"
 
@@ -16,15 +19,11 @@ Chip8::Chip8()
 	m_instrFlag(false),
 	m_exitFlag (false),
 	m_gfxResolution(WIDTH,HEIGHT),
-	m_memory ( nullptr )
+	m_memory(nullptr)
 	
 {
 	LOG("Creating Chip8 object...");
 }
-
-
-
-
 
 
 Chip8::~Chip8()
@@ -36,6 +35,25 @@ Chip8::~Chip8()
 }
 
 
+bool Chip8::initRenderer()
+{
+	if (!m_renderer) {
+		LOGerr("NULL iRenderer.");
+		return false;
+	}
+	return m_renderer->Initialize(m_gfxResolution.x, m_gfxResolution.y);
+}
+
+
+bool Chip8::initInput()
+{
+	if (!m_input) {
+		LOGerr("NULL iInput.");
+		return false;
+	}
+
+	return m_input->Initialize();
+}
 
 
 
@@ -58,11 +76,11 @@ bool Chip8::initialize(iRenderer* rend, iInput* input)
 	m_drawFlag = false;
 
 	m_memory = new(std::nothrow) uint8_t[MEMORY_MAX];
-	m_gfx.reset(new(std::nothrow) uint32_t[m_gfxResolution]);
+	m_gfx    = new(std::nothrow) uint32_t[m_gfxResolution];
 	m_gfxBytes = (m_gfxResolution * sizeof(uint32_t));
 
 
-	if ((m_memory == nullptr) || (m_gfx == nullptr))
+	if ( !m_memory || !m_gfx )
 	{
 		LOGerr("Cannot allocate memory for GFX or emulated Memory, interrupting Chip8 instance.");
 		this->dispose();
@@ -71,7 +89,7 @@ bool Chip8::initialize(iRenderer* rend, iInput* input)
 	}
 
 	std::srand(static_cast<unsigned int>(std::time(0)));             // seed rand
-	std::memset(m_gfx.get(), 0, m_gfxResolution * sizeof(uint32_t)); // Clear display
+	std::memset(m_gfx, 0, m_gfxResolution * sizeof(uint32_t));       // Clear display
 	std::memset(m_stack, 0, STACK_MAX * sizeof(uint16_t));           // Clear stack
 	std::memset(m_V, 0, V_REGISTERS_MAX * sizeof(uint8_t));          // Clear registers V0-VF
 	std::memset(m_memory, 0, MEMORY_MAX * sizeof(uint8_t));          // Clear memory
@@ -102,8 +120,8 @@ bool Chip8::initialize(iRenderer* rend, iInput* input)
 
 
 	/* initialize renderer / input / instruction table */
-	m_renderer.reset(rend);
-	m_input.reset(input);
+	m_renderer = rend;
+	m_input = input;
 
 	if (!initRenderer() || !initInput() || !Chip8Instructions::Initialize())
 	{
@@ -114,10 +132,13 @@ bool Chip8::initialize(iRenderer* rend, iInput* input)
 
 	};
 
-	m_renderer->SetBuffer(m_gfx.get());
+	m_renderer->SetBuffer(m_gfx);
+
+	/* set default callbacks */
 	m_input->SetWaitKeyPressCallback(this, waitKeyPressCallback);
 
-	/* set clocks */
+
+	/* set default clocks */
 	m_clocks.instr.SetTargetTime(128_hz);
 	m_clocks.frame.SetTargetTime(32_hz);
 
@@ -126,18 +147,20 @@ bool Chip8::initialize(iRenderer* rend, iInput* input)
 
 
 
-
-
 void Chip8::dispose() noexcept
 {
-	// reverse deallocation
+	/* reverse deallocation */
 	Chip8Instructions::Dispose();
-	m_input.reset();
-	m_renderer.reset();
+	m_input->Dispose();
+	m_renderer->Dispose();
 
+	delete m_input;
+	delete m_renderer;
+	delete[] m_gfx;
 	delete[] m_memory;
-	m_memory = nullptr;
+	m_memory = nullptr; /* used to check if need to dispose */
 }
+
 
 
 
@@ -151,18 +174,10 @@ Timer::Duration Chip8::getNextFlagTime() const
 }
 
 
-
-
-
-void Chip8::haltForNextFlag()
+void Chip8::haltForNextFlag() const
 {
 	if (!m_instrFlag && !m_drawFlag)
-	{
-		auto nextFlag = this->getNextFlagTime();
-		if (nextFlag >= 256_micro) {
-			Timer::Halt(nextFlag);
-		}
-	}
+		Timer::Halt(this->getNextFlagTime());
 }
 
 
@@ -193,9 +208,6 @@ void Chip8::updateSystemState()
 
 
 
-
-
-
 void Chip8::executeInstruction()
 {
 	++instructions; /* debug counter */
@@ -206,7 +218,6 @@ void Chip8::executeInstruction()
 	Chip8Instructions::s_instrTbl[(m_opcode & 0xF000) >> 12](this);
 	m_instrFlag = false;
 }
-
 
 
 
@@ -257,8 +268,12 @@ bool Chip8::loadRom(const char *romFileName)
 
 
 
-
-
+void Chip8::cleanFlags()
+{
+	m_instrFlag = false;
+	m_drawFlag = false;
+	m_exitFlag = false;
+}
 
 
 void Chip8::reset()
@@ -270,7 +285,7 @@ void Chip8::reset()
 	m_sp = 0;
 	m_soundTimer = 0;
 	m_delayTimer = 0;
-	std::memset(m_gfx.get(), 0, m_gfxBytes);
+	std::memset(m_gfx, 0, m_gfxBytes);
 	std::memset(m_stack,0, STACK_MAX * sizeof(uint16_t));
 	std::memset(m_V, 0, V_REGISTERS_MAX  * sizeof(uint8_t));
 
@@ -294,10 +309,6 @@ void Chip8::updateRenderer()
 
 
 
-
-
-
-
 void Chip8::updateInput()
 {
 	if (m_input->UpdateKeys())
@@ -313,10 +324,6 @@ void Chip8::updateInput()
 		}
 	}
 }
-
-
-
-
 
 
 
@@ -338,13 +345,8 @@ void Chip8::updateTimers()
 
 
 
-
-
-
-
 void Chip8::updateFlags()
 {
-
 	if (!m_instrFlag && m_clocks.instr.Finished())
 	{
 		m_instrFlag = true;
@@ -364,51 +366,8 @@ void Chip8::updateFlags()
 
 
 
-bool Chip8::initRenderer()
-{
-	if (!m_renderer) {
-		LOGerr("NULL iRenderer.");
-		return false;
-	}
-	return m_renderer->Initialize(m_gfxResolution.x, m_gfxResolution.y);
-}
 
-
-
-
-
-
-
-
-bool Chip8::initInput()
-{
-	if (!m_input) {
-		LOGerr("NULL iInput.");
-		return false;
-	}
-
-	return m_input->Initialize();
-}
-
-
-
-
-
-
-
-void Chip8::cleanFlags()
-{
-	m_instrFlag = false;
-	m_drawFlag = false;
-	m_exitFlag = false;
-}
-
-
-
-
-
-
-std::unique_ptr<iRenderer>& Chip8::getRenderer() 
+iRenderer* Chip8::getRenderer() 
 {
 	return m_renderer;
 }
@@ -416,7 +375,7 @@ std::unique_ptr<iRenderer>& Chip8::getRenderer()
 
 
 
-std::unique_ptr<iInput>& Chip8::getInput() 
+iInput* Chip8::getInput() 
 {
 	return m_input;
 }
@@ -425,7 +384,7 @@ std::unique_ptr<iInput>& Chip8::getInput()
 
 void Chip8::setRenderer(iRenderer* rend) 
 {
-	m_renderer.reset(rend);
+	m_renderer = rend;
 }
 
 
@@ -433,7 +392,7 @@ void Chip8::setRenderer(iRenderer* rend)
 
 void Chip8::setInput(iInput* rend) 
 {
-	m_input.reset(rend);
+	m_input = rend;
 }
 
 
@@ -460,10 +419,25 @@ void Chip8::setFramesPerSec(unsigned short frames)
 
 #define _this ((Chip8*)chip)
 bool Chip8::waitKeyPressCallback(void* chip)
-{
-	_this->updateRenderer();
-	Timer::Halt(_this->m_clocks.frame.GetRemain() + 50_milli);
-	_this->drawGraphics();
+{	
+	/* hold until instr flag is set */
+	do {
+		_this->haltForNextFlag(); /* wait for next flag ...    */
+		_this->updateFlags();     /* update flags ...          */
+		_this->updateRenderer();  /* check if window is closed */
+		
+		if(_this->m_drawFlag)     
+			_this->drawGraphics(); 
+
+
+	} while(!_this->m_instrFlag);
+	
+	/* returning from this function will cause the iInput 
+	 * to scan for a key, so it will count as an instruction
+	 * so lets set the instr flag to false meaning we're going
+	 * to execute one instruction ...
+	*/
+	_this->m_instrFlag = false;
 	return !_this->wantToExit();
 }
 #undef _this

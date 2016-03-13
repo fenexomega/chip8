@@ -2,6 +2,7 @@
 #include <cstring>
 #include "Chip8Instructions.h"
 #include "Chip8.h"
+#include "interfaces/iInput.h"
 #include "../utility/log.h"
 #include "../utility/timer.h"
 
@@ -71,7 +72,7 @@ void Chip8Instructions::op_0xxx(Chip8* const chip)
 			break;
 
 		case 0x00E0: // clear screen
-			std::memset(chip->m_gfx.get(), 0, chip->m_gfxBytes);
+			std::memset(chip->m_gfx, 0, chip->m_gfxBytes);
 			break;
 
 		case 0x00EE: // return from a subroutine ( unwind stack )

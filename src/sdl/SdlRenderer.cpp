@@ -10,7 +10,6 @@ SdlRenderer::SdlRenderer()
 	m_rend (nullptr), 
 	m_texture (nullptr),
 	m_buffer(nullptr),
-	m_needToDispose(false)
 	m_closeClbk(nullptr),
 	m_resizeClbk(nullptr),
 	m_closeClbkArg(nullptr),
@@ -21,38 +20,39 @@ SdlRenderer::SdlRenderer()
 }
 
 
+SdlRenderer::~SdlRenderer()
+{
+	LOG("Destroying SdlRenderer object...");
+	if (m_window != nullptr)
+		this->Dispose();
+
+	SDL_Quit();
+}
+
+
+
+
 void SdlRenderer::Dispose() noexcept
 {
 	SDL_DestroyTexture(m_texture);
 	SDL_DestroyRenderer(m_rend);
 	SDL_DestroyWindow(m_window);
 	m_window = nullptr;
-	m_rend = nullptr;
-	m_texture = nullptr;
 	m_buffer = nullptr;
 	m_closeClbk = nullptr;
 	m_resizeClbk = nullptr;
 	m_closeClbkArg = nullptr;
 	m_resizeClbkArg = nullptr;
-	m_needToDispose = false;
 }
 
 
-SdlRenderer::~SdlRenderer()
-{
-	LOG("Destroying SdlRenderer object...");
-	if(m_needToDispose)
-		this->Dispose();
-	
-	SDL_Quit();
-}
 
 
 bool SdlRenderer::Initialize(const int width, const int height)
 {
 
 	
-	if(m_needToDispose)
+	if(m_window != nullptr)
 		this->Dispose();
 	
 	if( SDL_Init(SDL_INIT_VIDEO) != SDL_FALSE ) {
@@ -99,10 +99,10 @@ bool SdlRenderer::Initialize(const int width, const int height)
 	SDL_RenderClear(m_rend);
 	SDL_RenderPresent(m_rend);
 
-	
-	m_needToDispose = true;
 	return true;
 }
+
+
 
 
 bool SdlRenderer::UpdateEvents()
@@ -114,7 +114,7 @@ bool SdlRenderer::UpdateEvents()
 		{
 			case SDL_WINDOWEVENT_RESIZED: /* fall */
 			case SDL_WINDOWEVENT_RESTORED: if(m_resizeClbk) m_resizeClbk(m_resizeClbkArg);  break;
-			case SDL_WINDOWEVENT_CLOSE: if(m_closeClbk) m_closeClbk(m_closeClbkArg); break;
+			case SDL_WINDOWEVENT_CLOSE: if(m_closeClbk) m_closeClbk(m_closeClbkArg); break; 
 		}
 
 		return true;
@@ -123,10 +123,14 @@ bool SdlRenderer::UpdateEvents()
 	return false;
 }
 
+
+
 void SdlRenderer::SetBuffer(const uint32_t* gfx)
 {
 	m_buffer = gfx;
 }
+
+
 
 
 void SdlRenderer::Render(const uint32_t* gfx)
@@ -137,6 +141,7 @@ void SdlRenderer::Render(const uint32_t* gfx)
 }
 
 
+
 void SdlRenderer::RenderBuffer()
 {
 	SDL_UpdateTexture(m_texture, nullptr, m_buffer, m_pitch);
@@ -145,16 +150,19 @@ void SdlRenderer::RenderBuffer()
 }
 
 
+
 bool SdlRenderer::IsWinClosed() const
 {
 	return g_sdlEvent.window.event == SDL_WINDOWEVENT_CLOSE;
 }
 
 
+
 WindowMode SdlRenderer::GetMode() const 
 {
 	return m_windowMode;
 }
+
 
 
 bool SdlRenderer::SetWinPosition(const unsigned x, const unsigned y)
@@ -204,11 +212,16 @@ bool SdlRenderer::SetWinSize(const unsigned width, const unsigned height)
 }
 
 
+
+
 void SdlRenderer::SetWinCloseCallback(void* arg, WinCloseCallback callback)
 {
 	m_closeClbkArg = arg;
 	m_closeClbk = callback;
 }
+
+
+
 
 void SdlRenderer::SetWinResizeCallback(void* arg, WinResizeCallback callback)
 {
