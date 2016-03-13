@@ -34,8 +34,7 @@ int main(int argc, char **argv)
 	
 	while (!chip8Cpu->wantToExit())
 	{
-		
-		chip8Cpu->haltForFlags();
+		chip8Cpu->haltForNextFlag();
 
 		chip8Cpu->updateSystemState();
 

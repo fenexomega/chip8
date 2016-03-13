@@ -8,10 +8,6 @@ extern void UpdateSdlEvents();
 
 SdlInput::SdlInput() 
 	: m_keyboardState(nullptr),
-	m_resetClbk(nullptr),
-	m_escapeClbk(nullptr),
-	m_resetClbkArg(nullptr),
-	m_escapeClbkArg(nullptr),
 	m_keyPairs
 	{
 		{ EmulatorKey::KEY_0, SDL_SCANCODE_KP_0}, { EmulatorKey::KEY_1, SDL_SCANCODE_KP_7}, { EmulatorKey::KEY_2, SDL_SCANCODE_KP_8}, 
@@ -20,7 +16,11 @@ SdlInput::SdlInput()
 		{ EmulatorKey::KEY_9, SDL_SCANCODE_KP_3}, { EmulatorKey::KEY_A, SDL_SCANCODE_KP_DIVIDE}, { EmulatorKey::KEY_B, SDL_SCANCODE_KP_MULTIPLY}, 
 		{ EmulatorKey::KEY_C, SDL_SCANCODE_KP_MINUS}, { EmulatorKey::KEY_D, SDL_SCANCODE_KP_PLUS}, { EmulatorKey::KEY_E, SDL_SCANCODE_KP_PERIOD}, 
 		{ EmulatorKey::KEY_F, SDL_SCANCODE_KP_ENTER}, { EmulatorKey::RESET, SDL_SCANCODE_RETURN}, { EmulatorKey::ESCAPE, SDL_SCANCODE_ESCAPE}
-	}
+	},
+	m_resetClbk(nullptr),
+	m_escapeClbk(nullptr),
+	m_resetClbkArg(nullptr),
+	m_escapeClbkArg(nullptr),
 {
 	LOG("Creating SdlInput object...");
 }

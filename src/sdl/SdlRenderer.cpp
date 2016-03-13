@@ -10,11 +10,12 @@ SdlRenderer::SdlRenderer()
 	m_rend (nullptr), 
 	m_texture (nullptr),
 	m_buffer(nullptr),
+	m_needToDispose(false)
 	m_closeClbk(nullptr),
 	m_resizeClbk(nullptr),
 	m_closeClbkArg(nullptr),
-	m_resizeClbkArg(nullptr),
-	m_needToDispose(false)
+	m_resizeClbkArg(nullptr)
+
 {
 	LOG("Creating SdlRenderer object...");
 }

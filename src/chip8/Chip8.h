@@ -28,7 +28,7 @@ public:
 	bool initialize(iRenderer* rend, iInput* input);
 	void dispose() noexcept;
 	Timer::Duration getNextFlagTime() const;
-	void haltForFlags();
+	void haltForNextFlag();
 
 	void updateSystemState();
 	void executeInstruction();

@@ -11,8 +11,8 @@ static Timer precisionCheck(1_sec);
 static unsigned int instructions = 0;
 static unsigned int fps = 0;
 
-Chip8::Chip8() : 
-	m_drawFlag (false),
+Chip8::Chip8() 
+	: m_drawFlag (false),
 	m_instrFlag(false),
 	m_exitFlag (false),
 	m_gfxResolution(WIDTH,HEIGHT),
@@ -154,9 +154,8 @@ Timer::Duration Chip8::getNextFlagTime() const
 
 
 
-void Chip8::haltForFlags()
+void Chip8::haltForNextFlag()
 {
-
 	if (!m_instrFlag && !m_drawFlag)
 	{
 		auto nextFlag = this->getNextFlagTime();
@@ -463,12 +462,8 @@ void Chip8::setFramesPerSec(unsigned short frames)
 bool Chip8::waitKeyPressCallback(void* chip)
 {
 	_this->updateRenderer();
-	_this->haltForFlags();
-	if (_this->m_clocks.frame.Finished()) {
-		_this->drawGraphics();
-		_this->m_clocks.frame.Start();
-	}
-
+	Timer::Halt(_this->m_clocks.frame.GetRemain() + 50_milli);
+	_this->drawGraphics();
 	return !_this->wantToExit();
 }
 #undef _this
