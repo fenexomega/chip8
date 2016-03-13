@@ -1,7 +1,7 @@
 #include <SDL2/SDL.h>
 #include "SdlInput.h"
 #include "../utility/log.h"
-#include "../utility/undearlyingtype.h"
+#include "../utility/traits.h"
 
 extern SDL_Event g_sdlEvent;
 extern void UpdateSdlEvents();
@@ -63,8 +63,7 @@ void SdlInput::Dispose() noexcept
 bool SdlInput::UpdateKeys()
 {
 	UpdateSdlEvents();
-	return g_sdlEvent.type == SDL_KEYDOWN 
-		|| g_sdlEvent.type == SDL_KEYUP;
+	return g_sdlEvent.type == SDL_KEYDOWN;
 	
 }
 

@@ -1,6 +1,7 @@
-#ifndef UNDERLYING_TYPE_H
-#define UNDERLYING_TYPE_H
+#ifndef _CHP8_TRAITS_H
+#define _CHP8_TRAITS_H
 #include <type_traits>
+
 template<class T>
 using underlying_type_t = typename std::underlying_type<T>::type;
 
