@@ -36,6 +36,7 @@ build/
 
 
 #vs
+*.sdf
 x64/
 Release/
 Debug/

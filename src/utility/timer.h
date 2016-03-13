@@ -2,6 +2,17 @@
 #define TIMER_H
 #include <chrono>
 
+
+#ifdef __linux__
+
+#include <ctime>
+
+#elif _WIN32
+
+#include <Windows.h>
+
+#endif
+
 constexpr std::chrono::microseconds operator""_sec(unsigned long long x) {
 	return std::chrono::seconds(x); 
 }
@@ -37,9 +48,10 @@ public:
 	const Micro GetTarget() const;
 	Duration GetRemain() const;
 	bool Finished() const;
-
 	void SetTargetTime(Micro target);
 	void Start();
+
+	static void Halt(Nano nano);
 private:
 	std::chrono::steady_clock::time_point m_startPoint = std::chrono::steady_clock::now();
 	Micro m_target;
@@ -54,7 +66,7 @@ inline Timer::Timer(Micro target) noexcept
 
 inline const Timer::Micro Timer::GetTarget() const
 {
-	return std::chrono::duration_cast<Micro>(m_target);
+	return m_target;
 }
 
 inline Timer::Duration Timer::GetRemain() const
@@ -80,6 +92,25 @@ inline bool Timer::Finished() const
 inline void Timer::Start()
 {
 	m_startPoint = std::chrono::steady_clock::now();
+}
+
+
+
+
+inline void Timer::Halt(Timer::Nano nano)
+{
+	using namespace std::chrono;
+	/* high precision sleep on linux */
+
+#ifdef __linux__
+	static timespec _sleep{ 0, 0 };
+		_sleep.tv_nsec = nano.count();
+		nanosleep(&_sleep, NULL);
+
+#elif _WIN32
+	Sleep(static_cast<DWORD>(duration_cast<milliseconds>(nano).count()));
+
+#endif
 }
 
 

@@ -1,9 +1,3 @@
-
-#ifdef __linux__
-#include <ctime>
-#elif
-#include <thread>
-#endif
 #include <cstring>
 #include <chrono>
 
@@ -12,12 +6,14 @@
 #include "../utility/log.h"
 #include "../utility/timer.h"
 
+/* debug variables ...*/
 static Timer precisionCheck(1_sec);
 static unsigned int instructions = 0;
 static unsigned int fps = 0;
 
 Chip8::Chip8() : 
 	m_drawFlag (false),
+	m_instrFlag(false),
 	m_exitFlag (false),
 	m_gfxResolution(WIDTH,HEIGHT),
 	m_memory ( nullptr )
@@ -122,8 +118,8 @@ bool Chip8::initialize(iRenderer* rend, iInput* input)
 	m_input->SetWaitKeyPressCallback(this, waitKeyPressCallback);
 
 	/* set clocks */
-	m_clocks.instr.SetTargetTime(358_hz);
-	m_clocks.frame.SetTargetTime(60_hz);
+	m_clocks.instr.SetTargetTime(128_hz);
+	m_clocks.frame.SetTargetTime(32_hz);
 
 	return true;
 }
@@ -164,23 +160,9 @@ void Chip8::haltForFlags()
 	if (!m_instrFlag && !m_drawFlag)
 	{
 		auto nextFlag = this->getNextFlagTime();
-		/* high precision sleep on linux */
-		#ifdef __linux__
-		static timespec _sleep { 0, 0 };
-		if (nextFlag > 100_micro) {
-			_sleep.tv_nsec = nextFlag.count() - 120000;
-			nanosleep(&_sleep, NULL);
+		if (nextFlag >= 256_micro) {
+			Timer::Halt(nextFlag);
 		}
-
-		#elif
-
-		if(nextFlag > 1_milli) {
-			std::this_thread::sleep_for(nextFlag - 50000_nano);
-		}
-
-
-		#endif
-
 	}
 }
 
@@ -194,6 +176,7 @@ void Chip8::updateSystemState()
 	updateInput();
 	updateTimers();
 	updateFlags();
+
 	/* testing timers precisions */
 	if (precisionCheck.Finished())
 	{
@@ -226,6 +209,14 @@ void Chip8::executeInstruction()
 }
 
 
+
+
+void Chip8::drawGraphics()
+{
+	++fps; /* debug counter */
+	m_renderer->RenderBuffer();
+	m_drawFlag = false;
+}
 
 
 
@@ -332,7 +323,7 @@ void Chip8::updateInput()
 
 void Chip8::updateTimers()
 {
-	/* decrease the timers by 1. every 60th of 1 second */
+	/* decrease the timers by 1, every 60th of 1 second */
 	static Timer delayAndSoundTimer(60_hz);
 
 	if (delayAndSoundTimer.Finished())
@@ -417,20 +408,6 @@ void Chip8::cleanFlags()
 
 
 
-
-
-void Chip8::drawGraphics() 
-{
-	++fps; /* debug counter */
-	m_renderer->RenderBuffer();
-	m_drawFlag = false;
-}
-
-
-
-
-
-
 std::unique_ptr<iRenderer>& Chip8::getRenderer() 
 {
 	return m_renderer;
@@ -491,6 +468,6 @@ bool Chip8::waitKeyPressCallback(void* chip)
 		_this->m_clocks.frame.Start();
 	}
 
-	return _this->wantToExit();
+	return !_this->wantToExit();
 }
 #undef _this

@@ -1,9 +1,7 @@
 #ifndef LOG_H
 #define LOG_H
 
-#ifdef __WIN32__
-#define CLS() std::system("cls")
-#elif _WIN64
+#ifdef _WIN32
 #define CLS() std::system("cls")
 #elif __linux__
 #define CLS() std::system("clear")

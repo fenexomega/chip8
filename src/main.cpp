@@ -47,7 +47,7 @@ int main(int argc, char **argv)
 	}
 
 	/*  debug */
-	std::atexit([]() {std::cin.ignore(); });
+	//std::atexit([]() {std::cin.ignore(); });
 	return 0;
 }
 
