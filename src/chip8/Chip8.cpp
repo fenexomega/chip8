@@ -345,13 +345,14 @@ void Chip8::updateTimers()
 
 void Chip8::updateFlags()
 {
-	if (m_clocks.instr.Finished())
+
+	if (!m_instrFlag && m_clocks.instr.Finished())
 	{
 		m_instrFlag = true;
 		m_clocks.instr.Start();
 	}
 
-	if (m_clocks.frame.Finished())
+	if (!m_drawFlag && m_clocks.frame.Finished())
 	{
 		m_drawFlag = true;
 		m_clocks.frame.Start();
