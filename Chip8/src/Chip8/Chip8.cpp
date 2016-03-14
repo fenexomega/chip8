@@ -14,9 +14,11 @@ static unsigned int instructions = 0;
 static unsigned int fps = 0;
 
 Chip8::Chip8() 
-	: m_exitFlag (false), 
+	: m_instrFlag(false),
 	m_drawFlag (false),
-	m_instrFlag(false),
+	m_exitFlag (false), 
+	
+	
 	
 	m_gfxResolution(WIDTH,HEIGHT),
 	m_memory(nullptr)
@@ -388,9 +390,9 @@ void Chip8::setRenderer(iRenderer* rend)
 
 
 
-void Chip8::setInput(iInput* rend) 
+void Chip8::setInput(iInput* input) 
 {
-	m_input = rend;
+	m_input = input;
 }
 
 

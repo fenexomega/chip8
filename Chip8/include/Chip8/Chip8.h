@@ -40,7 +40,7 @@ public:
 	iRenderer* getRenderer();
 	iInput* getInput();
 	void setRenderer(iRenderer* rend);
-	void setInput(iInput* rend);
+	void setInput(iInput* input);
 	void setInstrPerSec(unsigned short instrs);
 	void setFramesPerSec(unsigned short frames);
 
@@ -61,9 +61,9 @@ private:
 	static bool waitKeyPressCallback(void*);
 
 private:
-	bool m_exitFlag;
-	bool m_drawFlag;
 	bool m_instrFlag;
+	bool m_drawFlag;
+	bool m_exitFlag;
 	size_t m_gfxBytes;
 	resolution_t m_gfxResolution;
 		
