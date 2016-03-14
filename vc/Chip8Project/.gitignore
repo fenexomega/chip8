@@ -1,0 +1,14 @@
+
+./*.sdf
+./Debug/*
+./Release/*
+./x64/*
+./Chip8/Debug/*
+./Chip8/Release/*
+./Chip8/x64/*
+./SDL/Debug/*
+./SDL/Release/*
+./SDL/x64/*
+./Test/Debug/*
+./Test/Release/*
+./Test/x64/*
