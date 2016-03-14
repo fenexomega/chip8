@@ -5,7 +5,7 @@
 #include <Chip8/Chip8.h>
 #include <Chip8/Chip8Instructions.h>
 #include <Chip8/Interfaces/iRenderer.h>
-#include <Chip8/interfaces/iInput.h>
+#include <Chip8/Interfaces/iInput.h>
 #include <Chip8/Utility/log.h>
 
 /* debug variables ...*/
@@ -14,9 +14,10 @@ static unsigned int instructions = 0;
 static unsigned int fps = 0;
 
 Chip8::Chip8() 
-	: m_drawFlag (false),
+	: m_exitFlag (false), 
+	m_drawFlag (false),
 	m_instrFlag(false),
-	m_exitFlag (false),
+	
 	m_gfxResolution(WIDTH,HEIGHT),
 	m_memory(nullptr)
 	
@@ -76,6 +77,7 @@ bool Chip8::initInput()
 		((Chip8*)chip)->setExitFlag(true);
 	});
 
+	return true;
 }
 
 

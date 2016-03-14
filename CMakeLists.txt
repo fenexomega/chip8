@@ -1,6 +1,7 @@
 project(Chip8)
 cmake_minimum_required(VERSION 2.8)
 
+# This file will prepare chip8 to build with SDL2
 
 #compiler
 
@@ -29,11 +30,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeInclude)
 
 find_package(SDL2 REQUIRED)
 INCLUDE_DIRECTORIES( ${SDL2_INCLUDE_DIR} )
-INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/src )
+INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/Chip8/include/ )
 
 # ACHAR OS .CPP E .H
-file(GLOB_RECURSE SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.cpp)
-file(GLOB_RECURSE HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}  src/*.h)
+file(GLOB_RECURSE SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} Chip8/src/*.cpp)
+file(GLOB_RECURSE HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}  Chip8/include/*.h)
 
 
 # Linkar .cpp para este binário (que tem o nome do projeto)
