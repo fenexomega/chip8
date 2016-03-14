@@ -1,5 +1,0 @@
-﻿  Chip8Instructions.cpp
-  Chip8.cpp
-  Generating Code...
-c:\cygwin64\home\rafael\git\github\chip8\chip8\src\chip8\chip8.cpp(79): warning C4715: 'Chip8::initInput': not all control paths return a value
-  Chip8.vcxproj -> C:\cygwin64\home\Rafael\Git\github\chip8\vc\Chip8Project\Debug\Chip8.lib
