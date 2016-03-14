@@ -25,6 +25,7 @@ public:
 
 	bool initialize(iRenderer* rend, iInput* input);
 	void dispose() noexcept;
+
 	Timer::Duration getNextFlagTime() const;
 	void haltForNextFlag() const;
 
@@ -44,15 +45,17 @@ public:
 	void setFramesPerSec(unsigned short frames);
 
 
+	inline bool getExitFlag() const;
 	inline bool getDrawFlag() const;
 	inline bool getInstrFlag() const;
-	inline bool wantToExit() const;
+
+	inline void setExitFlag(bool);
+	inline void setDrawFlag(bool);
+	inline void setInstrFlag(bool);
 
 private:
 	bool initRenderer();
 	bool initInput();
-	void updateRenderer();
-	void updateInput();
 	void updateTimers();
 	void updateFlags();
 	static bool waitKeyPressCallback(void*);
@@ -86,7 +89,7 @@ private:
 };
 
 
-inline bool Chip8::wantToExit() const  {
+inline bool Chip8::getExitFlag() const  {
 	return m_exitFlag;
 }
 
@@ -96,6 +99,19 @@ inline bool Chip8::getDrawFlag() const {
 
 inline bool Chip8::getInstrFlag() const {
 	return m_instrFlag;
+}
+
+
+inline void Chip8::setExitFlag(bool val) {
+	m_exitFlag = val;
+}
+
+inline void Chip8::setDrawFlag(bool val) {
+	m_drawFlag = val;
+}
+
+inline void Chip8::setInstrFlag(bool val) {
+	m_instrFlag = val;
 }
 
 

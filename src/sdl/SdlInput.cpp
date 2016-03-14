@@ -63,8 +63,20 @@ void SdlInput::Dispose() noexcept
 bool SdlInput::UpdateKeys()
 {
 	UpdateSdlEvents();
-	return g_sdlEvent.type == SDL_KEYDOWN;
+	if (g_sdlEvent.type == SDL_KEYDOWN)
+	{
+		if (g_sdlEvent.key.keysym.sym == SDLK_RETURN) {
+			if (m_resetClbk) m_resetClbk(m_resetClbkArg);
+		}
+
+		else if (g_sdlEvent.key.keysym.sym == SDLK_ESCAPE) {
+			if (m_escapeClbk) m_escapeClbk(m_escapeClbkArg);
+		}
+
+		return true;
+	}
 	
+	return false;
 }
 
 
@@ -129,6 +141,6 @@ void SdlInput::SetResetCallback(void* arg, ResetCallback callback) {
 }
 
 void SdlInput::SetEscapeCallback(void* arg, EscapeCallback callback) {
-	m_resetClbkArg = arg;
+	m_escapeClbkArg = arg;
 	m_escapeClbk = callback;
 }

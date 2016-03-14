@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 	chip8Cpu->setInstrPerSec(358); /* 358hz */
 	chip8Cpu->setFramesPerSec(60);
 	
-	while (!chip8Cpu->wantToExit())
+	while (!chip8Cpu->getExitFlag())
 	{
 		chip8Cpu->haltForNextFlag();
 
