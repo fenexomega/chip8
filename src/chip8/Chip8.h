@@ -61,27 +61,29 @@ private:
 	static bool waitKeyPressCallback(void*);
 
 private:
+	bool m_exitFlag;
 	bool m_drawFlag;
 	bool m_instrFlag;
-	bool m_exitFlag;
 	size_t m_gfxBytes;
 	resolution_t m_gfxResolution;
-	
-	uint8_t* m_memory;
-	uint32_t* m_gfx;
+		
+	uint8_t m_delayTimer;
+	uint8_t m_soundTimer;
+
 	iRenderer* m_renderer;
 	iInput*	m_input;
 	
-	uint8_t m_V[V_REGISTERS_MAX];
-	uint8_t m_delayTimer;
-	uint8_t m_soundTimer;
-	uint8_t m_sp;	
+	
+	uint8_t* m_memory; /* also used to check if need to dispose ( when not nullptr ) */
+	uint32_t* m_gfx;   /* graphics array */
 	uint16_t m_opcode;
-	uint16_t m_I;
-	uint16_t m_pc;
-	uint16_t m_stack[STACK_MAX];
-
-
+	uint16_t m_pc;  
+	
+	uint16_t m_I;      /* index register    */
+	uint8_t* m_V;      /* registers V0 - VF */
+	uint16_t* m_stack; /* stack array       */
+	uint8_t m_sp;      /* stack index       */
+	
 	struct {
 		Timer instr;
 		Timer frame;

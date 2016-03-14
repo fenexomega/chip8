@@ -101,10 +101,12 @@ bool Chip8::initialize(iRenderer* rend, iInput* input)
 
 	m_memory = new(std::nothrow) uint8_t[MEMORY_MAX];
 	m_gfx    = new(std::nothrow) uint32_t[m_gfxResolution];
+	m_V      = new(std::nothrow) uint8_t[V_REGISTERS_MAX];
+	m_stack  = new(std::nothrow) uint16_t[STACK_MAX];
 	m_gfxBytes = (m_gfxResolution * sizeof(uint32_t));
 
 
-	if ( !m_memory || !m_gfx )
+	if (!m_memory || !m_gfx || !m_V || !m_stack)
 	{
 		LOGerr("Cannot allocate memory for GFX or emulated Memory, interrupting Chip8 instance.");
 		this->dispose();
@@ -113,10 +115,12 @@ bool Chip8::initialize(iRenderer* rend, iInput* input)
 	}
 
 	std::srand(static_cast<unsigned int>(std::time(0)));             // seed rand
-	std::memset(m_gfx, 0, m_gfxResolution * sizeof(uint32_t));       // Clear display
-	std::memset(m_stack, 0, STACK_MAX * sizeof(uint16_t));           // Clear stack
-	std::memset(m_V, 0, V_REGISTERS_MAX * sizeof(uint8_t));          // Clear registers V0-VF
 	std::memset(m_memory, 0, MEMORY_MAX * sizeof(uint8_t));          // Clear memory
+	std::memset(m_gfx, 0, m_gfxResolution * sizeof(uint32_t));       // Clear display
+	std::memset(m_V, 0, V_REGISTERS_MAX * sizeof(uint8_t));          // Clear registers V0-VF
+	std::memset(m_stack, 0, STACK_MAX * sizeof(uint16_t));           // Clear stack
+	
+	
 
 						
 	// Load fontset
@@ -174,9 +178,11 @@ void Chip8::dispose() noexcept
 
 	delete m_input;
 	delete m_renderer;
+	delete[] m_stack;
+	delete[] m_V;
 	delete[] m_gfx;
 	delete[] m_memory;
-	m_memory = nullptr; /* used to check if need to dispose */
+	m_memory = nullptr; 
 }
 
 

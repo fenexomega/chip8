@@ -77,7 +77,7 @@ void Chip8Instructions::op_0xxx(Chip8* const chip)
 
 		case 0x00EE: // return from a subroutine ( unwind stack )
 			chip->m_pc = chip->m_stack[--chip->m_sp];
-			if(chip->m_sp > 16) {
+			if(chip->m_sp > Chip8::STACK_MAX) {
 				LOGerr("Stack Underflow");
 				chip->m_exitFlag = true;
 			}
@@ -106,7 +106,7 @@ void Chip8Instructions::op_2NNN(Chip8 *const chip)
 	chip->m_stack[chip->m_sp++] = chip->m_pc;
 	chip->m_pc = NNN;
 
-	if (chip->m_sp >= 16) {
+	if (chip->m_sp >= Chip8::STACK_MAX) {
 		LOGerr("Stack Overflow!");
 		chip->m_exitFlag = true;
 	}
